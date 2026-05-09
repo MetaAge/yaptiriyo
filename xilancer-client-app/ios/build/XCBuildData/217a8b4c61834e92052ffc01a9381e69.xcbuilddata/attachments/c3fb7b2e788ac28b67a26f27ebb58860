@@ -1,0 +1,21 @@
+{
+  "" : {
+    "const-values" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherTweetNacl.build/Objects-normal/arm64/PusherTweetNacl-primary.swiftconstvalues",
+    "dependencies" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherTweetNacl.build/Objects-normal/arm64/PusherTweetNacl-primary.d",
+    "diagnostics" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherTweetNacl.build/Objects-normal/arm64/PusherTweetNacl-primary.dia",
+    "emit-module-dependencies" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherTweetNacl.build/Objects-normal/arm64/PusherTweetNacl-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherTweetNacl.build/Objects-normal/arm64/PusherTweetNacl-primary-emit-module.dia",
+    "pch" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherTweetNacl.build/Objects-normal/arm64/PusherTweetNacl-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherTweetNacl.build/Objects-normal/arm64/PusherTweetNacl-primary.swiftdeps"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherTweetNacl/Sources/TweetNacl/Constant.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherTweetNacl.build/Objects-normal/arm64/Constant.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherTweetNacl.build/Objects-normal/arm64/Constant.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherTweetNacl.build/Objects-normal/arm64/Constant.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherTweetNacl/Sources/TweetNacl/TweetNacl.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherTweetNacl.build/Objects-normal/arm64/TweetNacl.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherTweetNacl.build/Objects-normal/arm64/TweetNacl.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherTweetNacl.build/Objects-normal/arm64/TweetNacl.o"
+  }
+}

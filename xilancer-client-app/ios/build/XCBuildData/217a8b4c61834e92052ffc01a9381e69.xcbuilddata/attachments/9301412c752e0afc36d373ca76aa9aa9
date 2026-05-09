@@ -1,0 +1,226 @@
+{
+  "" : {
+    "const-values" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherSwift-primary.swiftconstvalues",
+    "dependencies" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherSwift-primary.d",
+    "diagnostics" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherSwift-primary.dia",
+    "emit-module-dependencies" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherSwift-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherSwift-primary-emit-module.dia",
+    "pch" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherSwift-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherSwift-primary.swiftdeps"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/Extensions/PusherChannel+EncryptionHelpers.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherChannel+EncryptionHelpers.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherChannel+EncryptionHelpers.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherChannel+EncryptionHelpers.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/Extensions/PusherConnection+WebsocketDelegate.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherConnection+WebsocketDelegate.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherConnection+WebsocketDelegate.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherConnection+WebsocketDelegate.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/Extensions/URL+Pusher.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/URL+Pusher.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/URL+Pusher.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/URL+Pusher.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/Helpers/Crypto.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/Crypto.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/Crypto.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/Crypto.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/Helpers/EventParser.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/EventParser.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/EventParser.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/EventParser.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/Helpers/Logger.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/Logger.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/Logger.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/Logger.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/Models/AuthError.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/AuthError.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/AuthError.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/AuthError.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/Models/AuthMethod.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/AuthMethod.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/AuthMethod.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/AuthMethod.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/Models/ChannelsProtocolCloseCode.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/ChannelsProtocolCloseCode.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/ChannelsProtocolCloseCode.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/ChannelsProtocolCloseCode.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/Models/ConnectionState.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/ConnectionState.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/ConnectionState.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/ConnectionState.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/Models/Constants.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/Constants.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/Constants.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/Constants.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/Models/EventError.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/EventError.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/EventError.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/EventError.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/Models/EventHandler.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/EventHandler.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/EventHandler.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/EventHandler.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/Models/PusherAuth.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherAuth.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherAuth.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherAuth.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/Models/PusherChannel.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherChannel.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherChannel.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherChannel.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/Models/PusherChannelType.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherChannelType.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherChannelType.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherChannelType.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/Models/PusherChannels.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherChannels.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherChannels.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherChannels.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/Models/PusherClientOptions.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherClientOptions.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherClientOptions.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherClientOptions.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/Models/PusherError.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherError.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherError.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherError.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/Models/PusherEvent.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherEvent.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherEvent.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherEvent.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/Models/PusherGlobalChannel.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherGlobalChannel.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherGlobalChannel.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherGlobalChannel.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/Models/PusherHost.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherHost.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherHost.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherHost.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/Models/PusherPresenceChannel.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherPresenceChannel.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherPresenceChannel.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherPresenceChannel.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/Models/PusherPresenceChannelMember.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherPresenceChannelMember.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherPresenceChannelMember.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherPresenceChannelMember.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/Models/QueuedClientEvent.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/QueuedClientEvent.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/QueuedClientEvent.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/QueuedClientEvent.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/ObjC/AuthMethod+ObjectiveC.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/AuthMethod+ObjectiveC.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/AuthMethod+ObjectiveC.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/AuthMethod+ObjectiveC.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/ObjC/OCAuthMethod.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/OCAuthMethod.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/OCAuthMethod.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/OCAuthMethod.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/ObjC/OCPusherHost.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/OCPusherHost.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/OCPusherHost.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/OCPusherHost.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/ObjC/Pusher+ObjectiveC.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/Pusher+ObjectiveC.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/Pusher+ObjectiveC.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/Pusher+ObjectiveC.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/ObjC/PusherClientOptions+ObjectiveC.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherClientOptions+ObjectiveC.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherClientOptions+ObjectiveC.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherClientOptions+ObjectiveC.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/ObjC/PusherConnection+ObjectiveC.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherConnection+ObjectiveC.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherConnection+ObjectiveC.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherConnection+ObjectiveC.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/ObjC/PusherError+ObjectiveC.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherError+ObjectiveC.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherError+ObjectiveC.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherError+ObjectiveC.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/ObjC/PusherHost+ObjectiveC.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherHost+ObjectiveC.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherHost+ObjectiveC.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherHost+ObjectiveC.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/Protocols/AuthRequestBuilderProtocol.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/AuthRequestBuilderProtocol.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/AuthRequestBuilderProtocol.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/AuthRequestBuilderProtocol.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/Protocols/Authorizer.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/Authorizer.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/Authorizer.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/Authorizer.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/Protocols/EventFactory.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/EventFactory.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/EventFactory.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/EventFactory.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/Protocols/EventQueue.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/EventQueue.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/EventQueue.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/EventQueue.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/Protocols/EventQueueDelegate.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/EventQueueDelegate.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/EventQueueDelegate.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/EventQueueDelegate.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/Protocols/PusherDelegate.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherDelegate.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherDelegate.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherDelegate.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/PusherSwift.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherSwift.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherSwift.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherSwift.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/Services/ChannelEventFactory.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/ChannelEventFactory.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/ChannelEventFactory.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/ChannelEventFactory.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/Services/ChannelEventQueue.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/ChannelEventQueue.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/ChannelEventQueue.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/ChannelEventQueue.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/PusherSwift/Sources/Services/PusherConnection.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherConnection.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherConnection.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/PusherSwift.build/Objects-normal/arm64/PusherConnection.o"
+  }
+}

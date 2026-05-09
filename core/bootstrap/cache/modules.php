@@ -1,0 +1,47 @@
+<?php return array (
+  'providers' => 
+  array (
+    0 => 'Modules\\Blog\\Providers\\BlogServiceProvider',
+    1 => 'Modules\\Chat\\Providers\\ChatServiceProvider',
+    2 => 'Modules\\CountryManage\\Providers\\CountryManageServiceProvider',
+    3 => 'Modules\\EmailTemplate\\Providers\\EmailTemplateServiceProvider',
+    4 => 'Modules\\Faq\\Providers\\FaqServiceProvider',
+    5 => 'Modules\\FreelancerChatController\\Providers\\FreelancerChatControllerServiceProvider',
+    6 => 'Modules\\GeneralSettings\\Providers\\GeneralSettingsServiceProvider',
+    7 => 'Modules\\Integrations\\Providers\\IntegrationsServiceProvider',
+    8 => 'Modules\\NewsLetter\\Providers\\NewsLetterServiceProvider',
+    9 => 'Modules\\Pages\\Providers\\PagesServiceProvider',
+    10 => 'Modules\\PaymentGatewaySettings\\Providers\\PaymentGatewaySettingsServiceProvider',
+    11 => 'Modules\\PluginManage\\Providers\\PluginManageServiceProvider',
+    12 => 'Modules\\PromoteFreelancer\\Providers\\PromoteFreelancerServiceProvider',
+    13 => 'Modules\\RolePermission\\Providers\\RolePermissionServiceProvider',
+    14 => 'Modules\\Service\\Providers\\ServiceServiceProvider',
+    15 => 'Modules\\Subscription\\Providers\\SubscriptionServiceProvider',
+    16 => 'Modules\\SupportTicket\\Providers\\SupportTicketServiceProvider',
+    17 => 'Modules\\Wallet\\Providers\\WalletServiceProvider',
+  ),
+  'eager' => 
+  array (
+    0 => 'Modules\\Blog\\Providers\\BlogServiceProvider',
+    1 => 'Modules\\Chat\\Providers\\ChatServiceProvider',
+    2 => 'Modules\\CountryManage\\Providers\\CountryManageServiceProvider',
+    3 => 'Modules\\EmailTemplate\\Providers\\EmailTemplateServiceProvider',
+    4 => 'Modules\\Faq\\Providers\\FaqServiceProvider',
+    5 => 'Modules\\FreelancerChatController\\Providers\\FreelancerChatControllerServiceProvider',
+    6 => 'Modules\\GeneralSettings\\Providers\\GeneralSettingsServiceProvider',
+    7 => 'Modules\\Integrations\\Providers\\IntegrationsServiceProvider',
+    8 => 'Modules\\NewsLetter\\Providers\\NewsLetterServiceProvider',
+    9 => 'Modules\\Pages\\Providers\\PagesServiceProvider',
+    10 => 'Modules\\PaymentGatewaySettings\\Providers\\PaymentGatewaySettingsServiceProvider',
+    11 => 'Modules\\PluginManage\\Providers\\PluginManageServiceProvider',
+    12 => 'Modules\\PromoteFreelancer\\Providers\\PromoteFreelancerServiceProvider',
+    13 => 'Modules\\RolePermission\\Providers\\RolePermissionServiceProvider',
+    14 => 'Modules\\Service\\Providers\\ServiceServiceProvider',
+    15 => 'Modules\\Subscription\\Providers\\SubscriptionServiceProvider',
+    16 => 'Modules\\SupportTicket\\Providers\\SupportTicketServiceProvider',
+    17 => 'Modules\\Wallet\\Providers\\WalletServiceProvider',
+  ),
+  'deferred' => 
+  array (
+  ),
+);

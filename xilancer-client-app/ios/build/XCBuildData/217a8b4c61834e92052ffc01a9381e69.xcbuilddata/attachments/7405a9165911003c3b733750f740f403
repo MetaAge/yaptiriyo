@@ -1,0 +1,5 @@
+
+module StripePaymentSheet.Swift {
+  header "StripePaymentSheet-Swift.h"
+  requires objc
+}

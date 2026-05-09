@@ -1,0 +1,41 @@
+PHP Deprecated:  Non-canonical cast (boolean) is deprecated, use the (bool) cast instead in /Users/ahmetsahin/Desktop/xilancer/core/app/Helper/helpers.php on line 150
+
+Deprecated: Non-canonical cast (boolean) is deprecated, use the (bool) cast instead in /Users/ahmetsahin/Desktop/xilancer/core/app/Helper/helpers.php on line 150
+PHP Deprecated:  Constant PDO::MYSQL_ATTR_SSL_CA is deprecated since 8.5, use Pdo\Mysql::ATTR_SSL_CA instead in /Users/ahmetsahin/Desktop/xilancer/core/vendor/laravel/framework/config/database.php on line 64
+
+Deprecated: Constant PDO::MYSQL_ATTR_SSL_CA is deprecated since 8.5, use Pdo\Mysql::ATTR_SSL_CA instead in /Users/ahmetsahin/Desktop/xilancer/core/vendor/laravel/framework/config/database.php on line 64
+PHP Deprecated:  Constant PDO::MYSQL_ATTR_SSL_CA is deprecated since 8.5, use Pdo\Mysql::ATTR_SSL_CA instead in /Users/ahmetsahin/Desktop/xilancer/core/vendor/laravel/framework/config/database.php on line 84
+
+Deprecated: Constant PDO::MYSQL_ATTR_SSL_CA is deprecated since 8.5, use Pdo\Mysql::ATTR_SSL_CA instead in /Users/ahmetsahin/Desktop/xilancer/core/vendor/laravel/framework/config/database.php on line 84
+PHP Deprecated:  Constant PDO::MYSQL_ATTR_SSL_CA is deprecated since 8.5, use Pdo\Mysql::ATTR_SSL_CA instead in /Users/ahmetsahin/Desktop/xilancer/core/config/database.php on line 62
+
+Deprecated: Constant PDO::MYSQL_ATTR_SSL_CA is deprecated since 8.5, use Pdo\Mysql::ATTR_SSL_CA instead in /Users/ahmetsahin/Desktop/xilancer/core/config/database.php on line 62
+
+   INFO  Running migrations.  
+
+  2023_09_12_105849_add_last_apply_date_and_last_seen_to_jobs_table  30.84ms FAIL
+
+   Illuminate\Database\QueryException 
+
+  SQLSTATE[42S21]: Column already exists: 1060 Duplicate column name 'job_approve_request' (Connection: mysql, SQL: alter table `job_posts` add `job_approve_request` tinyint not null default '0' comment '0=request for approve, 1=approve, 2=decline, 2=2 will change to 0 when the user edit the project.' after `on_off`)
+
+  at vendor/laravel/framework/src/Illuminate/Database/Connection.php:824
+    820▕                     $this->getName(), $query, $this->prepareBindings($bindings), $e
+    821▕                 );
+    822▕             }
+    823▕ 
+  ➜ 824▕             throw new QueryException(
+    825▕                 $this->getName(), $query, $this->prepareBindings($bindings), $e
+    826▕             );
+    827▕         }
+    828▕     }
+
+      [2m+9 vendor frames [22m
+
+  10  database/migrations/2023_09_12_105849_add_last_apply_date_and_last_seen_to_jobs_table.php:16
+      Illuminate\Support\Facades\Facade::__callStatic("table")
+      [2m+25 vendor frames [22m
+
+  36  artisan:35
+      Illuminate\Foundation\Console\Kernel::handle(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+

@@ -1,0 +1,32 @@
+/Users/ahmetsahin/.pub-cache/hosted/pub.dev/stripe_ios-11.4.0/ios/stripe_ios/Sources/stripe_ios/AddressSheetFactory.swift
+/Users/ahmetsahin/.pub-cache/hosted/pub.dev/stripe_ios-11.4.0/ios/stripe_ios/Sources/stripe_ios/Stripe\ Sdk/AddressSheet/AddressSheetUtils.swift
+/Users/ahmetsahin/.pub-cache/hosted/pub.dev/stripe_ios-11.4.0/ios/stripe_ios/Sources/stripe_ios/Stripe\ Sdk/AddressSheet/AddressSheetView.swift
+/Users/ahmetsahin/.pub-cache/hosted/pub.dev/stripe_ios-11.4.0/ios/stripe_ios/Sources/stripe_ios/AddToWalletButtonFactory.swift
+/Users/ahmetsahin/.pub-cache/hosted/pub.dev/stripe_ios-11.4.0/ios/stripe_ios/Sources/stripe_ios/Stripe\ Sdk/pushprovisioning/AddToWalletButtonView.swift
+/Users/ahmetsahin/.pub-cache/hosted/pub.dev/stripe_ios-11.4.0/ios/stripe_ios/Sources/stripe_ios/ApplePayButtonView.swift
+/Users/ahmetsahin/.pub-cache/hosted/pub.dev/stripe_ios-11.4.0/ios/stripe_ios/Sources/stripe_ios/Stripe\ Sdk/ApplePayUtils.swift
+/Users/ahmetsahin/.pub-cache/hosted/pub.dev/stripe_ios-11.4.0/ios/stripe_ios/Sources/stripe_ios/Stripe\ Sdk/ApplePayViewController.swift
+/Users/ahmetsahin/.pub-cache/hosted/pub.dev/stripe_ios-11.4.0/ios/stripe_ios/Sources/stripe_ios/AuBECSDebitFormFactory.swift
+/Users/ahmetsahin/.pub-cache/hosted/pub.dev/stripe_ios-11.4.0/ios/stripe_ios/Sources/stripe_ios/Stripe\ Sdk/AuBECSDebitFormView.swift
+/Users/ahmetsahin/.pub-cache/hosted/pub.dev/stripe_ios-11.4.0/ios/stripe_ios/Sources/stripe_ios/CardFieldFactory.swift
+/Users/ahmetsahin/.pub-cache/hosted/pub.dev/stripe_ios-11.4.0/ios/stripe_ios/Sources/stripe_ios/Stripe\ Sdk/CardFieldView.swift
+/Users/ahmetsahin/.pub-cache/hosted/pub.dev/stripe_ios-11.4.0/ios/stripe_ios/Sources/stripe_ios/CardFormFactory.swift
+/Users/ahmetsahin/.pub-cache/hosted/pub.dev/stripe_ios-11.4.0/ios/stripe_ios/Sources/stripe_ios/Stripe\ Sdk/CardFormView.swift
+/Users/ahmetsahin/.pub-cache/hosted/pub.dev/stripe_ios-11.4.0/ios/stripe_ios/Sources/stripe_ios/Stripe\ Sdk/CustomerSheet/CustomerSheetUtils.swift
+/Users/ahmetsahin/.pub-cache/hosted/pub.dev/stripe_ios-11.4.0/ios/stripe_ios/Sources/stripe_ios/Stripe\ Sdk/Errors.swift
+/Users/ahmetsahin/.pub-cache/hosted/pub.dev/stripe_ios-11.4.0/ios/stripe_ios/Sources/stripe_ios/Stripe\ Sdk/FinancialConnections.swift
+/Users/ahmetsahin/.pub-cache/hosted/pub.dev/stripe_ios-11.4.0/ios/stripe_ios/Sources/stripe_ios/Stripe\ Sdk/Mappers.swift
+/Users/ahmetsahin/.pub-cache/hosted/pub.dev/stripe_ios-11.4.0/ios/stripe_ios/Sources/stripe_ios/Stripe\ Sdk/PaymentMethodFactory.swift
+/Users/ahmetsahin/.pub-cache/hosted/pub.dev/stripe_ios-11.4.0/ios/stripe_ios/Sources/stripe_ios/Stripe\ Sdk/PaymentPassFinder.swift
+/Users/ahmetsahin/.pub-cache/hosted/pub.dev/stripe_ios-11.4.0/ios/stripe_ios/Sources/stripe_ios/Stripe\ Sdk/PaymentSheetAppearance.swift
+/Users/ahmetsahin/.pub-cache/hosted/pub.dev/stripe_ios-11.4.0/ios/stripe_ios/Sources/stripe_ios/Stripe\ Sdk/pushprovisioning/PushProvisioningUtils.swift
+/Users/ahmetsahin/.pub-cache/hosted/pub.dev/stripe_ios-11.4.0/ios/stripe_ios/Sources/stripe_ios/RCTBridge.swift
+/Users/ahmetsahin/.pub-cache/hosted/pub.dev/stripe_ios-11.4.0/ios/stripe_ios/Sources/stripe_ios/Stripe\ Sdk/CustomerSheet/ReactNativeCustomerAdapter.swift
+/Users/ahmetsahin/.pub-cache/hosted/pub.dev/stripe_ios-11.4.0/ios/stripe_ios/Sources/stripe_ios/Stripe\ Sdk/StripeContainerView.swift
+/Users/ahmetsahin/.pub-cache/hosted/pub.dev/stripe_ios-11.4.0/ios/stripe_ios/Sources/stripe_ios/StripeIosPlugin.swift
+/Users/ahmetsahin/.pub-cache/hosted/pub.dev/stripe_ios-11.4.0/ios/stripe_ios/Sources/stripe_ios/StripePlugin.swift
+/Users/ahmetsahin/.pub-cache/hosted/pub.dev/stripe_ios-11.4.0/ios/stripe_ios/Sources/stripe_ios/StripePlugin+PayPlugin.swift
+/Users/ahmetsahin/.pub-cache/hosted/pub.dev/stripe_ios-11.4.0/ios/stripe_ios/Sources/stripe_ios/Stripe\ Sdk/StripeSdk.swift
+/Users/ahmetsahin/.pub-cache/hosted/pub.dev/stripe_ios-11.4.0/ios/stripe_ios/Sources/stripe_ios/Stripe\ Sdk/StripeSdk+CustomerSheet.swift
+/Users/ahmetsahin/.pub-cache/hosted/pub.dev/stripe_ios-11.4.0/ios/stripe_ios/Sources/stripe_ios/Stripe\ Sdk/StripeSdk+PaymentSheet.swift
+/Users/ahmetsahin/.pub-cache/hosted/pub.dev/stripe_ios-11.4.0/ios/stripe_ios/Sources/stripe_ios/Stripe\ Sdk/UIColorExtension.swift

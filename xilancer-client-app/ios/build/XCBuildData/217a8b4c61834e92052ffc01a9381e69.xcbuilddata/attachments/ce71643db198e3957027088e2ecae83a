@@ -1,0 +1,176 @@
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/New\ Payment\ Method\ Screen/AddPaymentMethodViewController.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/ViewControllers/AutoComplete/AddressSearchResult.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/AddressViewController/AddressViewController.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/AddressViewController/AddressViewController+Configuration.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Views/AffirmCopyLabel.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Views/AfterpayPriceBreakdownView.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Views/Appearance+FontScaling.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Views/AUBECSMandate.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/ViewControllers/AutoComplete/AutoCompleteViewController.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Views/BacsDDMandateView.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/USBankAccount/BankAccountInfoView.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Helpers/BoolReference.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/ViewControllers/BottomSheet3DS2ViewController.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/BottomSheet/BottomSheetPresentable.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/BottomSheet/BottomSheetPresentationAnimator.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/BottomSheet/BottomSheetPresentationController.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/BottomSheet/BottomSheetTransitioningDelegate.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/ViewControllers/BottomSheetViewController.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Internal/API\ Bindings/VO/CardExpiryDate.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Views/CardScanButton.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Views/CardScanningView.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Elements/CardSection/CardSectionElement.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Elements/CardSection/CardSectionWithScannerView.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Views/CircularButton.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Views/ConfirmButton.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Elements/ConnectionsElement.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Internal/API\ Bindings/Link/ConsumerSession.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Internal/API\ Bindings/Link/ConsumerSession+LookupResponse.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Internal/API\ Bindings/Link/ConsumerSession+PublishableKey.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/CustomerAdapter/CustomerAdapter.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/CustomerSheet/CustomerAddPaymentMethodViewController.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/CustomerAdapter/CustomerPaymentOption.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/CustomerSheet/CustomerSavedPaymentMethodsCollectionViewController.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/CustomerSheet/CustomerSavedPaymentMethodsViewController.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Internal/API\ Bindings/v1-elements-sessions/CustomerSession.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/CustomerSessionAdapter/CustomerSessionAdapter.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/CustomerSheet/CustomerSheet.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/CustomerSheet/CustomerSheet+API.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/CustomerSheet/CustomerSheet+PaymentMethodAvailability.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/CustomerSheet/CustomerSheet+SwiftUI.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/CustomerSheet/CustomerSheetConfiguration.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/CustomerSheet/CustomerSheetDataSource.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/CustomerSheet/CustomerSheetError.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Views/CVCPaymentMethodInformationView.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Elements/CardSection/CVCRecollectionElement.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Views/CVCRecollectionView.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/ViewControllers/CVCReconfirmationVerticalViewController.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/ViewControllers/CVCReconfirmationViewController.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Categories/Data+SHA256.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Helpers/DownloadManager.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Internal/API\ Bindings/v1-elements-sessions/ElementsCustomer.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Error+PaymentSheet.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Internal/API\ Bindings/v1-elements-sessions/ExternalPaymentMethod.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Internal/Link/Extensions/FormElement+Link.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Vertical\ Main\ Screen/FormHeaderView.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/PaymentSheetFormFactory/FormSpec/FormSpec.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/PaymentSheetFormFactory/FormSpec/FormSpecProvider.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Elements/CardSection/HostedSurface.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Helpers/Images.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Internal/Link/ACH/InstantDebitsOnlyFinancialConnectionsAuthManager.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/USBankAccount/InstantDebitsPaymentMethodElement.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Intent.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Internal/Link/Extensions/Intent+Link.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/IntentConfirmParams.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Helpers/IntentStatusPoller.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Internal/Link/Verification/LinkAccountContext.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Internal/Link/Services/LinkAccountService.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Internal/Link/Verification/LinkCookieKey.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Internal/Link/Elements/LinkEmailElement.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Internal/Link/Elements/InlineSignup/LinkInlineSignupElement.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Internal/Link/Elements/InlineSignup/LinkInlineSignupView.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Internal/Link/Elements/InlineSignup/LinkInlineSignupView-CheckboxElement.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Internal/Link/ViewModels/LinkInlineSignupViewModel.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Internal/Link/Views/LinkLegalTermsView.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Internal/Link/Views/LinkMoreInfoView.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Link/LinkPaymentController.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Internal/Link/Utils/LinkPopupURLParser.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Internal/Link/LinkUI.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Internal/Link/Utils/LinkURLGenerator.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/ViewControllers/LoadingViewController.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Internal/Link/Utils/Locale+Link.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Views/ManualEntryButton.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Categories/NSAttributedString+Stripe.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Internal/Link/Utils/OperationDebouncer.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Internal/API\ Bindings/Link/PaymentDetails.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Internal/API\ Bindings/Link/PaymentDetailsShareResponse.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Elements/PaymentMethodElement/PaymentMethodElement.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Elements/PaymentMethodElement/PaymentMethodElementWrapper.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/ViewControllers/PaymentMethodFormViewController.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/PaymentMethodType.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/New\ Payment\ Method\ Screen/PaymentMethodTypeCollectionView.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Views/PaymentMethodTypeImageView.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/PaymentOption+Images.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/PaymentSheet.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/PaymentSheet+API.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/PaymentSheet+DeferredAPI.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/PaymentSheet+PaymentMethodAvailability.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/PaymentSheet+SwiftUI.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Link/PaymentSheet-LinkConfirmOption.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Analytics/PaymentSheetAnalyticsHelper.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/PaymentSheetAppearance.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/PaymentSheetConfiguration.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/PaymentSheetDeferredValidator.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/PaymentSheetError.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/PaymentSheetFlowController.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/ViewControllers/PaymentSheetFlowControllerViewController.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/PaymentSheetFormFactory/PaymentSheetFormFactory.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/PaymentSheetFormFactory/PaymentSheetFormFactory+BLIK.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/PaymentSheetFormFactory/PaymentSheetFormFactory+Boleto.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/PaymentSheetFormFactory/PaymentSheetFormFactory+Card.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/PaymentSheetFormFactory/PaymentSheetFormFactory+FormSpec.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/PaymentSheetFormFactory/PaymentSheetFormFactory+Mandates.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/PaymentSheetFormFactory/PaymentSheetFormFactory+OXXO.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/PaymentSheetFormFactory/PaymentSheetFormFactory+UPI.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/PaymentSheetFormFactory/PaymentSheetFormFactoryConfig.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/PaymentSheetIntentConfiguration.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Helpers/PaymentSheetLinkAccount.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/PaymentSheetLoader.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Views/PaymentSheetUIKitAdditions.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/ViewControllers/PaymentSheetVerticalViewController.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/ViewControllers/PaymentSheetViewController.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Views/PayWithLinkButton.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Link/PayWithLinkController.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Internal/Link/Controllers/PayWithLinkWebController.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/ViewControllers/PollingViewController.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/ViewControllers/PollingViewModel.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Vertical\ Main\ Screen/RightAccessoryButton.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Views/RotatingCardBrandsView.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Vertical\ Main\ Screen/RowButton.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Saved\ Payment\ Method\ Screen/SavedPaymentMethodCollectionView.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Helpers/SavedPaymentMethodManager.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Saved\ Payment\ Method\ Screen/Vertical\ Saved\ Payment\ Method\ Screen/SavedPaymentMethodRowButton.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Saved\ Payment\ Method\ Screen/SavedPaymentOptionsViewController.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/ViewControllers/SepaMandateViewController.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Internal/Basic\ UI/SeparatorLabel.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Views/ShadowedRoundedRectangleView.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Views/SheetNavigationBar.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Views/SheetNavigationButton.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Elements/SimpleMandateElement.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Views/SimpleMandateTextView.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Analytics/STPAnalyticsClient+Address.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Analytics/STPAnalyticsClient+CustomerSheet.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Internal/Link/Extensions/STPAnalyticsClient+Link.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Analytics/STPAnalyticsClient+LUXE.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/STPAnalyticsClient+PaymentSheet.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Internal/API\ Bindings/Link/STPAPIClient+Link.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Internal/API\ Bindings/STPAPIClient+PaymentSheet.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/STPApplePayContext+PaymentSheet.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Helpers/STPCameraView.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Internal/API\ Bindings/v1-elements-sessions/STPCardBrandChoice.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Helpers/STPCardScanner.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Internal/API\ Bindings/v1-elements-sessions/STPElementsSession.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Helpers/STPImageLibrary.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Helpers/STPLocalizedString.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/STPPaymentIntentShippingDetailsParams+PaymentSheet.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Categories/STPPaymentMethod+PaymentSheet.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Categories/STPPaymentMethodParams+PaymentSheet.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Helpers/STPStringUtils.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/ViewControllers/AutoComplete/String+AutoComplete.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Categories/String+Localized.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Categories/String+StripePaymentSheet.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Helpers/StripePaymentSheet+Exports.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Helpers/StripePaymentSheetBundleLocator.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Views/TestModeView.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Elements/TextField/TextFieldElement+Card.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Elements/TextField/TextFieldElement+IBAN.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Categories/UIApplication+StripePaymentSheet.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Internal/Link/Extensions/UIColor+Link.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/BottomSheet/UIViewController+BottomSheet.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/ViewControllers/UpdateCardViewController.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/USBankAccount/USBankAccountPaymentMethodElement.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/CustomerAdapter/UserDefaults+StripePaymentSheet.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/Internal/API\ Bindings/Link/VerificationSession.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Vertical\ Main\ Screen/VerticalPaymentMethodListViewController.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/Saved\ Payment\ Method\ Screen/Vertical\ Saved\ Payment\ Method\ Screen/VerticalSavedPaymentMethodsViewController.swift
+/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/StripePaymentSheet/StripePaymentSheet/StripePaymentSheet/Source/PaymentSheet/New\ Payment\ Method\ Screen/WalletHeaderView.swift

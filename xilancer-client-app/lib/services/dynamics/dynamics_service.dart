@@ -1,0 +1,108 @@
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:xilancer/helper/constant_helper.dart';
+import 'package:xilancer/helper/extension/string_extension.dart';
+import 'package:xilancer/services/user_mode_service.dart';
+
+import '../../../customizations.dart' as cus;
+import '../../data/network/network_api_services.dart';
+import '../../helper/app_urls.dart';
+
+class DynamicsService with ChangeNotifier {
+  bool onceRebuilt = false;
+  bool isDarkMode = false;
+
+  Color get primaryColor =>
+      UserModeService.instance.isFreelancer ? cus.softRed : cus.softBlue;
+  Color get whiteColor => isDarkMode ? const Color(0xff121212) : cus.whiteColor;
+  Color get blackColor => isDarkMode ? cus.whiteColor : cus.blackColor;
+  Color get hintColor => cus.hintColor;
+  Color get borderColor => cus.borderColor;
+  Color get secondaryColor => cus.secondaryColor;
+  Color get warningColor => cus.warningColor;
+  Color get greenColor => cus.greenColor;
+  Color get yellowColor => cus.yellowColor;
+  Color get gOneColor =>
+      UserModeService.instance.isFreelancer ? const Color(0xFFFF8E8E) : const Color(0xFF6B8EFF);
+  Color get gTwoColor =>
+      UserModeService.instance.isFreelancer ? const Color(0xFFFAA500) : cus.gOneColor;
+  Color get softBlue => cus.softBlue;
+  Color get softRed => cus.softRed;
+  List<Color> get chatAvatarBGColors => cus.chatAvatarBGColors;
+  List<Color> get statusColors => cus.statusColors;
+
+  bool _noConnection = false;
+
+  String languageSlug = 'en_GB';
+
+  bool currencyRight = false;
+  bool textDirectionRight = false;
+  String currencySymbol = "\$";
+  String currencyCode = "USD";
+  num toUsdConversionRate = 1;
+  get noConnection => _noConnection;
+  get appLocal =>
+      Locale(languageSlug.substring(0, 2), languageSlug.substring(3));
+
+  List gridColors = [
+    const Color(0xffE6F5DD),
+    const Color(0xffFEF4EC),
+    const Color(0xffF1F0FF),
+    const Color(0xffDDF4FF),
+  ];
+
+  Color get black9 => isDarkMode ? const Color(0xff1C1C1E) : const Color(0xffF2F4F7);
+  Color get black8 => isDarkMode ? const Color(0xff2C2C2E) : const Color(0xffEAECF0);
+  Color get black7 => isDarkMode ? const Color(0xff3A3A3E) : const Color(0xffD0D5DD);
+  Color get black6 => isDarkMode ? const Color(0xff68686B) : const Color(0xff98A2B3);
+  Color get black5 => isDarkMode ? const Color(0xff8E8E93) : const Color(0xff667085);
+  Color get black4 => isDarkMode ? const Color(0xffAEAEB2) : const Color(0xff475467);
+  Color get black3 => isDarkMode ? const Color(0xffC7C7CC) : const Color(0xff344054);
+  Color get black2 => isDarkMode ? const Color(0xffE5E5EA) : const Color(0xff1D2939);
+
+  Color get primary05 => primaryColor.withOpacity(.05);
+  Color get primary10 => primaryColor.withOpacity(.10);
+  Color get primary20 => primaryColor.withOpacity(.20);
+  Color get primary40 => primaryColor.withOpacity(.40);
+  Color get primary60 => primaryColor.withOpacity(.60);
+  Color get primary70 => primaryColor.withOpacity(.70);
+  Color get primary80 => primaryColor.withOpacity(.80);
+
+  setNoConnection(value) {
+    if (value == noConnection) {
+      return;
+    }
+    _noConnection = value;
+    notifyListeners();
+  }
+
+  getColors() async {
+    if (onceRebuilt) return;
+    onceRebuilt = true;
+    final prefs = await SharedPreferences.getInstance();
+    isDarkMode = prefs.getBool('isDarkMode') ?? false;
+    final responseData = await NetworkApiServices().getApi(
+      AppUrls.currencyLanguageUrl,
+      null,
+      headers: acceptJsonAuthHeader,
+    );
+    if (responseData != null) {
+      languageSlug = responseData["languages"]?["slug"] ?? "en_GB";
+      currencyRight = responseData["currencyPosition"] != "left";
+      currencySymbol = responseData["symbol"] ?? "\$";
+      currencyCode = responseData["currency_code"] ?? "USD";
+      final tempUsdConv =
+          responseData["usd_conversion_rate"].toString().tryToParse;
+      toUsdConversionRate = tempUsdConv > 0 ? tempUsdConv : 1;
+      textDirectionRight = responseData["rtl"].toString() == "true";
+    }
+    notifyListeners();
+  }
+
+  void toggleDarkMode() async {
+    isDarkMode = !isDarkMode;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setBool('isDarkMode', isDarkMode);
+  }
+}

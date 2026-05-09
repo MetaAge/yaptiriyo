@@ -1,0 +1,32 @@
+{
+  "name": "sharifur/payfast",
+  "authors": [
+    {
+      "name": "Sharifur Rahman",
+      "email": "dvrobin4@gmail.com"
+    }
+  ],
+  "description": "Laravel 10+ package for processing ITN payments through payfast.co.za",
+  "keywords": ["package", "laravel", "payfast"],
+  "license": "MIT",
+  "require": {
+    "illuminate/support": "^10.0|^11.0|^12.0",
+    "illuminate/http": "^10.0|^11.0|^12.0",
+    "billowapp/show-me-the-money": "^0.1.2|^0.2|^0.4"
+  },
+  "autoload": {
+    "psr-4": {
+      "Billow\\": "src/"
+    }
+  },
+  "require-dev": {
+    "symfony/var-dumper": "^5.4|^6.0|^7.0"
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Billow\\PayfastServiceProvider"
+      ]
+    }
+  }
+}

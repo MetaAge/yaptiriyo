@@ -1,0 +1,2 @@
+<script src="<?php echo e(asset('assets/backend/js/taginput/bootstrap-tagsinput.js')); ?>"></script>
+<?php /**PATH /Users/ahmetsahin/Desktop/xilancer/core/resources/views/components/tags/tag-input-js.blade.php ENDPATH**/ ?>

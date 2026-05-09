@@ -1,0 +1,26 @@
+{
+  "" : {
+    "const-values" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/NWWebSocket.build/Objects-normal/arm64/NWWebSocket-primary.swiftconstvalues",
+    "dependencies" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/NWWebSocket.build/Objects-normal/arm64/NWWebSocket-primary.d",
+    "diagnostics" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/NWWebSocket.build/Objects-normal/arm64/NWWebSocket-primary.dia",
+    "emit-module-dependencies" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/NWWebSocket.build/Objects-normal/arm64/NWWebSocket-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/NWWebSocket.build/Objects-normal/arm64/NWWebSocket-primary-emit-module.dia",
+    "pch" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/NWWebSocket.build/Objects-normal/arm64/NWWebSocket-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/NWWebSocket.build/Objects-normal/arm64/NWWebSocket-primary.swiftdeps"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/NWWebSocket/Sources/NWWebSocket/Extension/NWConnection+Extension.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/NWWebSocket.build/Objects-normal/arm64/NWConnection+Extension.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/NWWebSocket.build/Objects-normal/arm64/NWConnection+Extension.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/NWWebSocket.build/Objects-normal/arm64/NWConnection+Extension.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/NWWebSocket/Sources/NWWebSocket/Model/Client/NWWebSocket.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/NWWebSocket.build/Objects-normal/arm64/NWWebSocket.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/NWWebSocket.build/Objects-normal/arm64/NWWebSocket.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/NWWebSocket.build/Objects-normal/arm64/NWWebSocket.o"
+  },
+  "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/Pods/NWWebSocket/Sources/NWWebSocket/Protocol/WebSocketConnection.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/NWWebSocket.build/Objects-normal/arm64/WebSocketConnection.o",
+    "llvm-bc" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/NWWebSocket.build/Objects-normal/arm64/WebSocketConnection.bc",
+    "object" : "/Users/ahmetsahin/Desktop/xilancer/xilancer-client-app/ios/build/Pods.build/Release-iphoneos/NWWebSocket.build/Objects-normal/arm64/WebSocketConnection.o"
+  }
+}

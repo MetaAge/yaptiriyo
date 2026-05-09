@@ -1,0 +1,5 @@
+
+module Stripe.Swift {
+  header "Stripe-Swift.h"
+  requires objc
+}

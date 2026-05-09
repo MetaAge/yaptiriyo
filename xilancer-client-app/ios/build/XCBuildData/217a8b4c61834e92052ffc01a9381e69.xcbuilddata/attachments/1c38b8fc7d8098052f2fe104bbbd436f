@@ -1,0 +1,5 @@
+
+module StripeUICore.Swift {
+  header "StripeUICore-Swift.h"
+  requires objc
+}

@@ -1,0 +1,5 @@
+
+module StripePaymentsUI.Swift {
+  header "StripePaymentsUI-Swift.h"
+  requires objc
+}
