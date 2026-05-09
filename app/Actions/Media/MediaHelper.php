@@ -107,7 +107,7 @@ class MediaHelper
             $image_extenstion = $image->getClientOriginalExtension();
             $image_name_with_ext = $image->getClientOriginalName();
             $image_name = pathinfo($image_name_with_ext,PATHINFO_FILENAME);
-            $folder_path = 'assets/uploads/media-uploader/';
+            $folder_path = public_path('assets/uploads/media-uploader/');
 
             if($image_extenstion == 'svg'){
                 $image_name_with_ext = $image->getClientOriginalName();
@@ -187,9 +187,9 @@ class MediaHelper
 
         $all_image_files = [];
         foreach ($all_images as $image){
-            if (file_exists('assets/uploads/media-uploader/'.$image->path)){
+            if (file_exists(public_path('assets/uploads/media-uploader/'.$image->path))){
                 $image_url = asset('assets/uploads/media-uploader/'.$image->path);
-                if (file_exists('assets/uploads/media-uploader/grid-' . $image->path)) {
+                if (file_exists(public_path('assets/uploads/media-uploader/grid-' . $image->path))) {
                     $image_url = asset('assets/uploads/media-uploader/grid-' . $image->path);
                 }
                 $all_image_files[] = [
@@ -249,7 +249,7 @@ class MediaHelper
             return null;
         }
 
-        $folder_path = 'assets/uploads/media-uploader/';
+        $folder_path = public_path('assets/uploads/media-uploader/');
         if (!File::exists($folder_path)) {
             File::makeDirectory($folder_path, 0755, true);
         }

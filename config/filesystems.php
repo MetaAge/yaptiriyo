@@ -66,7 +66,7 @@ return [
 
         'CustomUploader' => [
             'driver' => 'local',
-            'root' => storage_path('../../assets/uploads/'),
+            'root' => public_path('assets/uploads/'),
             'throw' => false,
         ],
 

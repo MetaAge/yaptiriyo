@@ -54,10 +54,10 @@ class MediaUploadController extends Controller
         $all_media_file = MediaUpload::all();
         foreach ($all_media_file as $img) {
 
-            if (!file_exists('assets/uploads/media-uploader/' . $img->path)) {
+            if (!file_exists(public_path('assets/uploads/media-uploader/' . $img->path))) {
                 continue;
             }
-            $image = 'assets/uploads/media-uploader/' . $img->path;
+            $image = public_path('assets/uploads/media-uploader/' . $img->path);
             $image_dimension = getimagesize($image);
             $image_width = $image_dimension[0];
             $image_height = $image_dimension[1];
@@ -68,7 +68,7 @@ class MediaUploadController extends Controller
             $image_thumb = 'thumb-' . $image_db;
             $image_semi_large = 'semi-large-' . $image_db;
 
-            $folder_path = 'assets/uploads/media-uploader/';
+            $folder_path = public_path('assets/uploads/media-uploader/');
             $resize_grid_image = Image::make($image)->resize(350, null, function ($constraint) {
                 $constraint->aspectRatio();
             });
