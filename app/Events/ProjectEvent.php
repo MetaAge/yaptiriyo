@@ -16,6 +16,7 @@ class ProjectEvent implements ShouldBroadcast
 
     public $message;
     public $user_id;
+    public $connection = 'sync';
 
     /**
      * Create a new event instance.

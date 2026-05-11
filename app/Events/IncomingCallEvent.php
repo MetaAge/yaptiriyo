@@ -15,6 +15,7 @@ class IncomingCallEvent implements ShouldBroadcast
     public $callData;
     private int $client_id, $freelancer_id;
     private int $messageFrom;
+    public $connection = 'sync';
 
     public function __construct(array $callData, int $client_id, int $freelancer_id, int $messageFrom)
     {

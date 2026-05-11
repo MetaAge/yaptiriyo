@@ -16,6 +16,7 @@ class AdminEvent implements ShouldBroadcast
 
     public $message;
     public $admin_id;
+    public $connection = 'sync';
 
     /**
      * Create a new event instance.
