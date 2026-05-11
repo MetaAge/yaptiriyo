@@ -3,6 +3,7 @@
 namespace Modules\Subscription\Http\Controllers\Backend;
 
 use App\Models\AdminNotification;
+use Exception;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -78,7 +79,10 @@ class SubscriptionController extends Controller
                 SubscriptionFeature::insert($arr);
                 toastr_success(__('New Subscription Successfully Added'));
                 DB::commit();
-            }catch(Exception $e){}
+            }catch(Exception $e){
+                DB::rollBack();
+                \Illuminate\Support\Facades\Log::error($e->getMessage());
+            }
         }
 
         $all_types = SubscriptionType::all_types();
@@ -143,7 +147,10 @@ class SubscriptionController extends Controller
                 SubscriptionFeature::insert($arr);
                 toastr_success(__('Subscription Successfully Updated'));
                 DB::commit();
-            }catch(Exception $e){}
+            }catch(Exception $e){
+                DB::rollBack();
+                \Illuminate\Support\Facades\Log::error($e->getMessage());
+            }
         }
         $all_types = SubscriptionType::all_types();
         $subscription_details = Subscription::with('features')->where('id',$id)->first();
