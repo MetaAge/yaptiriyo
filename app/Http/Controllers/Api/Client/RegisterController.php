@@ -33,6 +33,7 @@ class RegisterController extends Controller
         }
 
         $email_verify_tokn = sprintf("%d", random_int(123456, 999999));
+        $is_verified = get_static_option('user_email_verify_status') == 0 ? 1 : 0;
         $user = User::create([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
@@ -42,6 +43,7 @@ class RegisterController extends Controller
             'password' => Hash::make($request->password),
             'user_type' => 1,
             'terms_conditions' =>1,
+            'is_email_verified' => $is_verified,
             'email_verify_token'=> $email_verify_tokn,
         ]);
 
