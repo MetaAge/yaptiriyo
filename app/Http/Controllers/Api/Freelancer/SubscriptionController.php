@@ -20,6 +20,45 @@ use App\Http\Services\Frontend\IyzicoPaymentService;
 
 class SubscriptionController extends Controller
 {
+    public static function cancel_old_subscriptions($user_id)
+    {
+        UserSubscription::where('user_id', $user_id)
+            ->where('status', 1)
+            ->update([
+                'status' => 0,
+                'expire_date' => Carbon::now()->subDay()
+            ]);
+    }
+
+    public function switch_to_free(Request $request)
+    {
+        $user = auth('sanctum')->user();
+        $free_subscription = Subscription::with('subscription_type:id,validity')->find(10);
+        
+        if (!$free_subscription) {
+            return response()->json(['msg' => __('Free plan not found')], 422);
+        }
+
+        self::cancel_old_subscriptions($user->id);
+
+        $user_sub = UserSubscription::create([
+            'user_id' => $user->id,
+            'subscription_id' => $free_subscription->id,
+            'price' => 0,
+            'limit' => $free_subscription->limit,
+            'expire_date' => Carbon::now()->addDays($free_subscription->subscription_type->validity ?? 365),
+            'payment_gateway' => 'free',
+            'payment_status' => 'complete',
+            'status' => 1,
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'msg' => __('Switched to free plan successfully'),
+            'subscription_details' => $user_sub
+        ]);
+    }
+
     //all types
     public function types()
     {
@@ -142,6 +181,10 @@ class SubscriptionController extends Controller
             $payment_status = $request->selected_payment_gateway === 'wallet' ? 'complete' : 'pending';
             $status = $request->selected_payment_gateway === 'wallet' ? 1 : 0;
 
+            if ($total == 0) {
+                return $this->switch_to_free($request);
+            }
+
             if($request->selected_payment_gateway === 'manual_payment')
             {
                 $request->validate(['manual_payment_image' => 'required|mimes:jpg,jpeg,png,pdf']);
@@ -188,7 +231,8 @@ class SubscriptionController extends Controller
             elseif($request->selected_payment_gateway === 'wallet')
             {
                 $wallet_balance = Wallet::select('balance')->where('user_id',$user->id)->first();
-                if(isset($wallet_balance) && $wallet_balance->balance > $total){
+                if(isset($wallet_balance) && $wallet_balance->balance >= $total){
+                    self::cancel_old_subscriptions($user->id);
                     $buy_subscription = UserSubscription::create([
                         'user_id' => $user->id,
                         'subscription_id' => $subscription_details->id,
@@ -254,6 +298,7 @@ class SubscriptionController extends Controller
 
                 $paymentResult = $iyzicoService->processPayment($buy_subscription, $user, $cardData);
                 if ($paymentResult->getStatus() === 'success') {
+                    self::cancel_old_subscriptions($user->id);
                     $buy_subscription->update([
                         'payment_status' => 'complete',
                         'status' => 1,

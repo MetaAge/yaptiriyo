@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Modules\Wallet\Entities\Wallet;
+use Modules\Subscription\Entities\UserSubscription;
+use Modules\Subscription\Entities\Subscription;
+use Illuminate\Support\Carbon;
 
 class RegisterController extends Controller
 {
@@ -56,6 +59,21 @@ class RegisterController extends Controller
                 'withdraw_amount' => 0,
                 'status' => 1
             ]);
+
+            // assign free subscription
+            $free_subscription = Subscription::with('subscription_type:id,validity')->find(10);
+            if ($free_subscription) {
+                UserSubscription::create([
+                    'user_id' => $user->id,
+                    'subscription_id' => $free_subscription->id,
+                    'price' => 0,
+                    'limit' => $free_subscription->limit,
+                    'expire_date' => Carbon::now()->addDays($free_subscription->subscription_type->validity ?? 365),
+                    'payment_gateway' => 'free',
+                    'payment_status' => 'complete',
+                    'status' => 1,
+                ]);
+            }
 
             //send register mail
             /* try {

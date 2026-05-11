@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Mail;
 use Modules\PromoteFreelancer\Entities\PromotionProjectList;
 use Modules\Subscription\Entities\UserSubscription;
 use Modules\Subscription\Entities\Subscription;
+use App\Http\Controllers\Api\Freelancer\SubscriptionController;
 
 class IyzicoCallbackController extends Controller
 {
@@ -130,6 +131,8 @@ class IyzicoCallbackController extends Controller
                 'msg' => __('Subscription not found or already processed'),
             ], 422);
         }
+
+        SubscriptionController::cancel_old_subscriptions($user->id);
 
         $subscription_details->update([
             'payment_status' => 'complete',

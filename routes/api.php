@@ -173,6 +173,7 @@ Route::group(['prefix' => 'v1', 'middleware' => 'setlang'], function () {
             Route::controller(\App\Http\Controllers\Api\Freelancer\SubscriptionController::class)->group(function () {
                 Route::get('subscription/history/list', 'all_subscription');
                 Route::post('subscription/buy', 'buy_subscription');
+                Route::post('subscription/switch-to-free', 'switch_to_free');
                 Route::post('subscription/validate-iap', 'validate_iap');
                 Route::post('subscription/buy/update-payment', 'payment_update');
             });
