@@ -67,7 +67,7 @@ class RegisterController extends Controller
 
 
             //send register welcome mail
-            try {
+            /* try {
                 $message = get_static_option('user_register_welcome_message') ?? __('Your registration successfully completed.');
                 $message = str_replace(["@name","@email","@username","@password","@userType"],[$user->first_name.' '.$user->last_name, $user->email, $user->username, $request->password, 'freelancer'], $message);
                 Mail::to($user->email)->send(new BasicMail([
@@ -75,17 +75,17 @@ class RegisterController extends Controller
                     'message' => $message
                 ]));
             }
-            catch (\Exception $e) {}
+            catch (\Exception $e) {} */
 
 
             //send otp mail
-            try {
+            /* try {
                 Mail::to($user->email)->send(new BasicMail([
                     'subject' =>  __('Otp Email'),
                     'message' => __('Your otp code').' '.$email_verify_tokn
                 ]));
             }
-            catch (\Exception $e) {}
+            catch (\Exception $e) {} */
 
             $token = $user->createToken(Str::slug(get_static_option('site_title', 'xilancer')) . 'api_keys')->plainTextToken;
             return response()->json([
