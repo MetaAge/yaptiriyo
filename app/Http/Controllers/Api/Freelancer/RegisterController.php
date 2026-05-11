@@ -56,14 +56,14 @@ class RegisterController extends Controller
             ]);
 
             //send register mail
-            try {
+            /* try {
                 $message = get_static_option('user_register_message') ?? __('You have successfully registered as a freelancer');
                 $message = str_replace(["@name","@email","@username","@password"],[$user->first_name.' '.$user->last_name, $user->email, $user->username, $request->password], $message);
                 Mail::to(get_static_option('site_global_email'))->send(new BasicMail([
                     'subject' => get_static_option('user_register_subject') ?? __('New User Register Email'),
                     'message' => $message
                 ]));
-            }catch (\Exception $e) {}
+            }catch (\Exception $e) {} */
 
 
             //send register welcome mail
