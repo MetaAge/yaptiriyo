@@ -14,6 +14,7 @@ class LivechatVendorMessageEvent implements ShouldBroadcast
 
     private int $client_id, $freelancer_id;
     public $message, $livechat, $messageBlade;
+    public $connection = 'sync';
 
     public function __construct(string $messageBlade,$message, $livechat,$client_id,$freelancer_id)
     {
