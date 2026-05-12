@@ -261,6 +261,11 @@ Route::group(['prefix' => 'v1', 'middleware' => 'setlang'], function () {
             Route::get('project/details/{id?}', 'project_details');
         });
 
+        // Price Estimator
+        Route::controller(\App\Http\Controllers\Api\Client\PriceEstimatorController::class)->group(function () {
+            Route::post('estimate-price', 'estimate');
+        });
+
         //profile details
         Route::controller(\App\Http\Controllers\Api\Client\ProfileDetailsController::class)->group(function () {
             Route::get('profile/details/{username?}', 'profile_details');
