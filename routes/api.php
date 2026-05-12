@@ -266,6 +266,11 @@ Route::group(['prefix' => 'v1', 'middleware' => 'setlang'], function () {
             Route::post('estimate-price', 'estimate');
         });
 
+        // Work Stories
+        Route::controller(\App\Http\Controllers\Api\Client\WorkStoryController::class)->group(function () {
+            Route::get('work-stories', 'stories');
+        });
+
         //profile details
         Route::controller(\App\Http\Controllers\Api\Client\ProfileDetailsController::class)->group(function () {
             Route::get('profile/details/{username?}', 'profile_details');
