@@ -206,6 +206,9 @@ Route::group(['middleware' => ['globalVariable', 'maintains_mode','setlang']], f
         });
     });
 
+    // Reels public view
+    Route::get('reels/view/{id}', [\App\Http\Controllers\Frontend\ReelController::class, 'view'])->name('reels.view');
+
     Route::get('/header-search', function(Request $request) {
         $query = $request->get('q', '');
 
