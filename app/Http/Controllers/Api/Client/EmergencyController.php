@@ -196,6 +196,16 @@ class EmergencyController extends Controller
      */
     public function accept(Request $request, $id)
     {
+        $freelancerId = Auth::id();
+
+        // Check for Pro or Premium subscription
+        if (!is_pro_user($freelancerId) && !is_premium_user($freelancerId)) {
+            return response()->json([
+                'status' => 'subscription_required', 
+                'msg' => __('Acil iş teklifi verebilmek için Pro veya Premium aboneliğiniz olmalıdır.')
+            ], 403);
+        }
+
         $request->validate([
             'offered_price' => 'required|numeric|min:1',
         ]);
