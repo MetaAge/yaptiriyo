@@ -331,6 +331,7 @@ class EmergencyController extends Controller
                 'category_name' => $e->category?->category,
                 'description' => $e->description,
                 'offered_price' => $e->offered_price,
+                'freelancer_id' => $e->accepted_by,
                 'freelancer_name' => $e->acceptedFreelancer?->first_name,
                 'freelancer_image' => $e->acceptedFreelancer?->image,
                 'freelancer_cloud_image' => $e->acceptedFreelancer?->image
