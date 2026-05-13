@@ -160,6 +160,20 @@ class EmergencyController extends Controller
         return response()->json(['status' => 'success', 'msg' => __('Acil talebiniz iptal edildi.')]);
     }
 
+    public function complete($id)
+    {
+        $updated = EmergencyRequest::where('id', $id)
+            ->where('client_id', Auth::id())
+            ->where('status', 'accepted')
+            ->update(['status' => 'completed']);
+
+        if ($updated === 0) {
+            return response()->json(['status' => 'error', 'msg' => __('İşlem başarısız.')], 400);
+        }
+
+        return response()->json(['status' => 'success', 'msg' => __('İş tamamlandı olarak işaretlendi.')]);
+    }
+
     /**
      * Freelancer accepts an emergency request with a price offer.
      * Race-condition safe: Only the first freelancer to accept wins.
