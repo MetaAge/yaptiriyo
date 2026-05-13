@@ -29,6 +29,8 @@ class PersonalInfoDisplayResource extends JsonResource
             "phone" => $this?->phone,
             "image" =>  asset('assets/uploads/profile/'.$this?->image) ?? '',
             "user_introduction" => $this?->user_introduction,
+            "is_pro_tier" => $this->is_pro_tier,
+            "is_premium_tier" => $this->is_premium_tier,
         ];
     }
 }
