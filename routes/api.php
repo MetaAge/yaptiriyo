@@ -224,7 +224,16 @@ Route::group(['prefix' => 'v1', 'middleware' => 'setlang'], function () {
                 Route::get('emergency/pending', 'pendingForFreelancer');
                 Route::get('emergency/accepted', 'acceptedForFreelancer');
             });
+
+            // Reels (Freelancer Side)
+            Route::controller(\App\Http\Controllers\Api\ReelController::class)->group(function () {
+                Route::post('reels/store', 'store');
+                Route::post('reels/delete/{id}', 'destroy');
+            });
         });
+
+        // Public Reels
+        Route::get('reels', [\App\Http\Controllers\Api\ReelController::class, 'index']);
     });
     //freelancer route end
 
