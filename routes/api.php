@@ -231,11 +231,11 @@ Route::group(['prefix' => 'v1', 'middleware' => 'setlang'], function () {
                 Route::post('reels/delete/{id}', 'destroy');
             });
         });
-
-        // Public Reels
-        Route::get('reels', [\App\Http\Controllers\Api\ReelController::class, 'index']);
     });
     //freelancer route end
+
+    // Public Reels
+    Route::get('reels', [\App\Http\Controllers\Api\ReelController::class, 'index']);
 
     //client route start
     Route::group(['prefix' => 'client'], function () {
