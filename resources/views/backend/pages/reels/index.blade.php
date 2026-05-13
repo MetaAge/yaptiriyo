@@ -51,7 +51,7 @@
                                             </td>
                                             <td>{{Str::limit($reel->description, 50)}}</td>
                                             <td>
-                                                <x-popup.delete-popup :url="route('admin.reels.delete',$reel->id)"/>
+                                                <x-popup.delete-popup :title="__('Delete Reel')" :url="route('admin.reels.delete',$reel->id)"/>
                                             </td>
                                         </tr>
                                     @endforeach
