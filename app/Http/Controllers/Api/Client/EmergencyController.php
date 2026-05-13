@@ -306,7 +306,7 @@ class EmergencyController extends Controller
     {
         $user = Auth::user();
 
-        $e = EmergencyRequest::with('category:id,category', 'acceptedFreelancer:id,first_name,last_name,image,cloud_image')
+        $e = EmergencyRequest::with('category:id,category', 'acceptedFreelancer:id,first_name,last_name,image,load_from')
             ->where('client_id', $user->id)
             ->whereIn('status', ['pending', 'accepted'])
             ->latest()
@@ -333,7 +333,9 @@ class EmergencyController extends Controller
                 'offered_price' => $e->offered_price,
                 'freelancer_name' => $e->acceptedFreelancer?->first_name,
                 'freelancer_image' => $e->acceptedFreelancer?->image,
-                'freelancer_cloud_image' => $e->acceptedFreelancer?->cloud_image,
+                'freelancer_cloud_image' => $e->acceptedFreelancer?->image
+                    ? render_frontend_cloud_image_if_module_exists('profile/' . $e->acceptedFreelancer->image, load_from: $e->acceptedFreelancer->load_from)
+                    : null,
                 'live_chat_id' => $chat?->id,
                 'notified_count' => $e->notified_count ?? 0,
             ]
