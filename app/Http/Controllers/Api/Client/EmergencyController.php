@@ -306,7 +306,7 @@ class EmergencyController extends Controller
     {
         $user = Auth::user();
 
-        $e = EmergencyRequest::with('category:id,category', 'acceptedBy:id,first_name,last_name,image,cloud_image')
+        $e = EmergencyRequest::with('category:id,category', 'acceptedFreelancer:id,first_name,last_name,image,cloud_image')
             ->where('client_id', $user->id)
             ->whereIn('status', ['pending', 'accepted'])
             ->latest()
@@ -331,9 +331,9 @@ class EmergencyController extends Controller
                 'category_name' => $e->category?->category,
                 'description' => $e->description,
                 'offered_price' => $e->offered_price,
-                'freelancer_name' => $e->acceptedBy?->first_name,
-                'freelancer_image' => $e->acceptedBy?->image,
-                'freelancer_cloud_image' => $e->acceptedBy?->cloud_image,
+                'freelancer_name' => $e->acceptedFreelancer?->first_name,
+                'freelancer_image' => $e->acceptedFreelancer?->image,
+                'freelancer_cloud_image' => $e->acceptedFreelancer?->cloud_image,
                 'live_chat_id' => $chat?->id,
                 'notified_count' => $e->notified_count ?? 0,
             ]
