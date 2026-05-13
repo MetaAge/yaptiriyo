@@ -12,6 +12,15 @@ class ReelController extends Controller
 {
     public function index()
     {
+        // Giriş yapmış kullanıcıyı isteğe eklenen token üzerinden manuel olarak algıla
+        if ($token = request()->bearerToken()) {
+            $accessToken = \Laravel\Sanctum\PersonalAccessToken::findToken($token);
+            if ($accessToken) {
+                $user = $accessToken->tokenable;
+                auth('sanctum')->setUser($user);
+            }
+        }
+
         $reels = Reel::with('user:id,first_name,last_name,image,username')
             ->latest()
             ->paginate(10);
