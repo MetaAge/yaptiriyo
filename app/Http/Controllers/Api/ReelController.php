@@ -160,7 +160,8 @@ class ReelController extends Controller
     {
         $user = \App\Models\User::where('username', $username)->firstOrFail();
         
-        $reels = Reel::where('user_id', $user->id)
+        $reels = Reel::with('user:id,first_name,last_name,image,username')
+            ->where('user_id', $user->id)
             ->latest()
             ->paginate(12);
 
