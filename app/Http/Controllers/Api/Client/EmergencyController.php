@@ -53,7 +53,7 @@ class EmergencyController extends Controller
 
         // Find available freelancers in the same city with projects in this category
         $freelancers = User::where('user_type', 2) // freelancer
-            ->where('check_work_availability', 1) // available for work
+            // ->where('check_work_availability', 1) // Temporarily disabled for testing
             ->where('city_id', $request->city_id) // same city
             ->whereHas('projects', function ($q) use ($request) {
                 $q->where('category_id', $request->category_id)
@@ -234,7 +234,7 @@ class EmergencyController extends Controller
         $user = Auth::user();
 
         // Get category IDs from freelancer's active projects
-        $categoryIds = $user->user_projects()
+        $categoryIds = $user->projects()
             ->where('status', 1)
             ->pluck('category_id')
             ->unique()
