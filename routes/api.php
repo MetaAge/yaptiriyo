@@ -229,6 +229,8 @@ Route::group(['prefix' => 'v1', 'middleware' => 'setlang'], function () {
             Route::controller(\App\Http\Controllers\Api\ReelController::class)->group(function () {
                 Route::post('reels/store', 'store');
                 Route::post('reels/delete/{id}', 'destroy');
+                Route::post('reels/like/{id}', 'toggleLike');
+                Route::post('reels/comment/{id}', 'storeComment');
             });
         });
     });
@@ -236,6 +238,7 @@ Route::group(['prefix' => 'v1', 'middleware' => 'setlang'], function () {
 
     // Public Reels
     Route::get('reels', [\App\Http\Controllers\Api\ReelController::class, 'index']);
+    Route::get('reels/comments/{id}', [\App\Http\Controllers\Api\ReelController::class, 'getComments']);
 
     //client route start
     Route::group(['prefix' => 'client'], function () {

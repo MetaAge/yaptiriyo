@@ -16,11 +16,70 @@ class ReelController extends Controller
             ->latest()
             ->paginate(10);
 
+        $reels->getCollection()->transform(function ($reel) {
+            $reel->append(['is_liked', 'likes_count', 'comments_count']);
+            return $reel;
+        });
+
         return response()->json([
             'status' => 'success',
             'data' => $reels,
             'video_path' => asset('assets/uploads/reels/'),
             'thumbnail_path' => asset('assets/uploads/reels/thumbnails/'),
+        ]);
+    }
+
+    public function toggleLike($id)
+    {
+        $user_id = auth('sanctum')->id();
+        $like = \App\Models\ReelLike::where('reel_id', $id)->where('user_id', $user_id)->first();
+
+        if ($like) {
+            $like->delete();
+            $status = 'unliked';
+        } else {
+            \App\Models\ReelLike::create([
+                'reel_id' => $id,
+                'user_id' => $user_id
+            ]);
+            $status = 'liked';
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'like_status' => $status,
+            'likes_count' => Reel::find($id)->likes_count
+        ]);
+    }
+
+    public function getComments($id)
+    {
+        $comments = \App\Models\ReelComment::with('user:id,first_name,last_name,image,username')
+            ->where('reel_id', $id)
+            ->latest()
+            ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $comments
+        ]);
+    }
+
+    public function storeComment(Request $request, $id)
+    {
+        $request->validate([
+            'comment' => 'required|string|max:1000'
+        ]);
+
+        $comment = \App\Models\ReelComment::create([
+            'reel_id' => $id,
+            'user_id' => auth('sanctum')->id(),
+            'comment' => $request->comment
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $comment->load('user:id,first_name,last_name,image,username')
         ]);
     }
 

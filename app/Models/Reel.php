@@ -21,4 +21,31 @@ class Reel extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function likes()
+    {
+        return $this->hasMany(ReelLike::class);
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(ReelComment::class);
+    }
+
+    public function getIsLikedAttribute()
+    {
+        $user_id = auth('sanctum')->id();
+        if (!$user_id) return false;
+        return $this->likes()->where('user_id', $user_id)->exists();
+    }
+
+    public function getLikesCountAttribute()
+    {
+        return $this->likes()->count();
+    }
+
+    public function getCommentsCountAttribute()
+    {
+        return $this->comments()->count();
+    }
 }
