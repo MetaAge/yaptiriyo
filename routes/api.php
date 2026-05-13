@@ -231,6 +231,7 @@ Route::group(['prefix' => 'v1', 'middleware' => 'setlang'], function () {
                 Route::post('reels/delete/{id}', 'destroy');
                 Route::post('reels/like/{id}', 'toggleLike');
                 Route::post('reels/comment/{id}', 'storeComment');
+                Route::post('reels/view-count/{id}', 'incrementViews');
             });
         });
     });
@@ -238,6 +239,7 @@ Route::group(['prefix' => 'v1', 'middleware' => 'setlang'], function () {
 
     // Public Reels
     Route::get('reels', [\App\Http\Controllers\Api\ReelController::class, 'index']);
+    Route::get('reels/user/{username}', [\App\Http\Controllers\Api\ReelController::class, 'userReels']);
     Route::get('reels/comments/{id}', [\App\Http\Controllers\Api\ReelController::class, 'getComments']);
 
     //client route start

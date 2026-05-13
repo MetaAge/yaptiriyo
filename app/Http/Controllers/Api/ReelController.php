@@ -21,9 +21,17 @@ class ReelController extends Controller
             }
         }
 
-        $reels = Reel::with('user:id,first_name,last_name,image,username')
-            ->latest()
-            ->paginate(10);
+        $query = Reel::with('user:id,first_name,last_name,image,username');
+
+        if (request('sort') === 'popular') {
+            // Basit bir skorlama: izlenme + (beğeni * 5) + (yorum * 10)
+            $query->withCount(['likes', 'comments'])
+                  ->orderByRaw('(views + (likes_count * 5) + (comments_count * 10)) DESC');
+        } else {
+            $query->latest();
+        }
+
+        $reels = $query->paginate(10);
 
         $reels->getCollection()->transform(function ($reel) {
             $reel->append(['is_liked', 'likes_count', 'comments_count']);
@@ -54,6 +62,15 @@ class ReelController extends Controller
             $status = 'liked';
         }
 
+        // Bildirim Gönder
+        if ($status == 'liked' && $user_id != $reel->user_id) {
+            \App\Models\FreelancerNotification::create([
+                'freelancer_id' => $reel->user_id,
+                'type' => 'reel_like',
+                'message' => auth('sanctum')->user()->first_name . ' videonu beğendi.',
+            ]);
+        }
+
         return response()->json([
             'status' => 'success',
             'like_status' => $status,
@@ -80,11 +97,23 @@ class ReelController extends Controller
             'comment' => 'required|string|max:1000'
         ]);
 
+        $user_id = auth('sanctum')->id();
+        $reel = Reel::findOrFail($id);
+
         $comment = \App\Models\ReelComment::create([
             'reel_id' => $id,
-            'user_id' => auth('sanctum')->id(),
+            'user_id' => $user_id,
             'comment' => $request->comment
         ]);
+
+        // Bildirim Gönder
+        if ($user_id != $reel->user_id) {
+            \App\Models\FreelancerNotification::create([
+                'freelancer_id' => $reel->user_id,
+                'type' => 'reel_comment',
+                'message' => auth('sanctum')->user()->first_name . ' videona yorum yaptı.',
+            ]);
+        }
 
         return response()->json([
             'status' => 'success',
@@ -123,6 +152,38 @@ class ReelController extends Controller
             'status' => 'success',
             'msg' => __('Reel uploaded successfully'),
             'data' => $reel
+        ]);
+    }
+
+    public function userReels($username)
+    {
+        $user = \App\Models\User::where('username', $username)->firstOrFail();
+        
+        $reels = Reel::where('user_id', $user->id)
+            ->latest()
+            ->paginate(12);
+
+        $reels->getCollection()->transform(function ($reel) {
+            $reel->append(['is_liked', 'likes_count', 'comments_count']);
+            return $reel;
+        });
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $reels,
+            'video_path' => asset('assets/uploads/reels'),
+            'thumbnail_path' => asset('assets/uploads/reels/thumbnails'),
+        ]);
+    }
+
+    public function incrementViews($id)
+    {
+        $reel = Reel::findOrFail($id);
+        $reel->increment('views');
+        
+        return response()->json([
+            'status' => 'success',
+            'views' => $reel->views
         ]);
     }
 
