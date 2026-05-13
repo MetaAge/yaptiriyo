@@ -289,6 +289,7 @@ class EmergencyController extends Controller
                     'description' => $e->description,
                     'address' => $e->address,
                     'client_name' => $e->client?->first_name,
+                    'client_id' => $e->client_id,
                     'offered_price' => $e->offered_price,
                     'accepted_at' => $e->accepted_at?->toIso8601String(),
                     'live_chat_id' => $chat?->id,
