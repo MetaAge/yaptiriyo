@@ -222,6 +222,7 @@ Route::group(['prefix' => 'v1', 'middleware' => 'setlang'], function () {
             Route::controller(\App\Http\Controllers\Api\Client\EmergencyController::class)->group(function () {
                 Route::post('emergency/accept/{id}', 'accept');
                 Route::get('emergency/pending', 'pendingForFreelancer');
+                Route::get('emergency/accepted', 'acceptedForFreelancer');
             });
         });
     });

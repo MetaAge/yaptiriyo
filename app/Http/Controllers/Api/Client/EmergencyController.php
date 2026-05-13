@@ -258,7 +258,40 @@ class EmergencyController extends Controller
                     'address' => $e->address,
                     'client_name' => $e->client?->first_name,
                     'created_at' => $e->created_at->toIso8601String(),
-                    'minutes_ago' => $e->created_at->diffInMinutes(now()),
+                    'minutes_ago' => (int) $e->created_at->diffInMinutes(now()),
+                ];
+            });
+
+        return response()->json(['status' => 'success', 'emergencies' => $emergencies]);
+    }
+
+    /**
+     * Freelancer views emergency requests they have accepted.
+     */
+    public function acceptedForFreelancer()
+    {
+        $user = Auth::user();
+
+        $emergencies = EmergencyRequest::with('category:id,category', 'client:id,first_name,last_name')
+            ->where('status', 'accepted')
+            ->where('accepted_by', $user->id)
+            ->latest()
+            ->get()
+            ->map(function ($e) {
+                // Find the live chat
+                $chat = LiveChat::where('client_id', $e->client_id)
+                    ->where('freelancer_id', $e->accepted_by)
+                    ->first();
+
+                return [
+                    'id' => $e->id,
+                    'category_name' => $e->category?->category,
+                    'description' => $e->description,
+                    'address' => $e->address,
+                    'client_name' => $e->client?->first_name,
+                    'offered_price' => $e->offered_price,
+                    'accepted_at' => $e->accepted_at?->toIso8601String(),
+                    'live_chat_id' => $chat?->id,
                 ];
             });
 
