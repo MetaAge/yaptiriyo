@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('reel_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->unique(['reel_id', 'user_id']); // Aynı kullanıcı aynı videoyu 2 kez beğenemez
             $table->timestamps();
         });
 
