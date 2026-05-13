@@ -413,6 +413,7 @@ Route::group(['prefix' => 'v1', 'middleware' => 'setlang'], function () {
                 Route::get('emergency/status/{id}', 'status');
                 Route::post('emergency/cancel/{id}', 'cancel');
                 Route::post('emergency/complete/{id}', 'complete');
+                Route::post('emergency/select-offer/{id}', 'selectOffer');
                 Route::get('emergency/active', 'activeForClient');
             });
         });

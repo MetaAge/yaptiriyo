@@ -39,6 +39,11 @@ class EmergencyRequest extends Model
         return $this->belongsTo(User::class, 'accepted_by');
     }
 
+    public function offers()
+    {
+        return $this->hasMany(EmergencyOffer::class, 'emergency_request_id');
+    }
+
     public function category()
     {
         return $this->belongsTo(Category::class, 'category_id');

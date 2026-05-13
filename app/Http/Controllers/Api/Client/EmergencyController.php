@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Client;
 
 use App\Http\Controllers\Controller;
 use App\Models\EmergencyRequest;
+use App\Models\EmergencyOffer;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -99,12 +100,10 @@ class EmergencyController extends Controller
      */
     public function status($id)
     {
-        $emergency = EmergencyRequest::with([
-            'acceptedFreelancer:id,first_name,last_name,image,load_from',
-            'category:id,category',
-        ])->where('id', $id)
-          ->where('client_id', Auth::id())
-          ->first();
+        $emergency = EmergencyRequest::with(['category', 'acceptedFreelancer', 'offers.freelancer'])
+            ->where('id', $id)
+            ->where('client_id', Auth::id())
+            ->first();
 
         if (!$emergency) {
             return response()->json(['status' => 'error', 'msg' => __('Talep bulunamadı.')], 404);
@@ -138,6 +137,23 @@ class EmergencyController extends Controller
                 ->where('freelancer_id', $emergency->accepted_by)
                 ->first();
             $response['live_chat_id'] = $chat?->id;
+        }
+
+        // Include offers if pending
+        if ($emergency->status === 'pending') {
+            $response['offers'] = $emergency->offers->map(function ($o) {
+                return [
+                    'id' => $o->id,
+                    'freelancer_id' => $o->freelancer_id,
+                    'freelancer_name' => $o->freelancer?->first_name . ' ' . $o->freelancer?->last_name,
+                    'freelancer_image' => $o->freelancer?->image,
+                    'freelancer_cloud_image' => $o->freelancer?->image 
+                        ? render_frontend_cloud_image_if_module_exists('profile/' . $o->freelancer?->image, load_from: $o->freelancer?->load_from)
+                        : null,
+                    'offered_price' => $o->offered_price,
+                    'created_at' => $o->created_at->toIso8601String(),
+                ];
+            });
         }
 
         return response()->json(['status' => 'success', 'emergency' => $response]);
@@ -184,42 +200,84 @@ class EmergencyController extends Controller
             'offered_price' => 'required|numeric|min:1',
         ]);
 
-        $freelancerId = Auth::id();
-
-        // Atomic update — only one freelancer can win
-        $updated = EmergencyRequest::where('id', $id)
-            ->where('status', 'pending')
-            ->update([
-                'status' => 'accepted',
-                'accepted_by' => $freelancerId,
-                'offered_price' => $request->offered_price,
-                'accepted_at' => now(),
-            ]);
-
-        if ($updated === 0) {
-            return response()->json([
-                'status' => 'error',
-                'msg' => __('Bu talep zaten başka biri tarafından kabul edildi.'),
-            ], 409);
+        $emergency = EmergencyRequest::findOrFail($id);
+        
+        if ($emergency->status !== 'pending') {
+            return response()->json(['status' => 'error', 'msg' => __('Bu talep artık tekliflere açık değil.')], 400);
         }
 
-        $emergency = EmergencyRequest::with('category:id,category')->find($id);
-        $freelancer = User::find($freelancerId);
-        $freelancerName = $freelancer->first_name . ' ' . $freelancer->last_name;
+        $freelancerId = Auth::id();
 
-        // Notify the client
+        // Check if already offered
+        $existing = EmergencyOffer::where('emergency_request_id', $id)
+            ->where('freelancer_id', $freelancerId)
+            ->first();
+
+        if ($existing) {
+            return response()->json(['status' => 'error', 'msg' => __('Zaten teklif verdiniz.')], 400);
+        }
+
+        $offer = EmergencyOffer::create([
+            'emergency_request_id' => $id,
+            'freelancer_id' => $freelancerId,
+            'offered_price' => $request->offered_price,
+            'status' => 'pending',
+        ]);
+
+        // Notify client about new offer
+        $freelancerName = Auth::user()->first_name . ' ' . Auth::user()->last_name;
         client_notification(
             $emergency->id,
             $emergency->client_id,
             'Emergency',
-            '✅ Acil talebiniz kabul edildi! ' . $freelancerName . ' ' . number_format($request->offered_price, 0) . '₺ teklif verdi.'
+            '⚡ Yeni bir acil iş teklifi geldi! ' . $freelancerName . ': ' . number_format($request->offered_price, 0) . '₺'
         );
 
-        // Create or find existing chat
+        return response()->json([
+            'status' => 'success', 
+            'msg' => __('Teklifiniz başarıyla gönderildi. Müşterinin seçmesi bekleniyor.'),
+            'offer_id' => $offer->id
+        ]);
+    }
+
+    /**
+     * Client selects an offer.
+     */
+    public function selectOffer(Request $request, $id)
+    {
+        $request->validate([
+            'offer_id' => 'required|exists:emergency_offers,id',
+        ]);
+
+        $emergency = EmergencyRequest::where('client_id', Auth::id())->findOrFail($id);
+        
+        if ($emergency->status !== 'pending') {
+            return response()->json(['status' => 'error', 'msg' => __('Bu talep zaten bir usta ile eşleşmiş.')], 400);
+        }
+
+        $offer = EmergencyOffer::where('emergency_request_id', $id)->findOrFail($request->offer_id);
+
+        // Atomic update the request
+        $emergency->update([
+            'status' => 'accepted',
+            'accepted_by' => $offer->freelancer_id,
+            'offered_price' => $offer->offered_price,
+            'accepted_at' => now(),
+        ]);
+
+        // Update offer status
+        $offer->update(['status' => 'accepted']);
+        
+        // Reject other offers
+        EmergencyOffer::where('emergency_request_id', $id)
+            ->where('id', '!=', $offer->id)
+            ->update(['status' => 'rejected']);
+
+        // Create chat
         $chat = LiveChat::firstOrCreate(
             [
                 'client_id' => $emergency->client_id,
-                'freelancer_id' => $freelancerId,
+                'freelancer_id' => $offer->freelancer_id,
             ],
             [
                 'status' => 1,
@@ -227,16 +285,9 @@ class EmergencyController extends Controller
         );
 
         return response()->json([
-            'status' => 'success',
-            'msg' => __('Talebi kabul ettiniz! Müşteri ile iletişime geçebilirsiniz.'),
-            'emergency' => [
-                'id' => $emergency->id,
-                'client_id' => $emergency->client_id,
-                'category_name' => $emergency->category?->category,
-                'description' => $emergency->description,
-                'address' => $emergency->address,
-            ],
-            'live_chat_id' => $chat->id,
+            'status' => 'success', 
+            'msg' => __('Usta başarıyla seçildi! Sohbet başlayabilir.'),
+            'live_chat_id' => $chat->id
         ]);
     }
 
@@ -320,7 +371,7 @@ class EmergencyController extends Controller
     {
         $user = Auth::user();
 
-        $e = EmergencyRequest::with('category:id,category', 'acceptedFreelancer:id,first_name,last_name,image,load_from')
+        $e = EmergencyRequest::with(['category', 'acceptedFreelancer', 'offers.freelancer'])
             ->where('client_id', $user->id)
             ->whereIn('status', ['pending', 'accepted'])
             ->latest()
@@ -337,23 +388,42 @@ class EmergencyController extends Controller
                 ->first();
         }
 
+        $response = [
+            'id' => $e->id,
+            'status' => $e->status,
+            'category_name' => $e->category?->category,
+            'description' => $e->description,
+            'offered_price' => $e->offered_price,
+            'freelancer_id' => $e->accepted_by,
+            'freelancer_name' => $e->acceptedFreelancer?->first_name . ' ' . $e->acceptedFreelancer?->last_name,
+            'freelancer_image' => $e->acceptedFreelancer?->image,
+            'freelancer_cloud_image' => $e->acceptedFreelancer?->image
+                ? render_frontend_cloud_image_if_module_exists('profile/' . $e->acceptedFreelancer->image, load_from: $e->acceptedFreelancer->load_from)
+                : null,
+            'live_chat_id' => $chat?->id,
+            'notified_count' => $e->notified_count ?? 0,
+            'created_at' => $e->created_at->toIso8601String(),
+        ];
+
+        if ($e->status === 'pending') {
+            $response['offers'] = $e->offers->map(function ($o) {
+                return [
+                    'id' => $o->id,
+                    'freelancer_id' => $o->freelancer_id,
+                    'freelancer_name' => $o->freelancer?->first_name . ' ' . $o->freelancer?->last_name,
+                    'freelancer_image' => $o->freelancer?->image,
+                    'freelancer_cloud_image' => $o->freelancer?->image 
+                        ? render_frontend_cloud_image_if_module_exists('profile/' . $o->freelancer?->image, load_from: $o->freelancer?->load_from)
+                        : null,
+                    'offered_price' => $o->offered_price,
+                    'created_at' => $o->created_at->toIso8601String(),
+                ];
+            });
+        }
+
         return response()->json([
             'status' => 'success',
-            'emergency' => [
-                'id' => $e->id,
-                'status' => $e->status,
-                'category_name' => $e->category?->category,
-                'description' => $e->description,
-                'offered_price' => $e->offered_price,
-                'freelancer_id' => $e->accepted_by,
-                'freelancer_name' => $e->acceptedFreelancer?->first_name,
-                'freelancer_image' => $e->acceptedFreelancer?->image,
-                'freelancer_cloud_image' => $e->acceptedFreelancer?->image
-                    ? render_frontend_cloud_image_if_module_exists('profile/' . $e->acceptedFreelancer->image, load_from: $e->acceptedFreelancer->load_from)
-                    : null,
-                'live_chat_id' => $chat?->id,
-                'notified_count' => $e->notified_count ?? 0,
-            ]
+            'emergency' => $response
         ]);
     }
 }
