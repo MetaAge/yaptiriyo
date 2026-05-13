@@ -49,6 +49,7 @@ class ReelController extends Controller
     public function toggleLike($id)
     {
         $user_id = auth('sanctum')->id();
+        $reel = Reel::findOrFail($id);
         $like = \App\Models\ReelLike::where('reel_id', $id)->where('user_id', $user_id)->first();
 
         if ($like) {
