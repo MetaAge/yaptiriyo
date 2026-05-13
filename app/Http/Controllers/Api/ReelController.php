@@ -66,6 +66,7 @@ class ReelController extends Controller
         // Bildirim Gönder
         if ($status == 'liked' && $user_id != $reel->user_id) {
             \App\Models\FreelancerNotification::create([
+                'identity' => $reel->id,
                 'freelancer_id' => $reel->user_id,
                 'type' => 'reel_like',
                 'message' => auth('sanctum')->user()->first_name . ' videonu beğendi.',
@@ -110,6 +111,7 @@ class ReelController extends Controller
         // Bildirim Gönder
         if ($user_id != $reel->user_id) {
             \App\Models\FreelancerNotification::create([
+                'identity' => $reel->id,
                 'freelancer_id' => $reel->user_id,
                 'type' => 'reel_comment',
                 'message' => auth('sanctum')->user()->first_name . ' videona yorum yaptı.',
