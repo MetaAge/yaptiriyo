@@ -12,8 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('subscriptions', function (Blueprint $table) {
-            $table->string('apple_product_id')->nullable();
-            $table->string('google_product_id')->nullable();
+            if (!Schema::hasColumn('subscriptions', 'apple_product_id')) {
+                $table->string('apple_product_id')->nullable();
+            }
+            if (!Schema::hasColumn('subscriptions', 'google_product_id')) {
+                $table->string('google_product_id')->nullable();
+            }
         });
     }
 
