@@ -389,6 +389,14 @@
                     </ul>
                 </li>
 
+                <!-- Reels Management -->
+                <li class="dashboard__bottom__list__item @if (request()->is('admin/reels*')) active @endif">
+                    <a href="{{ route('admin.reels.all') }}">
+                        <i class="fa-solid fa-video"></i>
+                        {{ __('Reels Management') }}
+                    </a>
+                </li>
+
                 <!-- Communication -->
                 <li class="dashboard__bottom__list__item has-children @if (request()->is('admin/newsletter*') || request()->is('admin/blog*') || request()->is('admin/support-ticket*') || request()->is('admin/notification*') || request()->routeIs(['admin.pusher.settings'])) active open show @endif">
                     <a href="javascript:void(0)"> <i class="fa-solid fa-comments"></i>{{ __('Communication') }}</a>

@@ -337,6 +337,14 @@ Route::group(['as'=>'admin.','prefix'=>'admin'],function(){
             });
         });
 
+        // reels manage
+        Route::group(['prefix' => 'reels'],function(){
+            Route::controller(\App\Http\Controllers\Backend\ReelController::class)->group(function () {
+                Route::get('all','index')->name('reels.all');
+                Route::post('delete/{id}','destroy')->name('reels.delete');
+            });
+        });
+
         //newsletter manage
         Route::group(['prefix' => 'newsletter'],function(){
             Route::controller(\App\Http\Controllers\Backend\NewsletterController::class)->group(function () {
