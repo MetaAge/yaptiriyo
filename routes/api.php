@@ -217,6 +217,12 @@ Route::group(['prefix' => 'v1', 'middleware' => 'setlang'], function () {
             Route::controller(\App\Http\Controllers\Api\Freelancer\IyzicoCallbackController::class)->group(function () {
                 Route::post('iyzico/3ds-complete', 'handle3dsCallback');
             });
+
+            // Emergency Service (Freelancer Side)
+            Route::controller(\App\Http\Controllers\Api\Client\EmergencyController::class)->group(function () {
+                Route::post('emergency/accept/{id}', 'accept');
+                Route::get('emergency/pending', 'pendingForFreelancer');
+            });
         });
     });
     //freelancer route end
@@ -398,6 +404,13 @@ Route::group(['prefix' => 'v1', 'middleware' => 'setlang'], function () {
                 Route::post('addresses/update/{id}', 'update');
                 Route::post('addresses/delete/{id}', 'destroy');
                 Route::post('addresses/make-default/{id}', 'make_default');
+            });
+
+            // Emergency Service (Client Side)
+            Route::controller(\App\Http\Controllers\Api\Client\EmergencyController::class)->group(function () {
+                Route::post('emergency/create', 'create');
+                Route::get('emergency/status/{id}', 'status');
+                Route::post('emergency/cancel/{id}', 'cancel');
             });
         });
     });
