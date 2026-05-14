@@ -45,10 +45,19 @@ class EmergencyController extends Controller
             ->first();
 
         if ($recentIssue) {
-            $diff = 60 - now()->diffInMinutes($recentIssue->updated_at);
+            $diffSeconds = 3600 - now()->diffInSeconds($recentIssue->updated_at);
+            $hours = floor($diffSeconds / 3600);
+            $minutes = floor(($diffSeconds % 3600) / 60);
+            $seconds = $diffSeconds % 60;
+            
+            $timeStr = "";
+            if ($hours > 0) $timeStr .= $hours . " saat ";
+            if ($minutes > 0) $timeStr .= $minutes . " dakika ";
+            if ($hours == 0 && $minutes == 0) $timeStr .= $seconds . " saniye ";
+
             return response()->json([
                 'status' => 'error',
-                'msg' => __('Çok sık talep oluşturup iptal ediyorsunuz. Lütfen ' . $diff . ' dakika sonra tekrar deneyin.'),
+                'msg' => __('Çok sık talep oluşturup iptal ediyorsunuz. Lütfen ' . trim($timeStr) . ' sonra tekrar deneyin.'),
             ], 429);
         }
 
