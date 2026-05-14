@@ -47,6 +47,7 @@ class OrderController extends Controller
         $project = Project::where('id',$request->project_id)->first();
         $job = JobPost::where('id',$request->job_id_for_order)->first();
         $offer = Offer::with('milestones')->where('id',$request->offer_id_for_order)->first();
+        $emergency = \App\Models\EmergencyRequest::where('id', $request->emergency_id_for_order)->first();
         $price = 0;
         $order_type = null;
 
@@ -98,6 +99,14 @@ class OrderController extends Controller
                 $delivery = $offer->deadline;
                 $project_or_job = 'offer';
                 $freelancer_id = $offer->freelancer_id;
+            }
+            if($emergency){
+                $price = $emergency->offered_price;
+                $type = 'emergency';
+                $revision = 0;
+                $delivery = 1; // 1 day default
+                $project_or_job = 'emergency';
+                $freelancer_id = $emergency->accepted_by;
             }
         }
 
@@ -265,6 +274,10 @@ class OrderController extends Controller
                 Cache::forget('proposal_id_for_order');
             }
 
+            if ($project_or_job == 'emergency') {
+                \App\Models\EmergencyRequest::where('id', $order->identity)->update(['status' => 'completed']);
+            }
+
             notificationToAdmin($last_order_id, $user_id,'Order',__('New order placed'));
             freelancer_notification($last_order_id, $freelancer_id,'Order',__('You have a new order'));
 
@@ -399,6 +412,10 @@ class OrderController extends Controller
                 }
                 if($order->is_project_job == 'offer') {
                     unset($order->project,$order->job );
+                    $order->project = null;
+                    $order->job = null;
+                }
+                if($order->is_project_job == 'emergency') {
                     $order->project = null;
                     $order->job = null;
                 }

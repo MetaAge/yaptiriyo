@@ -31,6 +31,7 @@ class OrderServiceApi
       if($request->project_id){ $identity = $request->project_id; }
       if($request->job_id_for_order){ $identity = $request->job_id_for_order; }
       if($request->offer_id_for_order){ $identity = $request->offer_id_for_order; }
+      if($request->emergency_id_for_order){ $identity = $request->emergency_id_for_order; }
 
       if($request->hasFile('manual_payment_image')){
           $manual_payment_image = $request->manual_payment_image;
@@ -114,6 +115,11 @@ class OrderServiceApi
               if($project_or_job == 'job'){
                   JobProposal::where('id',$request->proposal_id_for_order)->update(['is_hired'=>1]);
               }
+              if ($project_or_job == 'emergency') {
+                  // Manual payment doesn't complete the emergency until admin approves
+                  // But we might want to change status to 'paying' or similar?
+                  // For now let's keep it as is, or mark as processing.
+              }
 
               //status 1 means the offer is hired
               if($project_or_job == 'offer'){
@@ -142,6 +148,7 @@ class OrderServiceApi
         if($request->project_id){ $identity = $request->project_id; }
         if($request->job_id_for_order){ $identity = $request->job_id_for_order; }
         if($request->offer_id_for_order){ $identity = $request->offer_id_for_order; }
+        if($request->emergency_id_for_order){ $identity = $request->emergency_id_for_order; }
 
         $order = Order::create([
             'user_id' => $client_id,
@@ -224,6 +231,9 @@ class OrderServiceApi
         if($project_or_job == 'job'){
             JobProposal::where('id',$request->proposal_id_for_order)->update(['is_hired'=>1]);
         }
+        if ($project_or_job == 'emergency') {
+            \App\Models\EmergencyRequest::where('id', $order->identity)->update(['status' => 'completed']);
+        }
         $this->send_order_chat_message($order);
 
         $order_details = Order::with(['user','freelancer'])->where('id',$last_order_id)->first();
@@ -242,6 +252,7 @@ class OrderServiceApi
         if($request->project_id){ $identity = $request->project_id; }
         if($request->job_id_for_order){ $identity = $request->job_id_for_order; }
         if($request->offer_id_for_order){ $identity = $request->offer_id_for_order; }
+        if($request->emergency_id_for_order){ $identity = $request->emergency_id_for_order; }
 
         $order = Order::create([
             'user_id' => $client_id,
@@ -438,6 +449,7 @@ class OrderServiceApi
         if ($request->project_id) { $identity = $request->project_id; }
         if ($request->job_id_for_order) { $identity = $request->job_id_for_order; }
         if ($request->offer_id_for_order) { $identity = $request->offer_id_for_order; }
+        if ($request->emergency_id_for_order) { $identity = $request->emergency_id_for_order; }
 
         // Create order with pending payment status
         $order = Order::create([
@@ -572,6 +584,9 @@ class OrderServiceApi
             } elseif ($order->is_project_job == 'offer') {
                 $project_id = $order->identity;
                 $type = 'offer';
+            } elseif ($order->is_project_job == 'emergency') {
+                $project_id = $order->identity;
+                $type = 'emergency';
             }
 
             UserChatService::send(
