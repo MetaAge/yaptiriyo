@@ -120,6 +120,7 @@ class EmergencyController extends Controller
                 'payable_amount' => $offer->offered_price,
                 'status' => 0, // pending payment
                 'payment_status' => 'pending',
+                'is_project_job' => 'emergency',
                 'order_type' => 'emergency'
             ]);
 
