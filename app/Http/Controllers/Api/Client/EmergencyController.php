@@ -69,9 +69,9 @@ class EmergencyController extends Controller
     }
 
     /**
-     * Freelancer makes an offer for the emergency request.
+     * Freelancer accepts the emergency request (makes an offer).
      */
-    public function makeOffer(Request $request, $id)
+    public function accept(Request $request, $id)
     {
         $request->validate([
             'offered_price' => 'required|numeric|min:1',
@@ -101,8 +101,11 @@ class EmergencyController extends Controller
     /**
      * Client accepts an offer.
      */
-    public function acceptOffer($id, $offerId)
+    public function selectOffer(Request $request, $id)
     {
+        $request->validate(['offer_id' => 'required|integer']);
+        $offerId = $request->offer_id;
+
         $emergency = EmergencyRequest::where('client_id', Auth::id())
             ->where('status', 'pending')
             ->findOrFail($id);
@@ -133,7 +136,7 @@ class EmergencyController extends Controller
     /**
      * List emergency requests for freelancers (pending).
      */
-    public function listForFreelancer()
+    public function pendingForFreelancer()
     {
         $emergencies = EmergencyRequest::with('client:id,first_name,last_name,image,load_from')
             ->where('status', 'pending')
@@ -150,7 +153,7 @@ class EmergencyController extends Controller
     /**
      * List active emergency requests for client.
      */
-    public function listForClient()
+    public function activeForClient()
     {
         $emergencies = EmergencyRequest::with(['acceptedFreelancer:id,first_name,last_name,image,load_from', 'offers.freelancer'])
             ->where('client_id', Auth::id())
@@ -167,7 +170,7 @@ class EmergencyController extends Controller
     /**
      * Get single emergency request details.
      */
-    public function show($id)
+    public function status($id)
     {
         $e = EmergencyRequest::with([
             'client:id,first_name,last_name,image,load_from',
