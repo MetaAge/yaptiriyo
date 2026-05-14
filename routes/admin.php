@@ -446,7 +446,7 @@ Route::group(['as'=>'admin.','prefix'=>'admin'],function(){
         // emergency manage
         Route::group(['prefix' => 'emergency'], function () {
             Route::controller(EmergencyController::class)->group(function () {
-                Route::get('all', 'index')->name('emergency.all');
+                Route::get('all', 'index')->name('emergency.index');
                 Route::get('details/{id}', 'details')->name('emergency.details');
                 Route::post('delete/{id}', 'delete')->name('emergency.delete');
             });
