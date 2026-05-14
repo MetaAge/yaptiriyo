@@ -289,58 +289,69 @@ class EmergencyController extends Controller
      */
     private function formatEmergencyResponse($e)
     {
-        $e->load([
-            'client:id,first_name,last_name,image,load_from',
-            'acceptedFreelancer:id,first_name,last_name,image,load_from,phone',
-            'offers.freelancer:id,first_name,last_name,image,load_from',
-            'category:id,name'
-        ]);
+        try {
+            $e->load([
+                'client:id,first_name,last_name,image,load_from',
+                'acceptedFreelancer:id,first_name,last_name,image,load_from,phone',
+                'offers.freelancer:id,first_name,last_name,image,load_from',
+                'category:id,category'
+            ]);
 
-        $chat = \Modules\Chat\Entities\LiveChat::where('order_id', $e->order_id)->first();
+            $chat = null;
+            if ($e->order_id) {
+                $chat = \Modules\Chat\Entities\LiveChat::where('order_id', $e->order_id)->first();
+            }
 
-        return [
-            'id' => $e->id,
-            'title' => $e->title,
-            'description' => $e->description,
-            'status' => $e->status,
-            'latitude' => $e->latitude,
-            'longitude' => $e->longitude,
-            'address' => $e->address,
-            'category_id' => $e->category_id,
-            'category_name' => $e->category?->name ?? __('Genel'),
-            'client_id' => $e->client_id,
-            'client_name' => $e->client ? ($e->client->first_name . ' ' . $e->client->last_name) : null,
-            'client_image' => $e->client?->image,
-            'client_cloud_image' => $e->client?->image 
-                ? render_frontend_cloud_image_if_module_exists('profile/' . $e->client?->image, load_from: $e->client?->load_from)
-                : null,
-            'accepted_by' => $e->accepted_by,
-            'freelancer_id' => $e->accepted_by, // App expects freelancer_id
-            'freelancer_name' => $e->acceptedFreelancer ? ($e->acceptedFreelancer->first_name . ' ' . $e->acceptedFreelancer->last_name) : null,
-            'freelancer_image' => $e->acceptedFreelancer?->image,
-            'freelancer_cloud_image' => $e->acceptedFreelancer?->image 
-                ? render_frontend_cloud_image_if_module_exists('profile/' . $e->acceptedFreelancer?->image, load_from: $e->acceptedFreelancer?->load_from)
-                : null,
-            'freelancer_phone' => $e->acceptedFreelancer?->phone,
-            'offered_price' => $e->offered_price,
-            'order_id' => $e->order_id,
-            'live_chat_id' => $chat?->id,
-            'notified_count' => $e->notified_count ?? 0,
-            'created_at' => $e->created_at->toIso8601String(),
-            'expires_at' => $e->expires_at?->toIso8601String(),
-            'offers' => $e->offers->map(function($o) {
-                return [
-                    'id' => $o->id,
-                    'freelancer_id' => $o->freelancer_id,
-                    'freelancer_name' => $o->freelancer ? ($o->freelancer->first_name . ' ' . $o->freelancer->last_name) : __('Usta'),
-                    'freelancer_image' => $o->freelancer?->image,
-                    'freelancer_cloud_image' => $o->freelancer?->image 
-                        ? render_frontend_cloud_image_if_module_exists('profile/' . $o->freelancer?->image, load_from: $o->freelancer?->load_from)
-                        : null,
-                    'offered_price' => $o->offered_price,
-                    'created_at' => $o->created_at->toIso8601String(),
-                ];
-            })
-        ];
+            return [
+                'id' => $e->id,
+                'title' => $e->title,
+                'description' => $e->description,
+                'status' => $e->status,
+                'latitude' => $e->latitude,
+                'longitude' => $e->longitude,
+                'address' => $e->address,
+                'category_id' => $e->category_id,
+                'category_name' => $e->category ? $e->category->category : __('Genel'),
+                'client_id' => $e->client_id,
+                'client_name' => $e->client ? ($e->client->first_name . ' ' . $e->client->last_name) : null,
+                'client_image' => $e->client?->image,
+                'client_cloud_image' => $e->client?->image 
+                    ? render_frontend_cloud_image_if_module_exists('profile/' . $e->client?->image, $e->client?->load_from)
+                    : null,
+                'accepted_by' => $e->accepted_by,
+                'freelancer_id' => $e->accepted_by, 
+                'freelancer_name' => $e->acceptedFreelancer ? ($e->acceptedFreelancer->first_name . ' ' . $e->acceptedFreelancer->last_name) : null,
+                'freelancer_image' => $e->acceptedFreelancer?->image,
+                'freelancer_cloud_image' => $e->acceptedFreelancer?->image 
+                    ? render_frontend_cloud_image_if_module_exists('profile/' . $e->acceptedFreelancer?->image, $e->acceptedFreelancer?->load_from)
+                    : null,
+                'freelancer_phone' => $e->acceptedFreelancer?->phone,
+                'offered_price' => $e->offered_price,
+                'order_id' => $e->order_id,
+                'live_chat_id' => $chat?->id,
+                'notified_count' => $e->notified_count ?? 0,
+                'created_at' => $e->created_at->toIso8601String(),
+                'expires_at' => $e->expires_at ? $e->expires_at->toIso8601String() : null,
+                'offers' => $e->offers->map(function($o) {
+                    return [
+                        'id' => $o->id,
+                        'freelancer_id' => $o->freelancer_id,
+                        'freelancer_name' => $o->freelancer ? ($o->freelancer->first_name . ' ' . $o->freelancer->last_name) : __('Usta'),
+                        'freelancer_image' => $o->freelancer?->image,
+                        'freelancer_cloud_image' => $o->freelancer?->image 
+                            ? render_frontend_cloud_image_if_module_exists('profile/' . $o->freelancer?->image, $o->freelancer?->load_from)
+                            : null,
+                        'offered_price' => $o->offered_price,
+                        'created_at' => $o->created_at->toIso8601String(),
+                    ];
+                })
+            ];
+        } catch (\Exception $ex) {
+            return [
+                'id' => $e->id ?? 0,
+                'status' => $e->status ?? 'pending',
+                'error' => 'Formatting error: ' . $ex->getMessage()
+            ];
+        }
     }
 }
