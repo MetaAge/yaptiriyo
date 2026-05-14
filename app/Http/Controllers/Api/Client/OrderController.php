@@ -735,8 +735,11 @@ class OrderController extends Controller
 
             //if order from job proposal then first find job_id from order and update the job current_status
             $find_order = Order::findOrFail($id);
-            if($order && $order->is_project_job == 'job'){
+            if($find_order && $find_order->is_project_job == 'job'){
                 JobPost::where('id',$find_order->identity)->update(['current_status'=>2]);
+            }
+            if($find_order && $find_order->is_project_job == 'emergency'){
+                \App\Models\EmergencyRequest::where('id', $find_order->identity)->update(['status'=>'completed']);
             }
             return response()->json(['msg' => __('Order Successfully Completed')]);
         }
