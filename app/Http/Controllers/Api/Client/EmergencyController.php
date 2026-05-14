@@ -20,42 +20,54 @@ class EmergencyController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'title' => 'required|string|max:255',
+            'title' => 'nullable|string|max:255',
             'description' => 'required|string',
-            'latitude' => 'required|numeric',
-            'longitude' => 'required|numeric',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
             'category_id' => 'required|exists:categories,id',
+            'city_id' => 'nullable|integer',
+            'address' => 'nullable|string',
         ]);
 
         $emergency = EmergencyRequest::create([
             'client_id' => Auth::id(),
-            'title' => $request->title,
+            'title' => $request->title ?? __('Acil Yardım Talebi'),
             'description' => $request->description,
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
             'category_id' => $request->category_id,
+            'city_id' => $request->city_id,
+            'address' => $request->address,
             'status' => 'pending',
-            'expires_at' => now()->addMinutes(30), // SOS requests expire in 30 mins if not accepted
+            'expires_at' => now()->addMinutes(30),
         ]);
 
-        // Find freelancers within 20km radius (simple box for now)
-        $freelancers = User::where('user_type', 2) // Freelancer
-            ->whereBetween('latitude', [$request->latitude - 0.2, $request->latitude + 0.2])
-            ->whereBetween('longitude', [$request->longitude - 0.2, $request->longitude + 0.2])
-            ->get();
+        // Find freelancers
+        $query = User::where('user_type', 2);
+
+        if ($request->latitude && $request->longitude) {
+            // Find within 20km radius (simple box)
+            $query->whereBetween('latitude', [$request->latitude - 0.2, $request->latitude + 0.2])
+                  ->whereBetween('longitude', [$request->longitude - 0.2, $request->longitude + 0.2]);
+        } elseif ($request->city_id) {
+            // Fallback to city-based search if no coordinates
+            $query->where('city_id', $request->city_id);
+        }
+
+        $freelancers = $query->get();
 
         foreach ($freelancers as $f) {
             freelancer_notification(
                 $emergency->id,
                 $f->id,
                 'Emergency',
-                __('Yeni bir acil yardım talebi var: ') . $request->title
+                __('Yeni bir acil yardım talebi var: ') . $emergency->title
             );
         }
 
         return response()->json([
             'status' => 'success',
-            'msg' => __('Acil yardım talebiniz oluşturuldu ve yakındaki ustalara bildirildi.'),
+            'msg' => __('Acil yardım talebiniz oluşturuldu ve ustalara bildirildi.'),
             'emergency' => $emergency
         ]);
     }

@@ -9,10 +9,13 @@ class EmergencyRequest extends Model
 {
     protected $fillable = [
         'client_id',
+        'title',
         'category_id',
         'city_id',
         'description',
         'address',
+        'latitude',
+        'longitude',
         'status',
         'accepted_by',
         'offered_price',
