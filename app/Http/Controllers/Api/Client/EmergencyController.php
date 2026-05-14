@@ -127,13 +127,6 @@ class EmergencyController extends Controller
                 'freelancer_id' => $offer->freelancer_id,
             ]);
 
-            $emergency->update([
-                'accepted_by' => $offer->freelancer_id,
-                'offered_price' => $offer->offered_price,
-                'order_id' => $order->id,
-                'status' => 'accepted'
-            ]);
-
             freelancer_notification(
                 $emergency->id,
                 $offer->freelancer_id,
