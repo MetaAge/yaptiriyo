@@ -25,6 +25,7 @@ class EmergencyRequest extends Model
         'freelancer_status',
         'freelancer_lat',
         'freelancer_long',
+        'order_id',
     ];
 
     protected $casts = [

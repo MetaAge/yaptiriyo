@@ -109,8 +109,16 @@ class EmergencyController extends Controller
             ->findOrFail($id);
 
         $offer = EmergencyOffer::where('emergency_request_id', $id)->findOrFail($offerId);
+        $user = User::find($offer->freelancer_id);
 
         if ($emergency->status === 'pending') {
+            // Get commission settings
+            $commission_type = get_static_option('admin_commission_type') ?? 'percentage';
+            $commission_charge = get_static_option('admin_commission_charge') ?? 0;
+            $individual_commission = \App\Models\IndividualCommissionSetting::select(['user_id','admin_commission_type','admin_commission_charge'])->where('user_id',$user->id)->first();
+            $subscription_commission = get_user_subscription_commission($user->id);
+            $commission_amount = commission_amount($offer->offered_price, $individual_commission, $subscription_commission, $commission_type, $commission_charge);
+
             // Create an order for this emergency
             $order = Order::create([
                 'user_id' => $emergency->client_id,
@@ -118,7 +126,11 @@ class EmergencyController extends Controller
                 'identity' => $emergency->id,
                 'price' => $offer->offered_price,
                 'payable_amount' => $offer->offered_price,
+                'commission_type' => $commission_type,
+                'commission_charge' => $commission_charge,
+                'commission_amount' => $commission_amount,
                 'status' => 0, // pending payment
+                'payment_gateway' => 'manual_payment', // placeholder until payment
                 'payment_status' => 'pending',
                 'is_project_job' => 'emergency',
                 'order_type' => 'emergency'
