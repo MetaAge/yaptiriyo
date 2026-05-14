@@ -42,14 +42,11 @@ class EmergencyController extends Controller
             'expires_at' => now()->addMinutes(30),
         ]);
 
-        // Find freelancers
+        // Find freelancers by city
         $query = User::where('user_type', 2);
-
         if ($request->city_id) {
-            // Fallback to city-based search if no coordinates
             $query->where('city_id', $request->city_id);
         }
-
         $freelancers = $query->get();
 
         foreach ($freelancers as $f) {
@@ -115,8 +112,7 @@ class EmergencyController extends Controller
         $emergency->update([
             'accepted_by' => $offer->freelancer_id,
             'offered_price' => $offer->offered_price,
-            'status' => 'accepted',
-            'freelancer_status' => 'accepted'
+            'status' => 'accepted'
         ]);
 
         freelancer_notification(
@@ -178,13 +174,6 @@ class EmergencyController extends Controller
             'offers.freelancer:id,first_name,last_name,image,load_from'
         ])->findOrFail($id);
 
-        // Security check
-        if ($e->client_id != Auth::id() && $e->accepted_by != Auth::id() && $e->status != 'pending') {
-             // If not client, not accepted freelancer, and not a public pending request
-             // then unauthorized
-             // but for simplicity in this SOS flow, we allow viewing if pending
-        }
-
         $chat = \Modules\Chat\Entities\LiveChat::where('order_id', $e->order_id)->first();
 
         $response = [
@@ -192,7 +181,6 @@ class EmergencyController extends Controller
             'title' => $e->title,
             'description' => $e->description,
             'status' => $e->status,
-            'freelancer_status' => $e->freelancer_status,
             'latitude' => $e->latitude,
             'longitude' => $e->longitude,
             'client_id' => $e->client_id,
@@ -208,8 +196,6 @@ class EmergencyController extends Controller
                 ? render_frontend_cloud_image_if_module_exists('profile/' . $e->acceptedFreelancer?->image, load_from: $e->acceptedFreelancer?->load_from)
                 : null,
             'offered_price' => $e->offered_price,
-            'freelancer_lat' => $e->freelancer_lat,
-            'freelancer_long' => $e->freelancer_long,
             'order_id' => $e->order_id,
             'live_chat_id' => $chat?->id,
             'notified_count' => $e->notified_count ?? 0,
@@ -270,21 +256,15 @@ class EmergencyController extends Controller
             return response()->json(['status' => 'error', 'msg' => __('Talep bulunamadı veya zaten tamamlanmış.')], 400);
         }
 
-        // Update emergency status
         $emergency->update(['status' => 'completed']);
 
-        // Release funds if order exists
         if ($emergency->order_id) {
             $order = \App\Models\Order::find($emergency->order_id);
             if ($order && $order->status != 3) {
-                // Mark order as complete
                 $order->update(['status' => 3]);
-
-                // Transfer money to freelancer's earnings/wallet
                 $freelancer_id = $order->freelancer_id;
                 $payable_amount = $order->payable_amount;
 
-                // Update UserEarning
                 $total_earning = \App\Models\UserEarning::where('user_id', $freelancer_id)->first();
                 if ($total_earning) {
                     $total_earning->update([
@@ -299,7 +279,6 @@ class EmergencyController extends Controller
                     ]);
                 }
 
-                // Update Wallet
                 $wallet = \Modules\Wallet\Entities\Wallet::where('user_id', $freelancer_id)->first();
                 if ($wallet) {
                     $wallet->update([
@@ -308,7 +287,6 @@ class EmergencyController extends Controller
                     ]);
                 }
 
-                // Create Wallet History
                 \Modules\Wallet\Entities\WalletHistory::create([
                     'user_id' => $freelancer_id,
                     'payment_gateway' => 'Order',
@@ -348,86 +326,11 @@ class EmergencyController extends Controller
             ->findOrFail($id);
 
         $emergency->update(['status' => 'cancelled']);
-
-        // Delete associated offers
         EmergencyOffer::where('emergency_request_id', $emergency->id)->delete();
 
         return response()->json([
             'status' => 'success',
             'msg' => __('Talebiniz başarıyla iptal edildi.'),
-        ]);
-    }
-
-    /**
-     * Freelancer updates their tracking status and location.
-     */
-    public function updateTracking(Request $request, $id)
-    {
-        $request->validate([
-            'freelancer_status' => 'nullable|string|in:on_the_way,arrived,working,completed',
-            'latitude' => 'nullable|numeric',
-            'longitude' => 'nullable|numeric',
-        ]);
-
-        $emergency = EmergencyRequest::where('accepted_by', Auth::id())->findOrFail($id);
-
-        // Security: Can only update tracking if paid (order_id exists)
-        if (!$emergency->order_id) {
-            return response()->json([
-                'status' => 'error',
-                'msg' => __('Müşteri henüz ödeme yapmadı. Ödeme yapıldıktan sonra durum güncelleyebilirsiniz.')
-            ], 403);
-        }
-
-        $updateData = [];
-        if ($request->has('freelancer_status')) {
-            $updateData['freelancer_status'] = $request->freelancer_status;
-        }
-        if ($request->has('latitude')) {
-            $updateData['freelancer_lat'] = $request->latitude;
-        }
-        if ($request->has('longitude')) {
-            $updateData['freelancer_long'] = $request->longitude;
-        }
-
-        $emergency->update($updateData);
-
-        // If freelancer says completed, also update the Order status to 2 (Delivered/Submitted)
-        if ($request->freelancer_status === 'completed' && $emergency->order_id) {
-            $order = Order::find($emergency->order_id);
-            if ($order && $order->status == 1) { // If it was active, move it to delivered
-                $order->update(['status' => 2]);
-                
-                // Log submission history for standard compliance
-                \App\Models\OrderSubmitHistory::create([
-                    'order_id' => $order->id,
-                    'description' => __('Usta acil hizmeti tamamladı.'),
-                    'attachment' => null
-                ]);
-            }
-        }
-
-        // Notify client if status changed
-        if ($request->has('freelancer_status')) {
-            $statusMessages = [
-                'on_the_way' => __('Usta yola çıktı!'),
-                'arrived' => __('Usta adrese vardı.'),
-                'working' => __('Usta çalışmaya başladı.'),
-                'completed' => __('Usta işi bitirdi! Lütfen onaylayın.'),
-            ];
-            
-            client_notification(
-                $emergency->id,
-                $emergency->client_id,
-                'Emergency',
-                $statusMessages[$request->freelancer_status] ?? __('Usta durumunu güncelledi.')
-            );
-        }
-
-        return response()->json([
-            'status' => 'success',
-            'msg' => __('Durum güncellendi.'),
-            'freelancer_status' => $emergency->freelancer_status,
         ]);
     }
 }
