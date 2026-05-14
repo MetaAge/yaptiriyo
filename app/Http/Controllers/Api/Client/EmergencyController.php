@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Carbon;
 
 class EmergencyController extends Controller
@@ -104,28 +105,33 @@ class EmergencyController extends Controller
         $offerId = $request->offer_id;
 
         $emergency = EmergencyRequest::where('client_id', Auth::id())
-            ->where('status', 'pending')
+            ->whereIn('status', ['pending', 'accepted'])
             ->findOrFail($id);
 
         $offer = EmergencyOffer::where('emergency_request_id', $id)->findOrFail($offerId);
 
-        $emergency->update([
-            'accepted_by' => $offer->freelancer_id,
-            'offered_price' => $offer->offered_price,
-            'status' => 'accepted'
-        ]);
+        if ($emergency->status === 'pending') {
+            $emergency->update([
+                'accepted_by' => $offer->freelancer_id,
+                'offered_price' => $offer->offered_price,
+                'status' => 'accepted'
+            ]);
 
-        freelancer_notification(
-            $emergency->id,
-            $offer->freelancer_id,
-            'Emergency',
-            __('Acil talebi teklifiniz kabul edildi! Lütfen ödemeyi bekleyin.')
-        );
+            freelancer_notification(
+                $emergency->id,
+                $offer->freelancer_id,
+                'Emergency',
+                __('Acil talebi teklifiniz kabul edildi! Lütfen ödemeyi bekleyin.')
+            );
+        }
+
+        $formatted = $this->formatEmergencyResponse($emergency);
 
         return response()->json([
             'status' => 'success',
             'msg' => __('Teklif kabul edildi. Lütfen devam etmek için ödemeyi tamamlayın.'),
-            'emergency' => $this->formatEmergencyResponse($emergency)
+            'emergency' => $formatted,
+            'live_chat_id' => $formatted['live_chat_id'] ?? null
         ]);
     }
 
