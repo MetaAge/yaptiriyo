@@ -9,25 +9,20 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('reel_likes', function (Blueprint $table) {
-            // Önce varsa mükerrer kayıtları temizleyelim (güvenlik için)
-            $duplicates = DB::table('reel_likes')
-                ->select('reel_id', 'user_id')
-                ->groupBy('reel_id', 'user_id')
-                ->havingRaw('COUNT(*) > 1')
-                ->get();
+            // İndeks zaten var mı kontrol edelim
+            $conn = Schema::getConnection();
+            $dbName = $conn->getDatabaseName();
+            $indexExists = DB::select("
+                SELECT INDEX_NAME 
+                FROM INFORMATION_SCHEMA.STATISTICS 
+                WHERE TABLE_SCHEMA = ? 
+                AND TABLE_NAME = 'reel_likes' 
+                AND INDEX_NAME = 'reel_likes_reel_id_user_id_unique'
+            ", [$dbName]);
 
-            foreach ($duplicates as $duplicate) {
-                $ids = DB::table('reel_likes')
-                    ->where('reel_id', $duplicate->reel_id)
-                    ->where('user_id', $duplicate->user_id)
-                    ->pluck('id');
-                
-                // İlkini tutup geri kalanını silelim
-                DB::table('reel_likes')->whereIn('id', $ids->slice(1))->delete();
+            if (empty($indexExists)) {
+                $table->unique(['reel_id', 'user_id']);
             }
-
-            $table->unique(['reel_id', 'user_id']);
         });
     }
 
