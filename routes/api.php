@@ -223,6 +223,7 @@ Route::group(['prefix' => 'v1', 'middleware' => 'setlang'], function () {
                 Route::post('emergency/accept/{id}', 'accept');
                 Route::get('emergency/pending', 'pendingForFreelancer');
                 Route::get('emergency/accepted', 'acceptedForFreelancer');
+                Route::post('emergency/update-tracking/{id}', 'updateTracking');
             });
 
             // Reels (Freelancer Side)

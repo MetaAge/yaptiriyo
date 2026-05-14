@@ -321,6 +321,7 @@ class EmergencyController extends Controller
             'offered_price' => $offer->offered_price,
             'accepted_at' => now(),
             'expires_at' => now()->addMinutes(30), // Reset timer for payment
+            'freelancer_status' => 'accepted',
         ]);
 
         // Update offer status
@@ -417,6 +418,7 @@ class EmergencyController extends Controller
                     'offered_price' => $e->offered_price,
                     'accepted_at' => $e->accepted_at?->toIso8601String(),
                     'live_chat_id' => $chat?->id,
+                    'freelancer_status' => $e->freelancer_status,
                 ];
             });
 
@@ -466,9 +468,13 @@ class EmergencyController extends Controller
                 ? render_frontend_cloud_image_if_module_exists('profile/' . $e->acceptedFreelancer->image, load_from: $e->acceptedFreelancer->load_from)
                 : null,
             'freelancer_phone' => $e->acceptedFreelancer?->phone,
+            'freelancer_status' => $e->freelancer_status,
+            'freelancer_lat' => $e->freelancer_lat,
+            'freelancer_long' => $e->freelancer_long,
             'live_chat_id' => $chat?->id,
             'notified_count' => $e->notified_count ?? 0,
             'created_at' => $e->created_at->toIso8601String(),
+            'expires_at' => $e->expires_at?->toIso8601String(),
         ];
 
         if ($e->status === 'pending') {
@@ -490,6 +496,39 @@ class EmergencyController extends Controller
         return response()->json([
             'status' => 'success',
             'emergency' => $response
+        ]);
+    }
+
+    /**
+     * Freelancer updates their tracking status and location.
+     */
+    public function updateTracking(Request $request, $id)
+    {
+        $request->validate([
+            'freelancer_status' => 'nullable|string|in:accepted,on_the_way,arrived,working',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
+        ]);
+
+        $emergency = EmergencyRequest::where('accepted_by', Auth::id())->findOrFail($id);
+
+        $updateData = [];
+        if ($request->has('freelancer_status')) {
+            $updateData['freelancer_status'] = $request->freelancer_status;
+        }
+        if ($request->has('latitude')) {
+            $updateData['freelancer_lat'] = $request->latitude;
+        }
+        if ($request->has('longitude')) {
+            $updateData['freelancer_long'] = $request->longitude;
+        }
+
+        $emergency->update($updateData);
+
+        return response()->json([
+            'status' => 'success',
+            'msg' => __('Durum güncellendi.'),
+            'freelancer_status' => $emergency->freelancer_status,
         ]);
     }
 }

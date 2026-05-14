@@ -26,9 +26,10 @@ use App\Http\Controllers\Backend\TransactionController;
 use App\Http\Controllers\Backend\UserManageController;
 use App\Http\Controllers\Backend\UserReportController;
 use App\Http\Controllers\Backend\WidgetBuilderController;
-use App\Http\Controllers\Common\MediaUploadController;
 use App\Http\Controllers\Backend\CanContactFreelancerController;
+use App\Http\Controllers\Common\MediaUploadController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Backend\EmergencyController;
 use Modules\RolePermission\Http\Controllers\AdminManageController;
 
 $adminRoute = get_static_option('admin_url_prefix') ?? 'admin';
@@ -440,6 +441,15 @@ Route::group(['as'=>'admin.','prefix'=>'admin'],function(){
             Route::post('languages/add-new-word','add_new_words')->name('languages.add.new.word')->permission('language-word-add');
             Route::post('languages/regenerate-source-text','regenerate_source_text')->name('languages.regenerate.source.texts');
             Route::get('languages/default/{id}','make_default')->name('languages.make.default');
+        });
+
+        // emergency manage
+        Route::group(['prefix' => 'emergency'], function () {
+            Route::controller(EmergencyController::class)->group(function () {
+                Route::get('all', 'index')->name('emergency.all');
+                Route::get('details/{id}', 'details')->name('emergency.details');
+                Route::post('delete/{id}', 'delete')->name('emergency.delete');
+            });
         });
 
     });

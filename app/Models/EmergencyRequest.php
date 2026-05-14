@@ -19,6 +19,9 @@ class EmergencyRequest extends Model
         'accepted_at',
         'expires_at',
         'notified_count',
+        'freelancer_status',
+        'freelancer_lat',
+        'freelancer_long',
     ];
 
     protected $casts = [

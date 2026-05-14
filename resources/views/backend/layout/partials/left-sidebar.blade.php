@@ -389,6 +389,14 @@
                     </ul>
                 </li>
 
+                <!-- Emergency SOS -->
+                <li class="dashboard__bottom__list__item @if (request()->is('admin/emergency*')) active @endif">
+                    <a href="{{ route('admin.emergency.index') }}">
+                        <i class="fa-solid fa-truck-medical"></i>
+                        {{ __('Emergency SOS') }}
+                    </a>
+                </li>
+
                 <!-- Reels Management -->
                 <li class="dashboard__bottom__list__item @if (request()->is('admin/reels*')) active @endif">
                     <a href="{{ route('admin.reels.all') }}">
