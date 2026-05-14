@@ -27,17 +27,53 @@ class EmergencyController extends Controller
             'address' => 'nullable|string|max:255',
         ]);
 
-        $clientId = Auth::id();
+        $user = Auth::user();
+        $clientId = $user->id;
 
-        // Prevent duplicate pending requests
+        // Option 4: Verified Status
+        if (!$user->is_email_verified) {
+            return response()->json([
+                'status' => 'error',
+                'msg' => __('Acil talep oluşturabilmek için e-posta adresinizi doğrulamış olmanız gerekmektedir.'),
+            ], 403);
+        }
+
+        // Option 3: Cooldown after cancellation/expiration
+        $recentIssue = EmergencyRequest::where('client_id', $clientId)
+            ->whereIn('status', ['cancelled', 'expired'])
+            ->where('updated_at', '>', now()->subMinutes(60))
+            ->first();
+
+        if ($recentIssue) {
+            $diff = 60 - now()->diffInMinutes($recentIssue->updated_at);
+            return response()->json([
+                'status' => 'error',
+                'msg' => __('Çok sık talep oluşturup iptal ediyorsunuz. Lütfen ' . $diff . ' dakika sonra tekrar deneyin.'),
+            ], 429);
+        }
+
+        // Option 5: Daily Penalty System
+        $dailyIssuesCount = EmergencyRequest::where('client_id', $clientId)
+            ->whereIn('status', ['cancelled', 'expired'])
+            ->where('updated_at', '>', now()->subDay())
+            ->count();
+
+        if ($dailyIssuesCount >= 3) {
+            return response()->json([
+                'status' => 'error',
+                'msg' => __('Son 24 saat içinde çok fazla başarısız talebiniz olduğu için bu özellik geçici olarak kısıtlanmıştır.'),
+            ], 403);
+        }
+
+        // Prevent duplicate pending or accepted requests
         $existing = EmergencyRequest::where('client_id', $clientId)
-            ->where('status', 'pending')
+            ->whereIn('status', ['pending', 'accepted'])
             ->first();
 
         if ($existing) {
             return response()->json([
                 'status' => 'error',
-                'msg' => __('Zaten bekleyen bir acil talebiniz var.'),
+                'msg' => __('Zaten aktif bir acil talebiniz var.'),
                 'emergency_id' => $existing->id,
             ], 409);
         }
