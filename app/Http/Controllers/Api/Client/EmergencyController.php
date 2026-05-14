@@ -146,8 +146,9 @@ class EmergencyController extends Controller
                     'created_at' => $emergency->created_at->toIso8601String(),
                 ],
             ]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error("Emergency create failed: " . $e->getMessage() . " at " . $e->getFile() . ":" . $e->getLine());
+            Log::error($e->getTraceAsString());
             return response()->json([
                 'status' => 'error',
                 'msg' => __('Bir hata oluştu: ') . $e->getMessage(),
