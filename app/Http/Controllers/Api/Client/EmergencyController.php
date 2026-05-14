@@ -38,7 +38,8 @@ class EmergencyController extends Controller
             ], 403);
         }
 
-        // Option 3: Cooldown after cancellation/expiration (Latest record based)
+        // Option 3: Cooldown (Disabled to prevent testing issues)
+        /*
         $recentIssue = EmergencyRequest::where('client_id', $clientId)
             ->whereIn('status', ['cancelled', 'expired'])
             ->where('updated_at', '>', now()->subMinutes(60)) // 1 saatlik pencere
@@ -65,6 +66,7 @@ class EmergencyController extends Controller
                 ], 429);
             }
         }
+        */
 
         // Option 5: Daily Penalty System
         $dailyIssuesCount = EmergencyRequest::where('client_id', $clientId)
