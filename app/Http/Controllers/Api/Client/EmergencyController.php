@@ -17,7 +17,7 @@ class EmergencyController extends Controller
     /**
      * Create a new emergency request.
      */
-    public function store(Request $request)
+    public function create(Request $request)
     {
         $request->validate([
             'title' => 'nullable|string|max:255',
