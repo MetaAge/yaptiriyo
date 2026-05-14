@@ -70,6 +70,11 @@ class Order extends Model
         return $this->belongsTo(JobPost::class,'identity','id');
     }
 
+    public function emergency()
+    {
+        return $this->belongsTo(EmergencyRequest::class, 'identity', 'id');
+    }
+
     public function order_mile_stones()
     {
         return $this->hasMany(OrderMilestone::class,'order_id','id');

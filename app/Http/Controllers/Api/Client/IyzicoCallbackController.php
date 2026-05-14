@@ -80,6 +80,10 @@ class IyzicoCallbackController extends Controller
                 }
             }
 
+            if ($order->is_project_job == 'emergency') {
+                \App\Models\EmergencyRequest::where('id', $order->identity)->update(['status' => 'completed']);
+            }
+
             // Notifications
             notificationToAdmin($order->id, $order->user_id, 'Order', __('New order placed'));
             freelancer_notification($order->id, $order->freelancer_id, 'Order', __('You have a new order'));

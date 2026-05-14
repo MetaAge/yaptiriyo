@@ -353,7 +353,8 @@ class OrderController extends Controller
             $complete_orders = Order::where('user_id',$client_id)->whereHas('freelancer')->where('status',3)->count();
             $cancel_orders = Order::where('user_id',$client_id)->whereHas('freelancer')->where('status',4)->count();
         }else{
-            $orders = Order::where('user_id', $client_id)
+            $orders = Order::with(['project', 'job', 'freelancer', 'emergency'])
+                ->where('user_id', $client_id)
                 ->where('is_project_job', '!=', 'project')
                 ->whereHas('freelancer')
                 ->where(function ($query) {
@@ -418,6 +419,7 @@ class OrderController extends Controller
                 if($order->is_project_job == 'emergency') {
                     $order->project = null;
                     $order->job = null;
+                    $order->emergency = $order->emergency;
                 }
 
                 return $order;
@@ -472,6 +474,7 @@ class OrderController extends Controller
                 'freelancer:id,first_name,last_name,email,phone,country_id,state_id,city_id,image,username,user_verified_status,load_from',
                 'project:id,title',
                 'job:id,title,hourly_rate,estimated_hours',
+                'emergency',
                 'order_submit_history',
                 'hourly_work_history:id,order_id,start_date,end_date,hours_worked,notes',
                 'rating',

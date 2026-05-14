@@ -615,11 +615,15 @@ class OrderIPNController extends Controller
     }
     private function update_database($last_order_id,$transaction_id,$user_id,$freelancer_id,$project_or_job,$proposal_id)
     {
-        $order_info = Order::select('price','payable_amount','transaction_amount','commission_amount')->where('id',$last_order_id)->first();
+        $order_info = Order::where('id',$last_order_id)->first();
         
         if (is_null($order_info)) {
             Log::warning('OrderIPNController: Order not found during update_database. Order ID: ' . $last_order_id);
             return;
+        }
+
+        if (!$project_or_job) {
+            $project_or_job = $order_info->is_project_job;
         }
 
         if(moduleExists('CurrencySwitcher')){
