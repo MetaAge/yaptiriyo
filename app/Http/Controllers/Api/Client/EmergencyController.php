@@ -336,6 +336,26 @@ class EmergencyController extends Controller
     }
 
     /**
+     * Client cancels an emergency request.
+     */
+    public function cancel($id)
+    {
+        $emergency = EmergencyRequest::where('client_id', Auth::id())
+            ->whereIn('status', ['pending'])
+            ->findOrFail($id);
+
+        $emergency->update(['status' => 'cancelled']);
+
+        // Delete associated offers
+        EmergencyOffer::where('emergency_request_id', $emergency->id)->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'msg' => __('Talebiniz başarıyla iptal edildi.'),
+        ]);
+    }
+
+    /**
      * Freelancer updates their tracking status and location.
      */
     public function updateTracking(Request $request, $id)
