@@ -72,7 +72,7 @@ class EmergencyController extends Controller
             ->where('updated_at', '>', now()->subDay())
             ->count();
 
-        if ($dailyIssuesCount >= 3) {
+        if ($dailyIssuesCount >= 20) {
             return response()->json([
                 'status' => 'error',
                 'msg' => __('Son 24 saat içinde çok fazla başarısız talebiniz olduğu için bu özellik geçici olarak kısıtlanmıştır.'),
