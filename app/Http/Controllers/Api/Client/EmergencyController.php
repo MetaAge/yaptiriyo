@@ -275,6 +275,7 @@ class EmergencyController extends Controller
             'accepted_by' => $offer->freelancer_id,
             'offered_price' => $offer->offered_price,
             'accepted_at' => now(),
+            'expires_at' => now()->addMinutes(30), // Reset timer for payment
         ]);
 
         // Update offer status
@@ -323,6 +324,7 @@ class EmergencyController extends Controller
 
         $emergencies = EmergencyRequest::with('category:id,category', 'client:id,first_name,last_name')
             ->where('status', 'pending')
+            ->where('expires_at', '>', now())
             ->where('city_id', $user->city_id)
             ->whereIn('category_id', $categoryIds)
             ->latest()
@@ -390,6 +392,12 @@ class EmergencyController extends Controller
             ->first();
 
         if (!$e) {
+            return response()->json(['status' => 'success', 'emergency' => null]);
+        }
+
+        // Check for expiration
+        if ($e->expires_at && now()->gt($e->expires_at)) {
+            $e->update(['status' => 'expired']);
             return response()->json(['status' => 'success', 'emergency' => null]);
         }
 
