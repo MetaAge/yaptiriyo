@@ -94,58 +94,65 @@ class EmergencyController extends Controller
             ], 409);
         }
 
-        $emergency = EmergencyRequest::create([
-            'client_id' => $clientId,
-            'category_id' => $request->category_id,
-            'city_id' => $request->city_id,
-            'description' => $request->description,
-            'address' => $request->address,
-            'status' => 'pending',
-            'expires_at' => now()->addMinutes(30), // Infrastructure ready, not enforced
-        ]);
+        try {
+            $emergency = EmergencyRequest::create([
+                'client_id' => $clientId,
+                'category_id' => $request->category_id,
+                'city_id' => $request->city_id,
+                'description' => $request->description,
+                'address' => $request->address,
+                'status' => 'pending',
+                'expires_at' => now()->addMinutes(30),
+            ]);
 
-        // Find available freelancers in the same city with projects in this category
-        $freelancers = User::where('user_type', 2) // freelancer
-            // ->where('check_work_availability', 1) // Temporarily disabled for testing
-            ->where('city_id', $request->city_id) // same city
-            ->whereHas('projects', function ($q) use ($request) {
-                $q->where('category_id', $request->category_id)
-                  ->where('status', 1);
-            })
-            ->whereNotNull('firebase_device_token')
-            ->get();
+            // Find available freelancers
+            $freelancers = User::where('user_type', 2)
+                ->where('city_id', $request->city_id)
+                ->whereHas('projects', function ($q) use ($request) {
+                    $q->where('category_id', $request->category_id)
+                      ->where('status', 1);
+                })
+                ->whereNotNull('firebase_device_token')
+                ->get();
 
-        $category = Category::find($request->category_id);
-        $categoryName = $category ? $category->category : 'Hizmet';
-        $notifiedCount = 0;
+            $category = Category::find($request->category_id);
+            $categoryName = $category ? $category->category : 'Hizmet';
+            $notifiedCount = 0;
 
-        foreach ($freelancers as $freelancer) {
-            try {
-                freelancer_notification(
-                    $emergency->id,
-                    $freelancer->id,
-                    'Emergency',
-                    '🚨 Acil ' . $categoryName . ' talebi! Hemen yanıt ver ve teklif gönder.'
-                );
-                $notifiedCount++;
-            } catch (\Exception $e) {
-                Log::error("Emergency notification failed for user {$freelancer->id}: " . $e->getMessage());
+            foreach ($freelancers as $freelancer) {
+                try {
+                    freelancer_notification(
+                        $emergency->id,
+                        $freelancer->id,
+                        'Emergency',
+                        '🚨 Acil ' . $categoryName . ' talebi! Hemen yanıt ver ve teklif gönder.'
+                    );
+                    $notifiedCount++;
+                } catch (\Exception $e) {
+                    Log::error("Emergency notification failed for user {$freelancer->id}: " . $e->getMessage());
+                }
             }
+
+            $emergency->update(['notified_count' => $notifiedCount]);
+
+            return response()->json([
+                'status' => 'success',
+                'msg' => __('Acil talebiniz oluşturuldu! ') . $notifiedCount . __(' hizmet verene bildirim gönderildi.'),
+                'emergency' => [
+                    'id' => $emergency->id,
+                    'status' => $emergency->status,
+                    'notified_count' => $notifiedCount,
+                    'category_name' => $categoryName,
+                    'created_at' => $emergency->created_at->toIso8601String(),
+                ],
+            ]);
+        } catch (\Exception $e) {
+            Log::error("Emergency create failed: " . $e->getMessage() . " at " . $e->getFile() . ":" . $e->getLine());
+            return response()->json([
+                'status' => 'error',
+                'msg' => __('Bir hata oluştu: ') . $e->getMessage(),
+            ], 500);
         }
-
-        $emergency->update(['notified_count' => $notifiedCount]);
-
-        return response()->json([
-            'status' => 'success',
-            'msg' => __('Acil talebiniz oluşturuldu! ') . $notifiedCount . __(' hizmet verene bildirim gönderildi.'),
-            'emergency' => [
-                'id' => $emergency->id,
-                'status' => $emergency->status,
-                'notified_count' => $notifiedCount,
-                'category_name' => $categoryName,
-                'created_at' => $emergency->created_at->toIso8601String(),
-            ],
-        ]);
     }
 
     /**
