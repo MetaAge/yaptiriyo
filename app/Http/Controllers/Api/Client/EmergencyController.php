@@ -38,27 +38,32 @@ class EmergencyController extends Controller
             ], 403);
         }
 
-        // Option 3: Cooldown after cancellation/expiration
+        // Option 3: Cooldown after cancellation/expiration (Latest record based)
         $recentIssue = EmergencyRequest::where('client_id', $clientId)
             ->whereIn('status', ['cancelled', 'expired'])
-            ->where('updated_at', '>', now()->subMinutes(60))
+            ->where('updated_at', '>', now()->subMinutes(120)) // 2 saatlik pencere
+            ->latest('updated_at')
             ->first();
 
         if ($recentIssue) {
-            $diffSeconds = 3600 - now()->diffInSeconds($recentIssue->updated_at);
-            $hours = floor($diffSeconds / 3600);
-            $minutes = floor(($diffSeconds % 3600) / 60);
-            $seconds = $diffSeconds % 60;
+            $diffSeconds = 7200 - now()->diffInSeconds($recentIssue->updated_at, false);
             
-            $timeStr = "";
-            if ($hours > 0) $timeStr .= $hours . " saat ";
-            if ($minutes > 0) $timeStr .= $minutes . " dakika ";
-            if ($hours == 0 && $minutes == 0) $timeStr .= $seconds . " saniye ";
+            // Eğer süre dolmuşsa veya negatifse kısıtlamayı geç
+            if ($diffSeconds > 0) {
+                $hours = floor($diffSeconds / 3600);
+                $minutes = floor(($diffSeconds % 3600) / 60);
+                $seconds = $diffSeconds % 60;
+                
+                $timeStr = "";
+                if ($hours > 0) $timeStr .= $hours . " saat ";
+                if ($minutes > 0) $timeStr .= $minutes . " dakika ";
+                $timeStr .= $seconds . " saniye";
 
-            return response()->json([
-                'status' => 'error',
-                'msg' => __('Çok sık talep oluşturup iptal ediyorsunuz. Lütfen ' . trim($timeStr) . ' sonra tekrar deneyin.'),
-            ], 429);
+                return response()->json([
+                    'status' => 'error',
+                    'msg' => __('Çok sık talep oluşturup iptal ediyorsunuz. Güvenlik nedeniyle lütfen ' . trim($timeStr) . ' sonra tekrar deneyin.'),
+                ], 429);
+            }
         }
 
         // Option 5: Daily Penalty System
