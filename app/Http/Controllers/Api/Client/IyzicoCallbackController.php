@@ -59,7 +59,7 @@ class IyzicoCallbackController extends Controller
             // Update order as paid
             $order->update([
                 'payment_status' => 'complete',
-                'status' => 0,
+                'status' => $order->is_project_job == 'emergency' ? 1 : 0,
                 'price' => $order->price - $order->transaction_amount,
             ]);
 

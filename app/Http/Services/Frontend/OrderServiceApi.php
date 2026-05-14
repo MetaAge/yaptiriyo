@@ -69,7 +69,7 @@ class OrderServiceApi
                   'payment_gateway' => $request->selected_payment_gateway,
                   'payment_status' => $payment_status,
                   'manual_payment_image' => $manual_payment_image_name,
-                  'status' => 0,
+                  'status' => $project_or_job == 'emergency' ? 1 : 0,
                   'appointment_date' => $request->appointment_date,
                   'appointment_time' => $request->appointment_time,
                   'service_address' => $request->service_address,
@@ -170,7 +170,7 @@ class OrderServiceApi
             'payable_amount' => $payable_amount,
             'payment_gateway' => $request->selected_payment_gateway,
             'payment_status' => $payment_status,
-            'status' => 0,
+            'status' => $project_or_job == 'emergency' ? 1 : 0,
             'appointment_date' => $request->appointment_date,
             'appointment_time' => $request->appointment_time,
             'service_address' => $request->service_address,
@@ -277,6 +277,7 @@ class OrderServiceApi
             'payable_amount' => $payable_amount,
             'payment_gateway' => $request->selected_payment_gateway,
             'payment_status' => $payment_status,
+            'status' => $project_or_job == 'emergency' ? 1 : 0,
             'appointment_date' => $request->appointment_date,
             'appointment_time' => $request->appointment_time,
             'service_address' => $request->service_address,
@@ -475,6 +476,7 @@ class OrderServiceApi
             'payable_amount' => $payable_amount,
             'payment_gateway' => 'iyzipay',
             'payment_status' => 'pending',
+            'status' => $project_or_job == 'emergency' ? 1 : 0,
             'appointment_date' => $request->appointment_date,
             'appointment_time' => $request->appointment_time,
             'service_address' => $request->service_address,
@@ -526,7 +528,7 @@ class OrderServiceApi
         if ($paymentResult->getStatus() === 'success') {
             $order->update([
                 'payment_status' => 'complete',
-                'status' => 0,
+                'status' => $order->is_project_job == 'emergency' ? 1 : 0,
                 'price' => $price - $transaction_amount,
             ]);
 
