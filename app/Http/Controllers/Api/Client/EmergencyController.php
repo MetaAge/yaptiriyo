@@ -111,9 +111,29 @@ class EmergencyController extends Controller
         $offer = EmergencyOffer::where('emergency_request_id', $id)->findOrFail($offerId);
 
         if ($emergency->status === 'pending') {
+            // Create an order for this emergency
+            $order = Order::create([
+                'user_id' => $emergency->client_id,
+                'freelancer_id' => $offer->freelancer_id,
+                'identity' => $emergency->id,
+                'price' => $offer->offered_price,
+                'payable_amount' => $offer->offered_price,
+                'status' => 0, // pending payment
+                'payment_status' => 'pending',
+                'order_type' => 'emergency'
+            ]);
+
+            // Create a live chat session
+            $chat = \Modules\Chat\Entities\LiveChat::updateOrCreate([
+                'client_id' => $emergency->client_id,
+                'freelancer_id' => $offer->freelancer_id,
+                'order_id' => $order->id,
+            ]);
+
             $emergency->update([
                 'accepted_by' => $offer->freelancer_id,
                 'offered_price' => $offer->offered_price,
+                'order_id' => $order->id,
                 'status' => 'accepted'
             ]);
 
@@ -305,7 +325,15 @@ class EmergencyController extends Controller
 
             $chat = null;
             if ($e->order_id) {
+                // Ensure chat exists or create it if missing (sometimes it might be deleted)
                 $chat = \Modules\Chat\Entities\LiveChat::where('order_id', $e->order_id)->first();
+                if (!$chat && $e->status === 'accepted') {
+                     $chat = \Modules\Chat\Entities\LiveChat::firstOrCreate([
+                        'client_id' => $e->client_id,
+                        'freelancer_id' => $e->accepted_by,
+                        'order_id' => $e->order_id,
+                    ]);
+                }
             }
 
             return [
