@@ -45,11 +45,7 @@ class EmergencyController extends Controller
         // Find freelancers
         $query = User::where('user_type', 2);
 
-        if ($request->latitude && $request->longitude) {
-            // Find within 20km radius (simple box)
-            $query->whereBetween('latitude', [$request->latitude - 0.2, $request->latitude + 0.2])
-                  ->whereBetween('longitude', [$request->longitude - 0.2, $request->longitude + 0.2]);
-        } elseif ($request->city_id) {
+        if ($request->city_id) {
             // Fallback to city-based search if no coordinates
             $query->where('city_id', $request->city_id);
         }
