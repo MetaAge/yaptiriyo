@@ -377,9 +377,21 @@ class EmergencyController extends Controller
                     ? render_frontend_cloud_image_if_module_exists('profile/' . $e->acceptedFreelancer?->image, $e->acceptedFreelancer?->load_from)
                     : null,
                 'freelancer_phone' => $e->acceptedFreelancer?->phone,
+                'accepted_freelancer' => $e->acceptedFreelancer ? [
+                    'id' => $e->acceptedFreelancer->id,
+                    'name' => $e->acceptedFreelancer->first_name . ' ' . $e->acceptedFreelancer->last_name,
+                    'image' => $e->acceptedFreelancer->image,
+                    'cloud_image' => $e->acceptedFreelancer->image 
+                        ? render_frontend_cloud_image_if_module_exists('profile/' . $e->acceptedFreelancer->image, $e->acceptedFreelancer->load_from)
+                        : null,
+                    'phone' => $e->acceptedFreelancer->phone,
+                ] : null,
                 'offered_price' => $e->offered_price,
                 'order_id' => $e->order_id,
                 'live_chat_id' => $chat?->id,
+                'freelancer_status' => $e->freelancer_status,
+                'freelancer_lat' => $e->freelancer_lat,
+                'freelancer_long' => $e->freelancer_long,
                 'notified_count' => $e->notified_count ?? 0,
                 'created_at' => $e->created_at->toIso8601String(),
                 'expires_at' => $e->expires_at ? $e->expires_at->toIso8601String() : null,
