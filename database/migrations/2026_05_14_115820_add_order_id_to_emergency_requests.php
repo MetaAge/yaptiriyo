@@ -12,9 +12,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('emergency_requests', function (Blueprint $table) {
-            $table->string('freelancer_status')->nullable()->after('status'); // on_way, arrived, working, completed
-            $table->decimal('freelancer_lat', 10, 8)->nullable()->after('freelancer_status');
-            $table->decimal('freelancer_long', 11, 8)->nullable()->after('freelancer_lat');
             $table->unsignedBigInteger('order_id')->nullable()->after('freelancer_long');
         });
     }
@@ -25,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('emergency_requests', function (Blueprint $table) {
-            $table->dropColumn(['freelancer_status', 'freelancer_lat', 'freelancer_long', 'order_id']);
+            $table->dropColumn('order_id');
         });
     }
 };

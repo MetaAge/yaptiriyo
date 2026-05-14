@@ -232,7 +232,10 @@ class OrderServiceApi
             JobProposal::where('id',$request->proposal_id_for_order)->update(['is_hired'=>1]);
         }
         if ($project_or_job == 'emergency') {
-            \App\Models\EmergencyRequest::where('id', $order->identity)->update(['status' => 'completed']);
+            \App\Models\EmergencyRequest::where('id', $order->identity)->update([
+                'order_id' => $order->id,
+                'freelancer_status' => 'on_way'
+            ]);
         }
         $this->send_order_chat_message($order);
 
@@ -547,7 +550,10 @@ class OrderServiceApi
             }
 
             if ($project_or_job == 'emergency') {
-                \App\Models\EmergencyRequest::where('id', $order->identity)->update(['status' => 'completed']);
+                \App\Models\EmergencyRequest::where('id', $order->identity)->update([
+                    'order_id' => $order->id,
+                    'freelancer_status' => 'on_way'
+                ]);
             }
 
             $this->send_order_chat_message($order);

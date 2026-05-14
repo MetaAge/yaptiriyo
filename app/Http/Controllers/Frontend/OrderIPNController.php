@@ -671,7 +671,10 @@ class OrderIPNController extends Controller
         if ($project_or_job == 'emergency') {
             $order = Order::find($last_order_id);
             if ($order) {
-                \App\Models\EmergencyRequest::where('id', $order->identity)->update(['status' => 'completed']);
+                \App\Models\EmergencyRequest::where('id', $order->identity)->update([
+                    'order_id' => $order->id,
+                    'freelancer_status' => 'on_way'
+                ]);
             }
         }
     }

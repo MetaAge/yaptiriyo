@@ -240,16 +240,79 @@ class EmergencyController extends Controller
 
     public function complete($id)
     {
-        $updated = EmergencyRequest::where('id', $id)
+        $emergency = EmergencyRequest::where('id', $id)
             ->where('client_id', Auth::id())
             ->where('status', 'accepted')
-            ->update(['status' => 'completed']);
+            ->first();
 
-        if ($updated === 0) {
-            return response()->json(['status' => 'error', 'msg' => __('İşlem başarısız.')], 400);
+        if (!$emergency) {
+            return response()->json(['status' => 'error', 'msg' => __('Talep bulunamadı veya zaten tamamlanmış.')], 400);
         }
 
-        return response()->json(['status' => 'success', 'msg' => __('İş tamamlandı olarak işaretlendi.')]);
+        // Update emergency status
+        $emergency->update(['status' => 'completed']);
+
+        // Release funds if order exists
+        if ($emergency->order_id) {
+            $order = \App\Models\Order::find($emergency->order_id);
+            if ($order && $order->status != 3) {
+                // Mark order as complete
+                $order->update(['status' => 3]);
+
+                // Transfer money to freelancer's earnings/wallet
+                $freelancer_id = $order->freelancer_id;
+                $payable_amount = $order->payable_amount;
+
+                // Update UserEarning
+                $total_earning = \App\Models\UserEarning::where('user_id', $freelancer_id)->first();
+                if ($total_earning) {
+                    $total_earning->update([
+                        'total_earning' => $total_earning->total_earning + $payable_amount,
+                        'remaining_balance' => ($total_earning->total_earning + $payable_amount) - $total_earning->total_withdraw
+                    ]);
+                } else {
+                    \App\Models\UserEarning::create([
+                        'user_id' => $freelancer_id,
+                        'total_earning' => $payable_amount,
+                        'remaining_balance' => $payable_amount
+                    ]);
+                }
+
+                // Update Wallet
+                $wallet = \Modules\Wallet\Entities\Wallet::where('user_id', $freelancer_id)->first();
+                if ($wallet) {
+                    $wallet->update([
+                        'balance' => $wallet->balance + $payable_amount,
+                        'remaining_balance' => $wallet->remaining_balance + $payable_amount
+                    ]);
+                }
+
+                // Create Wallet History
+                \Modules\Wallet\Entities\WalletHistory::create([
+                    'user_id' => $freelancer_id,
+                    'payment_gateway' => 'Order',
+                    'payment_status' => 'complete',
+                    'amount' => $payable_amount,
+                    'transaction_fee' => 0,
+                    'total' => $payable_amount,
+                    'transaction_id' => 'emergency_' . $emergency->id . '_' . time(),
+                    'status' => 1,
+                    'currency' => get_static_option('site_global_currency'),
+                    'symbol' => get_static_option('site_global_currency'),
+                    'type' => 'earning'
+                ]);
+
+                // Notify freelancer
+                freelancer_notification(
+                    $order->id,
+                    $freelancer_id,
+                    'Order',
+                    __('Acil iş onaylandı ve ödemeniz cüzdanınıza aktarıldı.')
+                );
+            }
+        }
+
+        return response()->json(['status' => 'success', 'msg' => __('İş tamamlandı ve ödeme onaylandı.')]);
     }
 
     /**
@@ -486,6 +549,7 @@ class EmergencyController extends Controller
             'freelancer_status' => $e->freelancer_status,
             'freelancer_lat' => $e->freelancer_lat,
             'freelancer_long' => $e->freelancer_long,
+            'order_id' => $e->order_id,
             'live_chat_id' => $chat?->id,
             'notified_count' => $e->notified_count ?? 0,
             'created_at' => $e->created_at->toIso8601String(),
@@ -520,12 +584,20 @@ class EmergencyController extends Controller
     public function updateTracking(Request $request, $id)
     {
         $request->validate([
-            'freelancer_status' => 'nullable|string|in:accepted,on_the_way,arrived,working',
+            'freelancer_status' => 'nullable|string|in:on_way,arrived,working,completed',
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
         ]);
 
         $emergency = EmergencyRequest::where('accepted_by', Auth::id())->findOrFail($id);
+
+        // Security: Can only update tracking if paid (order_id exists)
+        if (!$emergency->order_id) {
+            return response()->json([
+                'status' => 'error',
+                'msg' => __('Müşteri henüz ödeme yapmadı. Ödeme yapıldıktan sonra durum güncelleyebilirsiniz.')
+            ], 403);
+        }
 
         $updateData = [];
         if ($request->has('freelancer_status')) {
@@ -539,6 +611,23 @@ class EmergencyController extends Controller
         }
 
         $emergency->update($updateData);
+
+        // Notify client if status changed
+        if ($request->has('freelancer_status')) {
+            $statusMessages = [
+                'on_way' => __('Usta yola çıktı!'),
+                'arrived' => __('Usta adrese vardı.'),
+                'working' => __('Usta çalışmaya başladı.'),
+                'completed' => __('Usta işi bitirdi! Lütfen onaylayın.'),
+            ];
+            
+            client_notification(
+                $emergency->id,
+                $emergency->client_id,
+                'Emergency',
+                $statusMessages[$request->freelancer_status] ?? __('Usta durumunu güncelledi.')
+            );
+        }
 
         return response()->json([
             'status' => 'success',

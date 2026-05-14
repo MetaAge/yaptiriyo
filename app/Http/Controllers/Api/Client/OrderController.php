@@ -275,7 +275,10 @@ class OrderController extends Controller
             }
 
             if ($project_or_job == 'emergency') {
-                \App\Models\EmergencyRequest::where('id', $order->identity)->update(['status' => 'completed']);
+                \App\Models\EmergencyRequest::where('id', $order->identity)->update([
+                    'order_id' => $order->id,
+                    'freelancer_status' => 'on_way'
+                ]);
             }
 
             notificationToAdmin($last_order_id, $user_id,'Order',__('New order placed'));

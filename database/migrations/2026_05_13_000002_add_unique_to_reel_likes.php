@@ -9,6 +9,7 @@ return new class extends Migration
 {
     public function up(): void
     {
+        Schema::table('reel_likes', function (Blueprint $table) {
             // İndeks zaten var mı kontrol edelim
             $conn = Schema::getConnection();
             $dbName = $conn->getDatabaseName();
