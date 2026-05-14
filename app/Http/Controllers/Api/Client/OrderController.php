@@ -277,7 +277,7 @@ class OrderController extends Controller
             if ($project_or_job == 'emergency') {
                 \App\Models\EmergencyRequest::where('id', $order->identity)->update([
                     'order_id' => $order->id,
-                    'freelancer_status' => 'on_way'
+                    'freelancer_status' => 'on_the_way'
                 ]);
             }
 

@@ -83,7 +83,7 @@ class IyzicoCallbackController extends Controller
             if ($order->is_project_job == 'emergency') {
                 \App\Models\EmergencyRequest::where('id', $order->identity)->update([
                     'order_id' => $order->id,
-                    'freelancer_status' => 'on_way'
+                    'freelancer_status' => 'on_the_way'
                 ]);
             }
 

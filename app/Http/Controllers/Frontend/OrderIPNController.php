@@ -673,7 +673,7 @@ class OrderIPNController extends Controller
             if ($order) {
                 \App\Models\EmergencyRequest::where('id', $order->identity)->update([
                     'order_id' => $order->id,
-                    'freelancer_status' => 'on_way'
+                    'freelancer_status' => 'on_the_way'
                 ]);
             }
         }

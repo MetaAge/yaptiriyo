@@ -234,7 +234,7 @@ class OrderServiceApi
         if ($project_or_job == 'emergency') {
             \App\Models\EmergencyRequest::where('id', $order->identity)->update([
                 'order_id' => $order->id,
-                'freelancer_status' => 'on_way'
+                'freelancer_status' => 'on_the_way'
             ]);
         }
         $this->send_order_chat_message($order);
@@ -552,7 +552,7 @@ class OrderServiceApi
             if ($project_or_job == 'emergency') {
                 \App\Models\EmergencyRequest::where('id', $order->identity)->update([
                     'order_id' => $order->id,
-                    'freelancer_status' => 'on_way'
+                    'freelancer_status' => 'on_the_way'
                 ]);
             }
 

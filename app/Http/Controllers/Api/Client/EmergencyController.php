@@ -584,7 +584,7 @@ class EmergencyController extends Controller
     public function updateTracking(Request $request, $id)
     {
         $request->validate([
-            'freelancer_status' => 'nullable|string|in:on_way,arrived,working,completed',
+            'freelancer_status' => 'nullable|string|in:on_the_way,arrived,working,completed',
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
         ]);
@@ -615,7 +615,7 @@ class EmergencyController extends Controller
         // Notify client if status changed
         if ($request->has('freelancer_status')) {
             $statusMessages = [
-                'on_way' => __('Usta yola çıktı!'),
+                'on_the_way' => __('Usta yola çıktı!'),
                 'arrived' => __('Usta adrese vardı.'),
                 'working' => __('Usta çalışmaya başladı.'),
                 'completed' => __('Usta işi bitirdi! Lütfen onaylayın.'),
