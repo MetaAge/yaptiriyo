@@ -91,6 +91,7 @@ class EmergencyController extends Controller
                 'status' => $emergency->status,
                 'notified_count' => $notifiedCount,
                 'category_name' => $categoryName,
+                'created_at' => $emergency->created_at->toIso8601String(),
             ],
         ]);
     }
@@ -128,6 +129,7 @@ class EmergencyController extends Controller
                 'cloud_image' => $freelancer->image
                     ? render_frontend_cloud_image_if_module_exists('profile/' . $freelancer->image, load_from: $freelancer->load_from)
                     : null,
+                'phone' => $freelancer->phone,
             ];
             $response['offered_price'] = $emergency->offered_price;
             $response['accepted_at'] = $emergency->accepted_at?->toIso8601String();
@@ -410,6 +412,7 @@ class EmergencyController extends Controller
             'freelancer_cloud_image' => $e->acceptedFreelancer?->image
                 ? render_frontend_cloud_image_if_module_exists('profile/' . $e->acceptedFreelancer->image, load_from: $e->acceptedFreelancer->load_from)
                 : null,
+            'freelancer_phone' => $e->acceptedFreelancer?->phone,
             'live_chat_id' => $chat?->id,
             'notified_count' => $e->notified_count ?? 0,
             'created_at' => $e->created_at->toIso8601String(),
