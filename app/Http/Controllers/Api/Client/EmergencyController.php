@@ -151,15 +151,15 @@ class EmergencyController extends Controller
      */
     public function activeForClient()
     {
-        $emergencies = EmergencyRequest::with(['acceptedFreelancer:id,first_name,last_name,image,load_from', 'offers.freelancer'])
+        $emergency = EmergencyRequest::with(['acceptedFreelancer:id,first_name,last_name,image,load_from', 'offers.freelancer'])
             ->where('client_id', Auth::id())
             ->whereIn('status', ['pending', 'accepted'])
             ->latest()
-            ->get();
+            ->first();
 
         return response()->json([
             'status' => 'success',
-            'emergencies' => $emergencies
+            'emergency' => $emergency
         ]);
     }
 
