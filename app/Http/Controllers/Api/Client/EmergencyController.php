@@ -124,10 +124,9 @@ class EmergencyController extends Controller
             ]);
 
             // Create a live chat session
-            $chat = \Modules\Chat\Entities\LiveChat::updateOrCreate([
+            $chat = \Modules\Chat\Entities\LiveChat::firstOrCreate([
                 'client_id' => $emergency->client_id,
                 'freelancer_id' => $offer->freelancer_id,
-                'order_id' => $order->id,
             ]);
 
             $emergency->update([
@@ -160,11 +159,13 @@ class EmergencyController extends Controller
      */
     public function pendingForFreelancer()
     {
-        $emergencies = EmergencyRequest::with('client:id,first_name,last_name,image,load_from')
-            ->where('status', 'pending')
+        $emergencies = EmergencyRequest::where('status', 'pending')
             ->where('expires_at', '>', now())
             ->latest()
-            ->get();
+            ->get()
+            ->map(function ($e) {
+                return $this->formatEmergencyResponse($e);
+            });
 
         return response()->json([
             'status' => 'success',
@@ -206,11 +207,13 @@ class EmergencyController extends Controller
      */
     public function acceptedForFreelancer()
     {
-        $emergencies = EmergencyRequest::with('client:id,first_name,last_name,image,load_from')
-            ->where('accepted_by', Auth::id())
+        $emergencies = EmergencyRequest::where('accepted_by', Auth::id())
             ->where('status', 'accepted')
             ->latest()
-            ->get();
+            ->get()
+            ->map(function ($e) {
+                return $this->formatEmergencyResponse($e);
+            });
 
         return response()->json([
             'status' => 'success',
@@ -324,14 +327,15 @@ class EmergencyController extends Controller
             ]);
 
             $chat = null;
-            if ($e->order_id) {
+            if ($e->status === 'accepted' && $e->accepted_by) {
                 // Ensure chat exists or create it if missing (sometimes it might be deleted)
-                $chat = \Modules\Chat\Entities\LiveChat::where('order_id', $e->order_id)->first();
-                if (!$chat && $e->status === 'accepted') {
+                $chat = \Modules\Chat\Entities\LiveChat::where('client_id', $e->client_id)
+                            ->where('freelancer_id', $e->accepted_by)
+                            ->first();
+                if (!$chat) {
                      $chat = \Modules\Chat\Entities\LiveChat::firstOrCreate([
                         'client_id' => $e->client_id,
                         'freelancer_id' => $e->accepted_by,
-                        'order_id' => $e->order_id,
                     ]);
                 }
             }
