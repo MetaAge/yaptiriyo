@@ -229,7 +229,10 @@ class OrderController extends Controller
         Order::where('id',$request->order_id)->update(['payment_status'=>'complete']);
         
         if ($order->is_project_job == 'emergency') {
-            \App\Models\EmergencyRequest::where('id', $order->identity)->update(['status' => 'completed']);
+            \App\Models\EmergencyRequest::where('id', $order->identity)->update([
+                'status' => 'accepted',
+                'freelancer_status' => 'on_the_way'
+            ]);
         }
         
         client_notification($request->order_id, $order->user_id, 'Order','Order Payment Confirm');

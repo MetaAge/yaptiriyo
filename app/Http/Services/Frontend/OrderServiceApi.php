@@ -116,9 +116,10 @@ class OrderServiceApi
                   JobProposal::where('id',$request->proposal_id_for_order)->update(['is_hired'=>1]);
               }
               if ($project_or_job == 'emergency') {
-                  // Manual payment doesn't complete the emergency until admin approves
-                  // But we might want to change status to 'paying' or similar?
-                  // For now let's keep it as is, or mark as processing.
+                  \App\Models\EmergencyRequest::where('id', $order->identity)->update([
+                      'order_id' => $order->id,
+                      'freelancer_status' => 'preparing'
+                  ]);
               }
 
               //status 1 means the offer is hired
@@ -300,6 +301,13 @@ class OrderServiceApi
 
         if($project_or_job == 'offer'){
             Offer::where('id',$request->offer_id_for_order)->update(['status'=>1]);
+        }
+
+        if ($project_or_job == 'emergency') {
+            \App\Models\EmergencyRequest::where('id', $order->identity)->update([
+                'order_id' => $order->id,
+                'freelancer_status' => 'preparing'
+            ]);
         }
 
         $order_details = Order::with(['user','freelancer'])->where('id',$last_order_id)->first();
