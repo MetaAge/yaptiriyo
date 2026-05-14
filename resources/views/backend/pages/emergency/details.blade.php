@@ -8,7 +8,7 @@
                     <div class="customMarkup__single__item">
                         <div class="customMarkup__single__item__flex">
                             <h4 class="customMarkup__single__title">{{ __('Emergency SOS Details') }} #{{ $emergency->id }}</h4>
-                            <a href="{{ route('admin.emergency.all') }}" class="btn btn-primary">{{ __('Back to List') }}</a>
+                            <a href="{{ route('admin.emergency.index') }}" class="btn btn-primary">{{ __('Back to List') }}</a>
                         </div>
                         <div class="row mt-4">
                             <div class="col-md-6">
