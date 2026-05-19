@@ -423,18 +423,30 @@ class FreelancerApiController extends Controller
                     ->exists();
             }
 
-            // Get primary category name (active project category prioritized, fallback to user_works profile categories)
-            $primary_category = DB::table('projects')
+            // Get distinct category names (active projects prioritized, fallback to user_works profile categories)
+            $active_project_categories = DB::table('projects')
                 ->join('categories', 'categories.id', '=', 'projects.category_id')
                 ->where('projects.user_id', $user->id)
                 ->where('projects.status', 1)
-                ->value('categories.category');
+                ->distinct()
+                ->pluck('categories.category')
+                ->toArray();
+
+            $primary_category = !empty($active_project_categories) 
+                ? implode(', ', $active_project_categories) 
+                : null;
 
             if (!$primary_category) {
-                $primary_category = DB::table('user_works')
+                $profile_categories = DB::table('user_works')
                     ->join('categories', 'categories.id', '=', 'user_works.category_id')
                     ->where('user_works.user_id', $user->id)
-                    ->value('categories.category');
+                    ->distinct()
+                    ->pluck('categories.category')
+                    ->toArray();
+
+                $primary_category = !empty($profile_categories)
+                    ? implode(', ', $profile_categories)
+                    : null;
             }
 
             if (!$primary_category) {
