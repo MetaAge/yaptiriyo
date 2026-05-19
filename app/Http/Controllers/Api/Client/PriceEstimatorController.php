@@ -98,6 +98,7 @@ class PriceEstimatorController extends Controller
                     'sample_count' => 0,
                     'category_name' => null,
                     'insights' => ['Henüz yeterli piyasa verisi bulunmuyor. Daha fazla hizmet eklendikçe tahminler iyileşecek.'],
+                    'recommendations' => [],
                 ],
                 'message' => 'Yeterli veri bulunamadı.'
             ]);
@@ -178,6 +179,50 @@ class PriceEstimatorController extends Controller
             $insights[] = "Genel piyasa verileri üzerinden $sampleCount hizmet analiz edildi.";
         }
 
+        // Fetch up to 3 matching projects (recommendations)
+        $recQuery = Project::query()
+            ->with(['project_creator' => function($q) {
+                $q->withAvg(['freelancer_ratings' => function($sq) {
+                    $sq->where('sender_type', 1);
+                }], 'rating')->withCount(['freelancer_ratings' => function($sq) {
+                    $sq->where('sender_type', 1);
+                }]);
+            }, 'project_category'])
+            ->whereHas('project_creator')
+            ->where('project_on_off', '1')
+            ->where('status', '1');
+
+        if ($categoryId) {
+            $recQuery->where('category_id', $categoryId);
+        } else {
+            $recQuery->where(function($q) use ($lowerDesc) {
+                $q->where('title', 'LIKE', '%' . $lowerDesc . '%')
+                    ->orWhereHas('project_category', function($cq) use ($lowerDesc){
+                        $cq->where('category', 'LIKE', '%'.$lowerDesc.'%');
+                    });
+            });
+        }
+
+        $recommendations = $recQuery->limit(3)->get();
+        $currentDate = \Carbon\Carbon::now()->toDateTimeString();
+
+        $recommendations->transform(function ($project) use ($currentDate) {
+            $project->project_cloud_image = render_frontend_cloud_image_if_module_exists('project/'.$project->first_image, load_from: $project->load_from);
+            
+            $isProActive = ($project->is_pro == 'yes' && $project->pro_expire_date > $currentDate) 
+                || (($project->sub_rank ?? 0) == 2)
+                || ($project->is_subscription_promoted == 1 && ($project->sub_rank ?? 0) > 0);
+            $project->is_pro = $isProActive ? 'yes' : 'no';
+            $project->is_premium = ($project->sub_rank ?? 0) == 2;
+            $project->is_pro_active = $isProActive;
+            
+            if ($project->project_creator) {
+                $project->project_creator->freelancer_cloud_image = render_frontend_cloud_image_if_module_exists('profile/'.$project->project_creator->image, load_from: $project->project_creator->load_from);
+            }
+            
+            return $project;
+        });
+
         return response()->json([
             'status' => 'success',
             'estimate' => [
@@ -189,6 +234,7 @@ class PriceEstimatorController extends Controller
                 'sample_count' => $sampleCount,
                 'category_name' => $categoryName,
                 'insights' => $insights,
+                'recommendations' => $recommendations,
             ],
             'message' => __('Fiyat piyasa verileri analiz edilerek tahmin edildi.')
         ]);
