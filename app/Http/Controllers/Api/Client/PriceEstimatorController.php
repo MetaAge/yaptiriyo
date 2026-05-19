@@ -188,6 +188,8 @@ class PriceEstimatorController extends Controller
                     $sq->where('sender_type', 1);
                 }]);
             }, 'project_category'])
+            ->withCount(['complete_orders', 'ratings'])
+            ->withAvg('ratings', 'rating')
             ->whereHas('project_creator')
             ->where('project_on_off', '1')
             ->where('status', '1');
