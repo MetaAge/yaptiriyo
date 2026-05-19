@@ -369,10 +369,14 @@ class FreelancerApiController extends Controller
             ->whereNotNull('latitude')
             ->whereNotNull('longitude');
 
-        // Apply category filter if requested
+        // Apply category filter if requested (checks active projects or fallback profile categories)
         if ($request->filled('category_id')) {
-            $query->whereHas('freelancer_category', function ($q) use ($request) {
-                $q->where('category_id', $request->category_id);
+            $query->where(function ($q) use ($request) {
+                $q->whereHas('projects', function ($sub) use ($request) {
+                    $sub->where('category_id', $request->category_id)->where('status', 1);
+                })->orWhereHas('freelancer_category', function ($sub) use ($request) {
+                    $sub->where('category_id', $request->category_id);
+                });
             });
         }
 
@@ -419,11 +423,23 @@ class FreelancerApiController extends Controller
                     ->exists();
             }
 
-            // Get primary category name
-            $primary_category = DB::table('user_works')
-                ->join('categories', 'categories.id', '=', 'user_works.category_id')
-                ->where('user_works.user_id', $user->id)
-                ->value('categories.category') ?? __('Genel');
+            // Get primary category name (active project category prioritized, fallback to user_works profile categories)
+            $primary_category = DB::table('projects')
+                ->join('categories', 'categories.id', '=', 'projects.category_id')
+                ->where('projects.user_id', $user->id)
+                ->where('projects.status', 1)
+                ->value('categories.category');
+
+            if (!$primary_category) {
+                $primary_category = DB::table('user_works')
+                    ->join('categories', 'categories.id', '=', 'user_works.category_id')
+                    ->where('user_works.user_id', $user->id)
+                    ->value('categories.category');
+            }
+
+            if (!$primary_category) {
+                $primary_category = __('Genel');
+            }
 
             $image_url = $user->image 
                 ? render_frontend_cloud_image_if_module_exists('profile/' . $user->image, $user->load_from) 
