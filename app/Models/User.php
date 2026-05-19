@@ -45,7 +45,9 @@ class User extends Authenticatable
         'is_synced',
         'is_fake',
         'city_id',
-        'iyzico_card_user_key'
+        'iyzico_card_user_key',
+        'latitude',
+        'longitude'
     ];
 
     protected $hidden = [

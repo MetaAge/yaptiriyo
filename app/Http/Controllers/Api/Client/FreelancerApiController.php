@@ -337,4 +337,119 @@ class FreelancerApiController extends Controller
             });
         }
     }
+
+    public function radarList(Request $request): JsonResponse
+    {
+        $current_date = now()->toDateTimeString();
+        
+        $query = User::query()
+            ->select([
+                'id',
+                'username',
+                'first_name',
+                'last_name',
+                'image',
+                'country_id',
+                'state_id',
+                'experience_level',
+                'hourly_rate',
+                'is_pro',
+                'pro_expire_date',
+                'user_verified_status',
+                'load_from',
+                'latitude',
+                'longitude',
+                'check_online_status',
+                'phone'
+            ])
+            ->where('user_type', 2)
+            ->where('is_email_verified', 1)
+            ->where('is_suspend', 0)
+            ->where('user_active_inactive_status', 1)
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude');
+
+        // Apply category filter if requested
+        if ($request->filled('category_id')) {
+            $query->whereHas('freelancer_category', function ($q) use ($request) {
+                $q->where('category_id', $request->category_id);
+            });
+        }
+
+        // Apply online-only filter if requested
+        if ($request->boolean('online_only')) {
+            $query->where('check_online_status', '>=', now()->subMinutes(60));
+        }
+
+        $freelancers = $query->withAvg([
+            'freelancer_ratings' => function ($q) {
+                $q->where('sender_type', 1);
+            }
+        ], 'rating')
+        ->withCount([
+            'freelancer_ratings' => function ($q) {
+                $q->where('sender_type', 1);
+            }
+        ])
+        ->get();
+
+        // Map sub_rank and check if they have active emergency services
+        $result = $freelancers->map(function ($user) use ($current_date) {
+            $sub_rank = DB::table('user_subscriptions')
+                ->join('subscriptions', 'subscriptions.id', '=', 'user_subscriptions.subscription_id')
+                ->where('user_subscriptions.user_id', $user->id)
+                ->where('user_subscriptions.status', 1)
+                ->where('user_subscriptions.payment_status', 'complete')
+                ->where('user_subscriptions.expire_date', '>', $current_date)
+                ->selectRaw('CASE 
+                    WHEN subscriptions.title LIKE "%PREMIUM%" OR subscriptions.title LIKE "%PROFESSIONAL%" OR subscriptions.title LIKE "%PLUS%" OR subscriptions.title LIKE "%GOLD%" OR subscriptions.title LIKE "%VIP%" OR subscriptions.title LIKE "%ELITE%" THEN 2
+                    WHEN subscriptions.title LIKE "%PRO%" THEN 1
+                    ELSE 0 
+                END as sub_rank')
+                ->value('sub_rank') ?? 0;
+
+            // Check if they have an active emergency service (project where is_emergency = 1 and status = 1)
+            // Note: emergency toggle is only valid if freelancer has Pro/Premium subscription (sub_rank > 0)
+            $has_emergency = false;
+            if ($sub_rank > 0) {
+                $has_emergency = DB::table('projects')
+                    ->where('user_id', $user->id)
+                    ->where('is_emergency', 1)
+                    ->where('status', 1)
+                    ->exists();
+            }
+
+            // Get primary category name
+            $primary_category = DB::table('user_works')
+                ->join('categories', 'categories.id', '=', 'user_works.category_id')
+                ->where('user_works.user_id', $user->id)
+                ->value('categories.category') ?? __('Genel');
+
+            $image_url = $user->image 
+                ? render_frontend_cloud_image_if_module_exists('profile/' . $user->image, $user->load_from) 
+                : asset('assets/uploads/profile/default.png');
+
+            return [
+                'id' => $user->id,
+                'username' => $user->username,
+                'name' => $user->first_name . ' ' . $user->last_name,
+                'image' => $image_url,
+                'latitude' => (float)$user->latitude,
+                'longitude' => (float)$user->longitude,
+                'rating' => (float)($user->freelancer_ratings_avg_rating ?? 0),
+                'rating_count' => (int)($user->freelancer_ratings_count ?? 0),
+                'category' => $primary_category,
+                'sub_rank' => $sub_rank,
+                'is_pro' => $user->is_pro_freelancer,
+                'is_emergency' => $has_emergency,
+                'is_online' => $user->check_online_status && \Carbon\Carbon::parse($user->check_online_status)->gt(now()->subMinutes(15)),
+                'phone' => $user->phone
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => $result
+        ], 200);
+    }
 }

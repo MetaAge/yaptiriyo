@@ -340,4 +340,28 @@ class PersonalInfoController extends Controller
             "status" => true
         ]);
     }
+
+    public function location_update(Request $request)
+    {
+        $request->validate([
+            'latitude' => 'required|numeric',
+            'longitude' => 'required|numeric',
+        ]);
+
+        $user = User::where('id', auth('sanctum')->user()->id)->first();
+        if ($user) {
+            $user->update([
+                'latitude' => $request->latitude,
+                'longitude' => $request->longitude,
+                'check_online_status' => now(),
+            ]);
+            return response()->json([
+                'status' => 'success',
+                'msg' => __('Location updated successfully'),
+            ]);
+        }
+        return response()->json([
+            'msg' => __('User not found'),
+        ], 404);
+    }
 }

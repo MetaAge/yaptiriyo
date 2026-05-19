@@ -105,6 +105,7 @@ Route::group(['prefix' => 'v1', 'middleware' => 'setlang'], function () {
                 Route::get('profile/details', 'profile_details');
                 Route::post('account/delete', 'account_delete');
                 Route::post('update/token', 'update_firebase_token');
+                Route::post('profile/location/update', 'location_update');
             });
             //projects
             Route::controller(\App\Http\Controllers\Api\Freelancer\ProjectController::class)->group(function () {
@@ -296,6 +297,11 @@ Route::group(['prefix' => 'v1', 'middleware' => 'setlang'], function () {
         //profile details
         Route::controller(\App\Http\Controllers\Api\Client\ProfileDetailsController::class)->group(function () {
             Route::get('profile/details/{username?}', 'profile_details');
+        });
+
+        // radar maps
+        Route::controller(\App\Http\Controllers\Api\Client\FreelancerApiController::class)->group(function () {
+            Route::get('radar/freelancers', 'radarList');
         });
 
         //country manage
