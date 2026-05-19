@@ -49,12 +49,14 @@ class Project extends Model
         'country_id',
         'state_id',
         'city_id',
-        'video_url'
+        'video_url',
+        'is_emergency'
     ];
 
     protected $casts = [
         'status' => 'integer',
         'project_approve_request' => 'integer',
+        'is_emergency' => 'integer',
         'image' => 'array'
     ];
 

@@ -36,8 +36,7 @@ class ProjectWithFilterController extends Controller
                 $project->is_pro = $isProActive ? 'yes' : 'no';
                 $project->is_premium = ($project->sub_rank ?? 0) == 2;
                 $project->is_pro_active = $isProActive;
-
-
+                $project->is_emergency = ($project->is_emergency == 1 && ($project->sub_rank ?? 0) > 0) ? 1 : 0;
 
                 return $project;
             });
@@ -50,8 +49,7 @@ class ProjectWithFilterController extends Controller
                 $project->is_pro = $isProActive ? 'yes' : 'no';
                 $project->is_premium = ($project->sub_rank ?? 0) == 2;
                 $project->is_pro_active = $isProActive;
-
-
+                $project->is_emergency = ($project->is_emergency == 1 && ($project->sub_rank ?? 0) > 0) ? 1 : 0;
 
                 return $project;
             });
@@ -83,8 +81,7 @@ class ProjectWithFilterController extends Controller
                 $project->is_pro = $isProActive ? 'yes' : 'no';
                 $project->is_premium = ($project->sub_rank ?? 0) == 2;
                 $project->is_pro_active = $isProActive;
-
-
+                $project->is_emergency = ($project->is_emergency == 1 && ($project->sub_rank ?? 0) > 0) ? 1 : 0;
 
                 return $project;
             });
@@ -97,8 +94,7 @@ class ProjectWithFilterController extends Controller
                 $project->is_pro = $isProActive ? 'yes' : 'no';
                 $project->is_premium = ($project->sub_rank ?? 0) == 2;
                 $project->is_pro_active = $isProActive;
-
-
+                $project->is_emergency = ($project->is_emergency == 1 && ($project->sub_rank ?? 0) > 0) ? 1 : 0;
 
                 return $project;
             });
@@ -126,7 +122,7 @@ class ProjectWithFilterController extends Controller
                 }]);
             },'project_attributes'])
                 ->whereHas('project_creator')
-                ->select(['id', 'title','slug','user_id','basic_regular_charge','basic_discount_charge','basic_delivery','description','image','load_from','is_pro','pro_expire_date'])
+                ->select(['id', 'title','slug','user_id','basic_regular_charge','basic_discount_charge','basic_delivery','description','image','load_from','is_pro','pro_expire_date','is_emergency'])
                 ->where('project_on_off','1')
                 ->where('pro_expire_date','>',$this->current_date)
                 ->where('is_pro','yes')
@@ -140,7 +136,7 @@ class ProjectWithFilterController extends Controller
                 }]);
             },'project_attributes'])
                 ->whereHas('project_creator')
-                ->select(['id', 'title','slug','user_id','basic_regular_charge','basic_discount_charge','basic_delivery','description','image','load_from','is_pro','pro_expire_date'])
+                ->select(['id', 'title','slug','user_id','basic_regular_charge','basic_discount_charge','basic_delivery','description','image','load_from','is_pro','pro_expire_date','is_emergency'])
                 ->where('project_on_off','1')
                 ->where('status','1');
         }
@@ -696,6 +692,22 @@ class ProjectWithFilterController extends Controller
             $project_details->project_creator->freelancer_cloud_image = render_frontend_cloud_image_if_module_exists('profile/'.$project_details?->project_creator?->image, load_from: $project_details?->project_creator?->load_from);
             $project_details->project_creator->is_pro_tier = is_pro_user($project_details->user_id);
             $project_details->project_creator->is_premium_tier = is_premium_user($project_details->user_id);
+        }
+
+        if ($project_details) {
+            $sub_rank = DB::table('user_subscriptions')
+                ->join('subscriptions', 'subscriptions.id', '=', 'user_subscriptions.subscription_id')
+                ->where('user_subscriptions.user_id', $project_details->user_id)
+                ->where('user_subscriptions.status', 1)
+                ->where('user_subscriptions.payment_status', 'complete')
+                ->where('user_subscriptions.expire_date', '>', now())
+                ->value(DB::raw('CASE 
+                    WHEN title LIKE "%PREMIUM%" THEN 2
+                    WHEN title LIKE "%PROFESSIONAL%" THEN 2
+                    WHEN title LIKE "%PRO%" THEN 1
+                    ELSE 0 
+                END'));
+            $project_details->is_emergency = ($project_details->is_emergency == 1 && ($sub_rank ?? 0) > 0) ? 1 : 0;
         }
 
 

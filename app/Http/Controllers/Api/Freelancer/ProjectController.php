@@ -24,7 +24,7 @@ class ProjectController extends Controller
     public function project_list()
     {
         $user_id  = auth('sanctum')->user()->id;
-        $project_lists = Project::select(['id','user_id','title','image','basic_delivery','basic_regular_charge','basic_discount_charge','status','project_on_off','is_pro','pro_expire_date','load_from','is_subscription_promoted'])
+        $project_lists = Project::select(['id','user_id','title','image','basic_delivery','basic_regular_charge','basic_discount_charge','status','project_on_off','is_pro','pro_expire_date','load_from','is_subscription_promoted','is_emergency'])
 
             ->withCount(['complete_orders','ratings'])->withAvg('ratings','rating')
             ->where('user_id', $user_id)
@@ -173,6 +173,7 @@ class ProjectController extends Controller
                     'project_approve_request'=>$project_approve_request,
                     'offer_packages_available_or_not'=>$request->offer_packages_available_or_not,
                     'video_url'=>$request->video_url,
+                    'is_emergency'=>$request->is_emergency ?? 0,
                     'load_from' => in_array($storage_driver,['CustomUploader']) ? 0 : 1, //added for cloud storage 0=local 1=cloud
                 ]);
                 $project->project_sub_categories()->attach(json_decode($request->subcategory,true));
@@ -435,6 +436,7 @@ class ProjectController extends Controller
                     'project_approve_request'=>$project_details->project_approve_request == 1 ? 1 : 0,
                     'offer_packages_available_or_not'=>$request->offer_packages_available_or_not ?? 0,
                     'video_url'=>$request->video_url,
+                    'is_emergency'=>$request->is_emergency ?? 0,
                 ]);
                 //update product pivot table data
                 $project = Project::find($project_details->id);

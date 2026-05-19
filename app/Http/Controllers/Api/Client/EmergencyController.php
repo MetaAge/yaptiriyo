@@ -76,6 +76,13 @@ class EmergencyController extends Controller
         ]);
 
         $emergency = EmergencyRequest::where('status', 'pending')->findOrFail($id);
+        if ($emergency->expires_at && $emergency->expires_at->isPast()) {
+            $emergency->update(['status' => 'expired']);
+            return response()->json([
+                'status' => 'error',
+                'msg' => __('Bu talebin süresi dolmuş.')
+            ], 400);
+        }
 
         $offer = EmergencyOffer::updateOrCreate(
             ['emergency_request_id' => $id, 'freelancer_id' => Auth::id()],
@@ -107,6 +114,14 @@ class EmergencyController extends Controller
         $emergency = EmergencyRequest::where('client_id', Auth::id())
             ->whereIn('status', ['pending', 'accepted'])
             ->findOrFail($id);
+
+        if ($emergency->status === 'pending' && $emergency->expires_at && $emergency->expires_at->isPast()) {
+            $emergency->update(['status' => 'expired']);
+            return response()->json([
+                'status' => 'error',
+                'msg' => __('Bu talebin süresi dolmuş.')
+            ], 400);
+        }
 
         $offer = EmergencyOffer::where('emergency_request_id', $id)->findOrFail($offerId);
         $user = User::find($offer->freelancer_id);
@@ -150,6 +165,11 @@ class EmergencyController extends Controller
      */
     public function pendingForFreelancer()
     {
+        // Auto-expire requests whose time is up
+        EmergencyRequest::where('status', 'pending')
+            ->where('expires_at', '<=', now())
+            ->update(['status' => 'expired']);
+
         $emergencies = EmergencyRequest::where('status', 'pending')
             ->where('expires_at', '>', now())
             ->latest()
@@ -169,6 +189,11 @@ class EmergencyController extends Controller
      */
     public function activeForClient()
     {
+        // Auto-expire requests whose time is up
+        EmergencyRequest::where('status', 'pending')
+            ->where('expires_at', '<=', now())
+            ->update(['status' => 'expired']);
+
         $emergency = EmergencyRequest::where('client_id', Auth::id())
             ->whereIn('status', ['pending', 'accepted'])
             ->latest()
@@ -186,6 +211,9 @@ class EmergencyController extends Controller
     public function status($id)
     {
         $e = EmergencyRequest::findOrFail($id);
+        if ($e->status === 'pending' && $e->expires_at && $e->expires_at->isPast()) {
+            $e->update(['status' => 'expired']);
+        }
 
         return response()->json([
             'status' => 'success',
