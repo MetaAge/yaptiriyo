@@ -28,7 +28,6 @@ class OrderServiceApi
       $pay_by_milestone = $request->pay_by_milestone;
       $offer = Offer::with('milestones')->where('id',$request->offer_id_for_order)->first();
 
-      $identity = null;
       if($request->project_id){ $identity = $request->project_id; }
       if($request->job_id_for_order){ $identity = $request->job_id_for_order; }
       if($request->offer_id_for_order){ $identity = $request->offer_id_for_order; }
@@ -58,7 +57,7 @@ class OrderServiceApi
                   'revision' => $revision,
                   'revision_left' => $revision,
                   'delivery_time' => $delivery,
-                  'description' => $request->order_description ?? ($offer?->description ?? NULL),
+                  'description' => $request->order_description ?? ($offer->description ?? NULL),
                   'price' => $price,
                   'commission_type' => $commission_type,
                   'commission_charge' => $commission_charge,
@@ -147,7 +146,6 @@ class OrderServiceApi
         $pay_by_milestone = $request->pay_by_milestone;
         $offer = Offer::with('milestones')->where('id',$request->offer_id_for_order)->first();
 
-        $identity = null;
         if($request->project_id){ $identity = $request->project_id; }
         if($request->job_id_for_order){ $identity = $request->job_id_for_order; }
         if($request->offer_id_for_order){ $identity = $request->offer_id_for_order; }
@@ -162,7 +160,7 @@ class OrderServiceApi
             'revision' => $revision,
             'revision_left' => $revision,
             'delivery_time' => $delivery,
-            'description' => $request->order_description ?? ($offer?->description ?? NULL),
+            'description' => $request->order_description ?? ($offer->description ?? NULL),
             'price' => $price,
             'commission_type' => $commission_type,
             'commission_charge' => $commission_charge,
@@ -204,11 +202,11 @@ class OrderServiceApi
             Offer::where('id',$request->offer_id_for_order)->update(['status'=>1]);
         }
 
-        // Deduct wallet balance for the paying user (client)
-        $client_email = null;
         if (auth('sanctum')->check()){
+            $user_type = auth('sanctum')->user()->user_type == 1 ? 'client' : 'freelancer';
             $client_email = auth('sanctum')->user()->email;
-            Wallet::where('user_id', $client_id)->update([
+            $user_id = $user_type == 'client' ? $client_id : $freelancer_id;
+            Wallet::where('user_id',$user_id)->update([
                 'balance'=> ($wallet_balance - $price)
             ]);
         }
@@ -222,9 +220,7 @@ class OrderServiceApi
 
         //email to client
         try {
-            if ($client_email) {
-                Mail::to($client_email)->send(new OrderMail($last_order_id,'client'));
-            }
+            Mail::to($client_email)->send(new OrderMail($last_order_id,'client'));
         } catch (\Exception $e) {}
 
         //email to freelancer
@@ -257,7 +253,6 @@ class OrderServiceApi
         $pay_by_milestone = $request->pay_by_milestone;
         $offer = Offer::with('milestones')->where('id',$request->offer_id_for_order)->first();
 
-        $identity = null;
         if($request->project_id){ $identity = $request->project_id; }
         if($request->job_id_for_order){ $identity = $request->job_id_for_order; }
         if($request->offer_id_for_order){ $identity = $request->offer_id_for_order; }
@@ -272,7 +267,7 @@ class OrderServiceApi
             'revision' => $revision,
             'revision_left' => $revision,
             'delivery_time' => $delivery,
-            'description' => $request->order_description ?? ($offer?->description ?? NULL),
+            'description' => $request->order_description ?? ($offer->description ?? NULL),
             'price' => $price,
             'commission_type' => $commission_type,
             'commission_charge' => $commission_charge,
