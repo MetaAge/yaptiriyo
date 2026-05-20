@@ -11,9 +11,16 @@ class WorkStoryController extends Controller
 {
     public function stories()
     {
-        $stories = Order::with(['freelancer:id,first_name,last_name,image,load_from', 'project:id,title,image,load_from', 'rating' => function($q) {
-            $q->where('sender_type', 1); // Client's rating to Freelancer
-        }])
+        $stories = Order::with([
+            'freelancer:id,first_name,last_name,image,load_from', 
+            'project:id,title,image,load_from', 
+            'order_submit_history' => function($q) {
+                $q->whereNotNull('attachment');
+            },
+            'rating' => function($q) {
+                $q->where('sender_type', 1); // Client's rating to Freelancer
+            }
+        ])
         ->where('status', 3) // Completed
         ->whereHas('rating', function($q) {
             $q->where('sender_type', 1);
@@ -24,16 +31,24 @@ class WorkStoryController extends Controller
 
         $formattedStories = $stories->map(function ($order) {
             $rating = $order->rating->where('sender_type', 1)->first();
-            $projectImage = null;
-            if ($order->project && !empty($order->project->image)) {
-                $images = is_string($order->project->image) ? json_decode($order->project->image) : $order->project->image;
-                $projectImage = !empty($images) ? $images[0] : null;
+            
+            $storyImage = null;
+            if ($order->order_submit_history) {
+                foreach ($order->order_submit_history as $submit) {
+                    if ($submit->attachment) {
+                        $ext = strtolower(pathinfo($submit->attachment, PATHINFO_EXTENSION));
+                        if (in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'gif'])) {
+                            $storyImage = asset('assets/uploads/attachment/order/' . $submit->attachment);
+                            break;
+                        }
+                    }
+                }
             }
 
             return [
                 'id' => $order->id,
                 'title' => $order->project ? $order->project->title : ($order->job ? $order->job->title : __('Custom Order')),
-                'image' => $projectImage ? asset('assets/uploads/project/' . $projectImage) : null,
+                'image' => $storyImage,
                 'freelancer_name' => $order->freelancer->first_name . ' ' . $order->freelancer->last_name,
                 'freelancer_image' => $order->freelancer->image ? asset('assets/uploads/profile/' . $order->freelancer->image) : null,
                 'rating' => $rating ? $rating->rating : 5,
