@@ -510,7 +510,11 @@ class ProjectWithFilterController extends Controller
             AND us.status = 1 
             AND us.payment_status = "complete" 
             AND us.expire_date > ? 
-            LIMIT 1) as sub_rank', [$this->current_date]);
+            LIMIT 1) as sub_rank,
+            (SELECT COUNT(DISTINCT ip_address) 
+             FROM project_views 
+             WHERE project_views.project_id = projects.id 
+             AND project_views.created_at >= ?) as views_count', [$this->current_date, \Carbon\Carbon::now()->subMinutes(15)->toDateTimeString()]);
 
         $projects = $query;
 
@@ -613,6 +617,16 @@ class ProjectWithFilterController extends Controller
     //project details
     public function project_details($id)
     {
+        try {
+            DB::table('project_views')->insert([
+                'project_id' => $id,
+                'ip_address' => request()->ip(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        } catch (\Exception $e) {
+        }
+
         $project_details = Project::with([
             'project_creator:id,first_name,last_name,experience_level,image,username,check_online_status,check_work_availability,user_active_inactive_status,user_verified_status,country_id,state_id,load_from',
             'project_attributes',
@@ -727,6 +741,12 @@ class ProjectWithFilterController extends Controller
                     ->first();
             }
 
+            $views_count = \Illuminate\Support\Facades\DB::table('project_views')
+                ->where('project_id', $id)
+                ->where('created_at', '>=', now()->subMinutes(15))
+                ->distinct('ip_address')
+                ->count('ip_address');
+
             return response()->json([
                 'project_details' => $project_details,
                 'project_file_path' => asset('assets/uploads/project/'),
@@ -741,6 +761,7 @@ class ProjectWithFilterController extends Controller
                 'storage_driver' => Storage::getDefaultDriver() ?? '',
                 'freelancer_level' => freelancer_level_api($project_details->user_id) ?? '',
                 'is_profile_promoted'=> !empty($is_promoted) ? true : false,
+                'views_count' => $views_count,
             ]);
         }
         return response()->json(['msg' => __('no projects found.')]);
