@@ -27,7 +27,7 @@ class TicketController extends Controller
     public function create_ticket(Request $request)
     {
         $request->validate([
-            'title'=> 'required|min:10|max:191',
+            'title'=> 'required|max:191',
             'department'=> 'required|max:191',
             'priority'=> 'required|max:191',
             'description'=> 'required',
