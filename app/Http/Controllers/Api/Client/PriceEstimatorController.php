@@ -7,6 +7,7 @@ use App\Models\JobPost;
 use App\Models\Project;
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Modules\CountryManage\Entities\City;
 use Modules\Service\Entities\Category;
 use Modules\Service\Entities\SubCategory;
 
@@ -25,6 +26,7 @@ class PriceEstimatorController extends Controller
         }
 
         $cityId = $request->city_id;
+        $cityName = $cityId ? City::where('id', $cityId)->value('city') : null;
         $lowerDesc = mb_strtolower($description, 'UTF-8');
 
         // ── Step 1: Dynamic Category Detection ──
@@ -227,6 +229,9 @@ class PriceEstimatorController extends Controller
         } else {
             $priceDrivers[] = "Genel piyasa verileri üzerinden $sampleCount fiyat verisi analiz edildi.";
         }
+        if ($cityName) {
+            $priceDrivers[] = "$cityName şehir filtresi önerilerde dikkate alındı.";
+        }
 
         // Fetch up to 3 matching projects (recommendations)
         $recQuery = Project::query()
@@ -250,6 +255,14 @@ class PriceEstimatorController extends Controller
                 $q->where('title', 'LIKE', '%' . $lowerDesc . '%')
                     ->orWhereHas('project_category', function($cq) use ($lowerDesc){
                         $cq->where('category', 'LIKE', '%'.$lowerDesc.'%');
+                    });
+            });
+        }
+        if ($cityId) {
+            $recQuery->where(function ($q) use ($cityId) {
+                $q->where('city_id', $cityId)
+                    ->orWhereHas('service_areas', function ($sq) use ($cityId) {
+                        $sq->where('city_id', $cityId);
                     });
             });
         }
