@@ -165,7 +165,7 @@ class IyzicoCardController extends Controller
                         'price' => $detail->getPrice(),
                         'card_type' => $detail->getCardType(),
                         'card_association' => $detail->getCardAssociation(),
-                        'card_family' => $detail->getCardFamily(),
+                        'card_family' => $detail->getCardFamilyName(),
                         'bank_name' => $detail->getBankName(),
                         'bank_code' => $detail->getBankCode(),
                         'installment_prices' => $installmentPrices,
