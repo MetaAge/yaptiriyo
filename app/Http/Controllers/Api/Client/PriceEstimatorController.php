@@ -27,6 +27,7 @@ class PriceEstimatorController extends Controller
 
         $cityId = $request->city_id;
         $cityName = $cityId ? City::where('id', $cityId)->value('city') : null;
+        $usedCityFilterForPricing = !empty($cityId);
         $lowerDesc = mb_strtolower($description, 'UTF-8');
 
         // ── Step 1: Dynamic Category Detection ──
@@ -119,6 +120,7 @@ class PriceEstimatorController extends Controller
 
         // If no data at all for the category, try without category filter
         if (empty($allPrices) && $categoryId) {
+            $usedCityFilterForPricing = false;
             $allPrices = Project::query()
                 ->where('status', 1)
                 ->whereNotNull('basic_regular_charge')
@@ -230,7 +232,9 @@ class PriceEstimatorController extends Controller
             $priceDrivers[] = "Genel piyasa verileri üzerinden $sampleCount fiyat verisi analiz edildi.";
         }
         if ($cityName) {
-            $priceDrivers[] = "$cityName şehir filtresi önerilerde dikkate alındı.";
+            $priceDrivers[] = $usedCityFilterForPricing
+                ? "$cityName şehir filtresi fiyat ve önerilerde dikkate alındı."
+                : "$cityName için yeterli fiyat verisi bulunamadı; fiyat genel piyasa verisiyle hesaplandı.";
         }
 
         // Fetch up to 3 matching projects (recommendations)
