@@ -23,6 +23,8 @@ use Iyzipay\Request\CreatePaymentRequest;
 use Iyzipay\Request\CreateThreedsPaymentRequest;
 use Iyzipay\Request\DeleteCardRequest;
 use Iyzipay\Request\RetrieveCardListRequest;
+use Iyzipay\Request\RetrieveInstallmentInfoRequest;
+use Iyzipay\Model\InstallmentInfo;
 
 class IyzicoPaymentService
 {
@@ -137,6 +139,22 @@ class IyzicoPaymentService
     }
 
     /**
+     * Retrieve installment rates/options for a given BIN number (first 6 digits of card)
+     */
+    public function getInstallmentInfo($binNumber, $price)
+    {
+        $request = new RetrieveInstallmentInfoRequest();
+        $request->setLocale(Locale::TR);
+        $request->setConversationId(uniqid('inst_'));
+        $request->setBinNumber($binNumber);
+        $request->setPrice(number_format($price, 2, '.', ''));
+
+        $installmentInfo = InstallmentInfo::retrieve($request, $this->options);
+
+        return $installmentInfo;
+    }
+
+    /**
      * Delete a saved card
      */
     public function deleteCard($user, $cardToken)
@@ -164,10 +182,14 @@ class IyzicoPaymentService
         $request = new CreatePaymentRequest();
         $request->setLocale(Locale::TR);
         $request->setConversationId('order_' . $order->id);
-        $request->setPrice(number_format($order->price, 2, '.', ''));
-        $request->setPaidPrice(number_format($order->price, 2, '.', ''));
+        
+        $price = number_format($order->price, 2, '.', '');
+        $paidPrice = !empty($cardData['paid_price']) ? number_format($cardData['paid_price'], 2, '.', '') : $price;
+        
+        $request->setPrice($price);
+        $request->setPaidPrice($paidPrice);
         $request->setCurrency(Currency::TL);
-        $request->setInstallment(1);
+        $request->setInstallment($cardData['installment'] ?? 1);
         $request->setBasketId('order_' . $order->id);
         $request->setPaymentChannel(PaymentChannel::MOBILE);
         $request->setPaymentGroup(PaymentGroup::PRODUCT);

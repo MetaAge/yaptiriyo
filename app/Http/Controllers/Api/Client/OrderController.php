@@ -218,6 +218,8 @@ class OrderController extends Controller
                 'card_token' => $request->card_token,
                 'card_user_key' => $request->card_user_key,
                 'register_card' => $request->register_card,
+                'installment' => $request->installment ?? 1,
+                'paid_price' => $request->paid_price ?? null,
             ];
 
             return (new OrderServiceApi())->iyzico_native_order($data, $request, $client_id, $user->id, $project_or_job, $type, $revision, $delivery, ($price + $transaction_amount), $commission_type, $commission_charge, $commission_amount, $transaction_type, $transaction_charge, $transaction_amount, $payable_amount, $payment_status, $cardData);

@@ -129,4 +129,59 @@ class IyzicoCardController extends Controller
             'msg' => $result->getErrorMessage() ?? __('Failed to delete card'),
         ], 422);
     }
+
+    /**
+     * Retrieve installment options for a given BIN number and price
+     */
+    public function getInstallmentOptions(Request $request)
+    {
+        $request->validate([
+            'bin_number' => 'required|string|size:6',
+            'price' => 'required|numeric|min:0.1',
+        ]);
+
+        $iyzicoService = new IyzicoPaymentService();
+        $result = $iyzicoService->getInstallmentInfo($request->bin_number, $request->price);
+
+        if ($result->getStatus() === 'success') {
+            $installmentDetails = [];
+            
+            // Parse details
+            $details = $result->getInstallmentDetails();
+            if (!empty($details)) {
+                foreach ($details as $detail) {
+                    $prices = $detail->getInstallmentPrices();
+                    $installmentPrices = [];
+                    foreach ($prices as $price) {
+                        $installmentPrices[] = [
+                            'installment_price' => $price->getInstallmentPrice(),
+                            'total_price' => $price->getTotalPrice(),
+                            'installment_number' => $price->getInstallmentNumber(),
+                        ];
+                    }
+                    
+                    $installmentDetails[] = [
+                        'bin_number' => $detail->getBinNumber(),
+                        'price' => $detail->getPrice(),
+                        'card_type' => $detail->getCardType(),
+                        'card_association' => $detail->getCardAssociation(),
+                        'card_family' => $detail->getCardFamily(),
+                        'bank_name' => $detail->getBankName(),
+                        'bank_code' => $detail->getBankCode(),
+                        'installment_prices' => $installmentPrices,
+                    ];
+                }
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'installment_details' => $installmentDetails,
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'error',
+            'msg' => $result->getErrorMessage() ?? __('Failed to retrieve installment options'),
+        ], 422);
+    }
 }

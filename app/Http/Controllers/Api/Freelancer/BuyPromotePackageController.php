@@ -344,6 +344,8 @@ class BuyPromotePackageController extends Controller
                         'card_token' => $request->card_token,
                         'card_user_key' => $request->card_user_key,
                         'register_card' => $request->register_card,
+                        'installment' => $request->installment ?? 1,
+                        'paid_price' => $request->paid_price ?? null,
                     ];
 
                     $iyzicoService = new IyzicoPaymentService();

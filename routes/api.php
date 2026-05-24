@@ -212,6 +212,7 @@ Route::group(['prefix' => 'v1', 'middleware' => 'setlang'], function () {
                 Route::get('iyzico/cards', 'listCards');
                 Route::post('iyzico/card/save', 'saveCard');
                 Route::post('iyzico/card/delete', 'deleteCard');
+                Route::get('iyzico/installments', 'getInstallmentOptions');
             });
 
             // Iyzico Callback Management
@@ -412,6 +413,7 @@ Route::group(['prefix' => 'v1', 'middleware' => 'setlang'], function () {
                 Route::get('iyzico/cards', 'listCards');
                 Route::post('iyzico/card/save', 'saveCard');
                 Route::post('iyzico/card/delete', 'deleteCard');
+                Route::get('iyzico/installments', 'getInstallmentOptions');
             });
 
             // Iyzico 3DS Callback (from client app)
