@@ -24,6 +24,8 @@ use Illuminate\Contracts\Foundation\Application;
 use Modules\Chat\Events\LivechatUserMessageEvent;
 use Modules\Chat\Events\LivechatVendorMessageEvent;
 
+use Modules\Chat\Entities\Offer;
+
 class UserChatService
 {
     private $liveChat = null;
@@ -151,8 +153,7 @@ class UserChatService
     /**
      * @throws Exception
      */
-    #[NoReturn]
-    public static function send(int $client_id,int $freelancer_id,?string $message,int $messageFrom,$file = null,?int $project_id = null, $type = null, $proposal_id = null, $interview_message = null, $responseType = 'html', $order_id = null): View|Factory|array|string|Application|null
+    public static function send(int $client_id,int $freelancer_id,?string $message,int $messageFrom,$file = null,?int $project_id = null, $type = null, $proposal_id = null, $interview_message = null, $responseType = 'html', $order_id = null, $offer_id = null): View|Factory|array|string|Application|null
     {
         //  this method will send message and also store the message to livechat_messages table in database
         //  message column value should be json format when product id is not empty
@@ -173,6 +174,8 @@ class UserChatService
         //  assign product information to product value if product not exists then store null
         $instance->message["project"] = $project_id ? $instance->prepareProductDetails($project_id, $type, $proposal_id, $interview_message) : null;
         $instance->message["order_id"] = $order_id;
+        $instance->message["offer_id"] = $offer_id;
+        $instance->message["offer"] = $offer_id ? $instance->prepareOfferDetails($offer_id) : null;
         //  now check need to upload file for checking and uploading file then call storeFile method
         //  this condition will check file is not empty if empty then do not call storeFile method
         if(!empty($file)){
@@ -180,8 +183,8 @@ class UserChatService
             $instance->storeFile($file);
         }
 
-        // Allow message if either message text, project, or file is present
-        if(empty($instance->message["message"]) && empty($instance->message["project"]) && empty($instance->filename)){
+        // Allow message if either message text, project, offer, or file is present
+        if(empty($instance->message["message"]) && empty($instance->message["project"]) && empty($instance->filename) && empty($instance->message["offer"])){
             return $instance->sendResponse(null, $instance->liveChat, $messageFrom, $responseType);
         }
 
@@ -235,7 +238,7 @@ class UserChatService
                 "message" => $message,
                 "clientImage" => $client_image,
                 "freelancerImage" => $freelancer_image
-            ]);
+            ])->render();
 
             event(new LivechatVendorMessageEvent(
                 $messageBlade,
@@ -329,6 +332,32 @@ class UserChatService
             'image' =>  $type == 'job' ? $project->attachment : $project->image,
             'type' =>  $type == 'job' ? 'job' : 'project',
             'interview_message' =>  $type == 'job' ? $interview_message : ''
+        ];
+    }
+
+    private function prepareOfferDetails($offer_id): ?array {
+        $offer = Offer::with('milestones')->find($offer_id);
+        if (!$offer) return null;
+
+        $milestones = [];
+        foreach ($offer->milestones as $milestone) {
+            $milestones[] = [
+                'id' => $milestone->id,
+                'title' => $milestone->title,
+                'price' => $milestone->price,
+                'description' => $milestone->description,
+                'deadline' => $milestone->deadline,
+                'status' => $milestone->status,
+            ];
+        }
+
+        return [
+            'id' => $offer->id,
+            'price' => $offer->price,
+            'description' => $offer->description,
+            'deadline' => $offer->deadline,
+            'status' => $offer->status,
+            'milestones' => $milestones,
         ];
     }
 

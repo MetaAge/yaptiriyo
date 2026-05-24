@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Modules\Chat\Entities\Offer;
 use Modules\Chat\Entities\OfferMilestone;
 use Modules\CurrencySwitcher\App\Models\SelectedCurrencyList;
+use Modules\Chat\Services\UserChatService;
 
 class FreelancerOfferController extends Controller
 {
@@ -74,6 +75,25 @@ class FreelancerOfferController extends Controller
                 ]);
             }
         }
+        try {
+            UserChatService::send(
+                $offer->client_id,
+                $offer->freelancer_id,
+                "Yeni bir teklif gönderdim. Teklif ID: #{$offer->id}",
+                2, // from_user = 2 (Freelancer)
+                null,
+                null,
+                null,
+                null,
+                null,
+                'html',
+                null,
+                $offer->id
+            );
+        } catch (\Exception $e) {
+            \Log::error("Failed to send custom offer chat message: " . $e->getMessage());
+        }
+
         toastr_success(__('Offer Successfully Send'));
         return redirect()->route('freelancer.live.chat',[
             'client_id'=>$request->client_id

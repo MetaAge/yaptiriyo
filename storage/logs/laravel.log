@@ -13468,3 +13468,5 @@
 #19 /Users/ahmetsahin/Desktop/xilancer/core/artisan(35): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
 #20 {main}
 "} 
+[2026-05-24 18:29:57] local.ERROR: LiveChatMessage Notification Error for token emf52-eI80iEnWUOG7en3B:APA91bGuABwboHkzHiXoz7FPGLBEMlaCiYVHxWGToMxxSXaQks0MLwKDgL5gTkhQ3W0bRHFn_CVoBcaPTZE6y68XAh4WLhzH0hcR1xEiUYtRuyTkdDmPdko: invalid_grant  
+[2026-05-24 18:33:47] local.ERROR: LiveChatMessage Notification Error for token emf52-eI80iEnWUOG7en3B:APA91bGuABwboHkzHiXoz7FPGLBEMlaCiYVHxWGToMxxSXaQks0MLwKDgL5gTkhQ3W0bRHFn_CVoBcaPTZE6y68XAh4WLhzH0hcR1xEiUYtRuyTkdDmPdko: invalid_grant  

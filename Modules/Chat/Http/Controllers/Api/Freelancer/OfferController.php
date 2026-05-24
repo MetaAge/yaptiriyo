@@ -11,6 +11,7 @@ use Modules\Chat\Entities\OfferMilestone;
 
 use App\Models\Order;
 use App\Models\Rating;
+use Modules\Chat\Services\UserChatService;
 
 class OfferController extends Controller
 {
@@ -109,6 +110,26 @@ class OfferController extends Controller
 
             self::createMilestone($last_offer_id,$request,$data);
         }
+
+        try {
+            UserChatService::send(
+                $offer->client_id,
+                $offer->freelancer_id,
+                "Yeni bir teklif gönderdim. Teklif ID: #{$offer->id}",
+                2, // from_user = 2 (Freelancer)
+                null,
+                null,
+                null,
+                null,
+                null,
+                'html',
+                null,
+                $offer->id
+            );
+        } catch (\Exception $e) {
+            \Log::error("Failed to send custom offer chat message: " . $e->getMessage());
+        }
+
         return response()->json([
             'msg' => __('Offer Successfully Send')
         ]);

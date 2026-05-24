@@ -233,11 +233,28 @@ class OrderController extends Controller
     public function payment_update(Request $request)
     {
         $request->validate([
-            'order_id' => 'required',
+            'order_id' => 'required|integer',
             'status' => 'required'
         ]);
 
-        $order = Order::find($request->order_id);
+        $auth_user = auth('sanctum')->user();
+        $order = Order::where('id', $request->order_id)
+            ->where('user_id', $auth_user->id)
+            ->first();
+
+        if (empty($order)) {
+            return response()->json([
+                'msg' => __('Order not found')
+            ])->setStatusCode(422);
+        }
+
+        if ($order->payment_status == 'complete') {
+            return response()->json([
+                'status' => __('success'),
+                'msg' => __('Order Status Updated Successfully')
+            ]);
+        }
+
         $last_order_id = $order->id;
         $user_id = $order->user_id;
         $freelancer_id = $order->freelancer_id;
