@@ -68,7 +68,7 @@ class ChatController extends Controller
 
         $tempAllMessage = $all_message->getCollection();
 
-//        LiveChatMessage::where('from_user',1)->where('live_chat_id',$live_chat_id)->update(['is_seen'=>1]);
+        LiveChatMessage::where('from_user',1)->where('live_chat_id',$live_chat_id)->update(['is_seen'=>1]);
 
         if (cloudStorageExist() && in_array(Storage::getDefaultDriver(), ['s3', 'cloudFlareR2', 'wasabi'])) {
             $tempAllMessage->transform(function ($msg) {
@@ -202,7 +202,7 @@ class ChatController extends Controller
     public function unseen_message_count()
     {
         $message = User::select('id')->withCount(['freelancer_unseen_message' => function($q){
-            $q->where('is_seen',0);
+            $q->where('is_seen',0)->where('from_user',1);
         }])->where('id', auth('sanctum')->user()->id)->first();
 
         return response()->json([
