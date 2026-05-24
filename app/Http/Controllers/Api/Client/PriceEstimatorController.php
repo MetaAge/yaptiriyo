@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Api\Client;
 
 use App\Http\Controllers\Controller;
+use App\Models\JobPost;
 use App\Models\Project;
 use App\Models\Order;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Modules\Service\Entities\Category;
 use Modules\Service\Entities\SubCategory;
 
@@ -14,7 +14,7 @@ class PriceEstimatorController extends Controller
 {
     public function estimate(Request $request)
     {
-        $description = trim($request->description ?? '');
+        $description = trim(strip_tags($request->description ?? ''));
         
         // Validation: Minimum meaningful input
         if (mb_strlen($description) < 3) {
@@ -28,10 +28,18 @@ class PriceEstimatorController extends Controller
         $lowerDesc = mb_strtolower($description, 'UTF-8');
 
         // ── Step 1: Dynamic Category Detection ──
-        $detectedCategory = $this->detectCategoryFromDB($lowerDesc);
-        $categoryId = $detectedCategory['id'];
-        $categoryName = $detectedCategory['name'];
-        $matchScore = $detectedCategory['score'];
+        $requestCategoryId = $request->category_id ?? $request->category;
+        if (!empty($requestCategoryId)) {
+            $category = Category::where('status', 1)->where('id', $requestCategoryId)->first();
+            $categoryId = $category?->id;
+            $categoryName = $category?->category;
+            $matchScore = $category ? 100 : 0;
+        } else {
+            $detectedCategory = $this->detectCategoryFromDB($lowerDesc);
+            $categoryId = $detectedCategory['id'];
+            $categoryName = $detectedCategory['name'];
+            $matchScore = $detectedCategory['score'];
+        }
 
         // ── Step 2: Multi-layer Price Calculation ──
 
@@ -44,14 +52,38 @@ class PriceEstimatorController extends Controller
             $projectQuery->where('city_id', $cityId);
         }
 
-        $projectPrices = $projectQuery
-            ->whereNotNull('basic_regular_charge')
-            ->where('basic_regular_charge', '>', 0)
-            ->pluck('basic_regular_charge')
-            ->toArray();
+        $projectPrices = [];
+        $projectQuery
+            ->where(function ($q) {
+                $q->where('basic_regular_charge', '>', 0)
+                    ->orWhere('standard_regular_charge', '>', 0)
+                    ->orWhere('premium_regular_charge', '>', 0);
+            })
+            ->select([
+                'basic_regular_charge',
+                'basic_discount_charge',
+                'standard_regular_charge',
+                'standard_discount_charge',
+                'premium_regular_charge',
+                'premium_discount_charge',
+            ])
+            ->chunk(200, function ($projects) use (&$projectPrices) {
+                foreach ($projects as $project) {
+                    foreach (['basic', 'standard', 'premium'] as $package) {
+                        $regular = (float)($project->{$package . '_regular_charge'} ?? 0);
+                        $discount = (float)($project->{$package . '_discount_charge'} ?? 0);
+                        $price = $discount > 0 ? $discount : $regular;
+                        if ($price > 0) {
+                            $projectPrices[] = $price;
+                        }
+                    }
+                }
+            });
 
         // Layer 2: Completed order prices (real market data)
-        $orderQuery = Order::query()->where('status', 3); // Completed orders
+        $orderQuery = Order::query()
+            ->where('status', 3)
+            ->where('is_project_job', 'project'); // Completed project orders
         if ($categoryId) {
             $orderQuery->whereHas('project', function ($q) use ($categoryId) {
                 $q->where('category_id', $categoryId);
@@ -68,9 +100,20 @@ class PriceEstimatorController extends Controller
             ->pluck('price')
             ->toArray();
 
-        // Merge both data sources (orders weighted more as they're real transactions)
-        $allPrices = array_merge($projectPrices, $orderPrices, $orderPrices); // Orders counted twice for weight
-        $sampleCount = count($projectPrices) + count($orderPrices);
+        // Layer 3: Client job budgets in the same category.
+        $jobQuery = JobPost::query()
+            ->where('type', 'fixed')
+            ->where('budget', '>', 0)
+            ->where('status', 1);
+        if ($categoryId) {
+            $jobQuery->where('category', $categoryId);
+        }
+        $jobBudgetPrices = $jobQuery->pluck('budget')->toArray();
+
+        // Merge data sources. Orders are real transactions, so they carry extra weight.
+        $allPrices = array_merge($projectPrices, $jobBudgetPrices, $orderPrices, $orderPrices);
+        $allPrices = $this->removeOutliers($allPrices);
+        $sampleCount = count($projectPrices) + count($jobBudgetPrices) + count($orderPrices);
 
         // If no data at all for the category, try without category filter
         if (empty($allPrices) && $categoryId) {
@@ -80,6 +123,7 @@ class PriceEstimatorController extends Controller
                 ->where('basic_regular_charge', '>', 0)
                 ->pluck('basic_regular_charge')
                 ->toArray();
+            $allPrices = $this->removeOutliers($allPrices);
             $sampleCount = count($allPrices);
             $categoryName = null; // Reset since we're using general data
             $matchScore = 0;
@@ -97,6 +141,10 @@ class PriceEstimatorController extends Controller
                     'confidence' => 'none',
                     'sample_count' => 0,
                     'category_name' => null,
+                    'recommended' => 0,
+                    'detected_scope' => $this->extractScope($lowerDesc),
+                    'missing_fields' => $this->missingFields($lowerDesc),
+                    'price_drivers' => ['Henüz yeterli piyasa verisi bulunmuyor. Daha fazla hizmet eklendikçe tahminler iyileşecek.'],
                     'insights' => ['Henüz yeterli piyasa verisi bulunmuyor. Daha fazla hizmet eklendikçe tahminler iyileşecek.'],
                     'recommendations' => [],
                 ],
@@ -118,19 +166,19 @@ class PriceEstimatorController extends Controller
 
         // ── Step 4: Keyword-based Adjustments ──
         $adjustment = 1.0;
-        $insights = [];
+        $priceDrivers = [];
 
         if (str_contains($lowerDesc, 'acil') || str_contains($lowerDesc, 'bugün') || str_contains($lowerDesc, 'hemen')) {
             $adjustment += 0.20;
-            $insights[] = 'Acil talep algılandı — fiyatlar ortalama %20 daha yüksek olabilir.';
+            $priceDrivers[] = 'Acil talep algılandı; hızlı teslim fiyatı artırabilir.';
         }
         if (str_contains($lowerDesc, 'malzeme benden') || str_contains($lowerDesc, 'malzeme dahil değil')) {
             $adjustment -= 0.25;
-            $insights[] = 'Malzeme müşteriden — işçilik maliyeti düşürüldü.';
+            $priceDrivers[] = 'Malzeme müşteriden olduğu için tahmin işçilik ağırlıklı hesaplandı.';
         }
         if (str_contains($lowerDesc, 'malzeme dahil') || str_contains($lowerDesc, 'malzemeli')) {
             $adjustment += 0.15;
-            $insights[] = 'Malzeme dahil — toplam maliyet artırıldı.';
+            $priceDrivers[] = 'Malzeme dahil olduğu için toplam bütçe yukarı çekildi.';
         }
 
         // Room/size detection
@@ -138,14 +186,14 @@ class PriceEstimatorController extends Controller
             $rooms = (int)$matches[1] + (int)$matches[2];
             $sizeMultiplier = 1.0 + ($rooms - 2) * 0.15; // Each room adds ~15%
             $adjustment *= $sizeMultiplier;
-            $insights[] = "{$matches[0]} daire algılandı — alan büyüklüğüne göre ayarlandı.";
+            $priceDrivers[] = "{$matches[0]} alan bilgisi algılandı; kapsam büyüklüğüne göre ayarlandı.";
         }
         if (str_contains($lowerDesc, 'villa') || str_contains($lowerDesc, 'müstakil')) {
             $adjustment *= 1.4;
-            $insights[] = 'Villa/müstakil ev — büyük alan çarpanı uygulandı.';
+            $priceDrivers[] = 'Villa/müstakil ev ifadesi büyük alan etkisi olarak değerlendirildi.';
         }
         if (str_contains($lowerDesc, 'kombi') || str_contains($lowerDesc, 'kalorifer')) {
-            $insights[] = 'Isıtma sistemi işi algılandı.';
+            $priceDrivers[] = 'Isıtma sistemi işi algılandı.';
         }
 
         // Apply adjustments
@@ -157,6 +205,7 @@ class PriceEstimatorController extends Controller
         $adjustedMin = round($adjustedMin, -1);
         $adjustedMax = round($adjustedMax, -1);
         $adjustedMedian = round($adjustedMedian, -1);
+        $recommendedPrice = $adjustedMedian;
 
         // Ensure min < max
         if ($adjustedMin >= $adjustedMax) {
@@ -174,9 +223,9 @@ class PriceEstimatorController extends Controller
 
         // Category insight
         if ($categoryName) {
-            $insights[] = "\"$categoryName\" kategorisinde $sampleCount aktif hizmet/sipariş verisi analiz edildi.";
+            $priceDrivers[] = "\"$categoryName\" kategorisinde $sampleCount fiyat verisi analiz edildi.";
         } else {
-            $insights[] = "Genel piyasa verileri üzerinden $sampleCount hizmet analiz edildi.";
+            $priceDrivers[] = "Genel piyasa verileri üzerinden $sampleCount fiyat verisi analiz edildi.";
         }
 
         // Fetch up to 3 matching projects (recommendations)
@@ -231,15 +280,77 @@ class PriceEstimatorController extends Controller
                 'min' => (int)$adjustedMin,
                 'max' => (int)$adjustedMax,
                 'median' => (int)$adjustedMedian,
+                'recommended' => (int)$recommendedPrice,
                 'currency' => '₺',
                 'confidence' => $confidence,
                 'sample_count' => $sampleCount,
                 'category_name' => $categoryName,
-                'insights' => $insights,
+                'detected_scope' => $this->extractScope($lowerDesc),
+                'missing_fields' => $this->missingFields($lowerDesc),
+                'price_drivers' => array_slice($priceDrivers, 0, 3),
+                'insights' => $priceDrivers,
                 'recommendations' => $recommendations,
             ],
             'message' => __('Fiyat piyasa verileri analiz edilerek tahmin edildi.')
         ]);
+    }
+
+    private function removeOutliers(array $prices): array
+    {
+        $prices = array_values(array_filter(array_map('floatval', $prices), fn($price) => $price > 0));
+        sort($prices);
+
+        $count = count($prices);
+        if ($count < 8) {
+            return $prices;
+        }
+
+        $trim = max(1, (int)floor($count * 0.05));
+        return array_slice($prices, $trim, $count - ($trim * 2));
+    }
+
+    private function extractScope(string $text): array
+    {
+        $scope = [];
+
+        if (preg_match('/(\d)\+(\d)/', $text, $matches)) {
+            $scope['room_count'] = $matches[0];
+        }
+        if (preg_match('/(\d+)\s*(m2|m²|metrekare)/u', $text, $matches)) {
+            $scope['area_m2'] = (int)$matches[1];
+        }
+        if (str_contains($text, 'acil') || str_contains($text, 'bugün') || str_contains($text, 'hemen')) {
+            $scope['urgency'] = 'urgent';
+        }
+        if (str_contains($text, 'malzeme dahil') || str_contains($text, 'malzemeli')) {
+            $scope['material_included'] = true;
+        } elseif (str_contains($text, 'malzeme benden') || str_contains($text, 'malzeme dahil değil')) {
+            $scope['material_included'] = false;
+        }
+
+        return $scope;
+    }
+
+    private function missingFields(string $text): array
+    {
+        $missing = [];
+        $looksLikeHomeService = str_contains($text, 'boya')
+            || str_contains($text, 'badana')
+            || str_contains($text, 'temizlik')
+            || str_contains($text, 'tadilat');
+
+        if ($looksLikeHomeService && !preg_match('/(\d+)\s*(m2|m²|metrekare)/u', $text)) {
+            $missing[] = 'Yaklaşık metrekare bilgisi tahmini netleştirir.';
+        }
+        if ($looksLikeHomeService
+            && !str_contains($text, 'malzeme dahil')
+            && !str_contains($text, 'malzemeli')
+            && !str_contains($text, 'malzeme benden')
+            && !str_contains($text, 'malzeme dahil değil')) {
+            $missing[] = 'Malzemenin kime ait olduğu belirtilirse bütçe daha doğru olur.';
+        }
+
+        return array_slice($missing, 0, 2);
     }
 
     /**
