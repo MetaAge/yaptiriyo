@@ -30,7 +30,7 @@ class PersonalInfoController extends Controller
     public function personal_info()
     {
         $personal_info = User::with('user_country:id,country','user_state:id,state','user_city:id,city', 'user_introduction')
-            ->select('id', 'first_name','last_name', 'email', 'country_id', 'state_id','city_id','experience_level','phone','image','load_from')
+            ->select('id', 'username', 'first_name','last_name', 'email', 'country_id', 'state_id','city_id','experience_level','phone','image','load_from')
             ->where('id',auth('sanctum')->user()->id)
             ->first();
         
