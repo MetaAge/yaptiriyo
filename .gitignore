@@ -12,3 +12,4 @@ yarn-error.log
 .DS_Store
 
 *.zip
+/storage/app/firebase/firebase_credentials.json

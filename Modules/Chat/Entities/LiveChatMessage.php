@@ -82,8 +82,7 @@ class LiveChatMessage extends Model
                         return;
                     }
 
-                    $jsonCredentials = file_get_contents($credentialsPath);
-                    $factory = (new Factory)->withServiceAccount($jsonCredentials);
+                    $factory = (new Factory)->withServiceAccount($credentialsPath);
                     $messaging = $factory->createMessaging();
 
                     $targetUser = $modal->from_user == 1 ? $freelancer : $user;

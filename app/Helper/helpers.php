@@ -2838,10 +2838,8 @@ function freelancer_notification($identity, $freelancer_id, $type, $msg)
         if($freelancer->firebase_device_token){
             $credentialsPath = storage_path('app/firebase/firebase_credentials.json');
             if (file_exists($credentialsPath)) {
-                $jsonCredentials = file_get_contents($credentialsPath);
-                
                 // Initialize Firebase Admin SDK
-                $factory = (new Factory)->withServiceAccount($jsonCredentials);
+                $factory = (new Factory)->withServiceAccount($credentialsPath);
                 $messaging = $factory->createMessaging();
 
                 // Construct the message
@@ -2918,10 +2916,8 @@ function client_notification($identity, $client_id, $type, $msg)
         if($client_for_device->firebase_device_token){
             $credentialsPath = storage_path('app/firebase/firebase_credentials.json');
             if (file_exists($credentialsPath)) {
-                $jsonCredentials = file_get_contents($credentialsPath);
-
                 // Initialize Firebase Admin SDK
-                $factory = (new Factory)->withServiceAccount($jsonCredentials);
+                $factory = (new Factory)->withServiceAccount($credentialsPath);
                 $messaging = $factory->createMessaging();
 
                 // Construct the message
@@ -2994,8 +2990,7 @@ function send_voice_call_notification($receiver_id, $data)
             return;
         }
 
-        $jsonCredentials = file_get_contents($credentialsPath);
-        $factory = (new Factory)->withServiceAccount($jsonCredentials);
+        $factory = (new Factory)->withServiceAccount($credentialsPath);
         $messaging = $factory->createMessaging();
 
         $message = CloudMessage::new()
