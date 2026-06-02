@@ -628,7 +628,7 @@ class ProjectWithFilterController extends Controller
         }
 
         $project_details = Project::with([
-            'project_creator:id,first_name,last_name,experience_level,image,username,check_online_status,check_work_availability,user_active_inactive_status,user_verified_status,country_id,state_id,load_from',
+            'project_creator:id,first_name,last_name,experience_level,image,username,check_online_status,check_work_availability,user_active_inactive_status,user_verified_status,country_id,state_id,load_from,phone',
             'project_attributes',
             'project_category:id,category,slug',
             'project_sub_categories:id,sub_category,slug',

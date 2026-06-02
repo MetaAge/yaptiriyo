@@ -7,7 +7,7 @@ use App\Models\JobPost;
 use App\Models\Project;
 use App\Models\Order;
 use Illuminate\Http\Request;
-use Modules\CountryManage\Entities\City;
+use Modules\CountryManage\Entities\State;
 use Modules\Service\Entities\Category;
 use Modules\Service\Entities\SubCategory;
 
@@ -25,9 +25,9 @@ class PriceEstimatorController extends Controller
             ], 422);
         }
 
-        $cityId = $request->city_id;
-        $cityName = $cityId ? City::where('id', $cityId)->value('city') : null;
-        $usedCityFilterForPricing = !empty($cityId);
+        $stateId = $request->state_id;
+        $stateName = $stateId ? State::where('id', $stateId)->value('state') : null;
+        $usedStateFilterForPricing = !empty($stateId);
         $lowerDesc = mb_strtolower($description, 'UTF-8');
 
         // ── Step 1: Dynamic Category Detection ──
@@ -51,8 +51,8 @@ class PriceEstimatorController extends Controller
         if ($categoryId) {
             $projectQuery->where('category_id', $categoryId);
         }
-        if ($cityId) {
-            $projectQuery->where('city_id', $cityId);
+        if ($stateId) {
+            $projectQuery->where('state_id', $stateId);
         }
 
         $projectPrices = [];
@@ -92,9 +92,9 @@ class PriceEstimatorController extends Controller
                 $q->where('category_id', $categoryId);
             });
         }
-        if ($cityId) {
-            $orderQuery->whereHas('project', function ($q) use ($cityId) {
-                $q->where('city_id', $cityId);
+        if ($stateId) {
+            $orderQuery->whereHas('project', function ($q) use ($stateId) {
+                $q->where('state_id', $stateId);
             });
         }
 
@@ -120,7 +120,7 @@ class PriceEstimatorController extends Controller
 
         // If no data at all for the category, try without category filter
         if (empty($allPrices) && $categoryId) {
-            $usedCityFilterForPricing = false;
+            $usedStateFilterForPricing = false;
             $allPrices = Project::query()
                 ->where('status', 1)
                 ->whereNotNull('basic_regular_charge')
@@ -231,10 +231,10 @@ class PriceEstimatorController extends Controller
         } else {
             $priceDrivers[] = "Genel piyasa verileri üzerinden $sampleCount fiyat verisi analiz edildi.";
         }
-        if ($cityName) {
-            $priceDrivers[] = $usedCityFilterForPricing
-                ? "$cityName şehir filtresi fiyat ve önerilerde dikkate alındı."
-                : "$cityName için yeterli fiyat verisi bulunamadı; fiyat genel piyasa verisiyle hesaplandı.";
+        if ($stateName) {
+            $priceDrivers[] = $usedStateFilterForPricing
+                ? "$stateName il filtresi fiyat ve önerilerde dikkate alındı."
+                : "$stateName için yeterli fiyat verisi bulunamadı; fiyat genel piyasa verisiyle hesaplandı.";
         }
 
         // Fetch up to 3 matching projects (recommendations)
@@ -262,11 +262,11 @@ class PriceEstimatorController extends Controller
                     });
             });
         }
-        if ($cityId) {
-            $recQuery->where(function ($q) use ($cityId) {
-                $q->where('city_id', $cityId)
-                    ->orWhereHas('service_areas', function ($sq) use ($cityId) {
-                        $sq->where('city_id', $cityId);
+        if ($stateId) {
+            $recQuery->where(function ($q) use ($stateId) {
+                $q->where('state_id', $stateId)
+                    ->orWhereHas('service_areas', function ($sq) use ($stateId) {
+                        $sq->where('state_id', $stateId);
                     });
             });
         }
