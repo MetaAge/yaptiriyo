@@ -91,6 +91,7 @@ Route::group(['prefix' => 'v1', 'middleware' => 'setlang'], function () {
                 Route::get('country/all', 'country');
                 Route::post('state/all', 'state');
                 Route::post('city/all', 'city');
+                Route::post('neighborhood/all', 'neighborhood');
             });
             //module list info
             Route::controller(\App\Http\Controllers\Api\Freelancer\ModuleListController::class)->group(function () {
@@ -310,6 +311,7 @@ Route::group(['prefix' => 'v1', 'middleware' => 'setlang'], function () {
             Route::get('country/all', 'country');
             Route::post('state/all', 'state');
             Route::post('city/all', 'city');
+            Route::post('neighborhood/all', 'neighborhood');
         });
 
         //iyzico public web callback for 3DS

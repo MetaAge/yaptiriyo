@@ -49,6 +49,7 @@ class Project extends Model
         'country_id',
         'state_id',
         'city_id',
+        'neighborhood_id',
         'video_url',
         'is_emergency'
     ];
@@ -179,6 +180,11 @@ class Project extends Model
     public function city()
     {
         return $this->belongsTo(\Modules\CountryManage\Entities\City::class, 'city_id');
+    }
+
+    public function neighborhood()
+    {
+        return $this->belongsTo(\Modules\CountryManage\Entities\Neighborhood::class, 'neighborhood_id');
     }
 
     public function service_areas()

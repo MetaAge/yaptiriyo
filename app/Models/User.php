@@ -13,6 +13,7 @@ use Modules\Chat\Entities\LiveChatMessage;
 use Modules\CountryManage\Entities\City;
 use Modules\CountryManage\Entities\Country;
 use Modules\CountryManage\Entities\State;
+use Modules\CountryManage\Entities\Neighborhood;
 use Modules\Wallet\Entities\Wallet;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
@@ -45,6 +46,7 @@ class User extends Authenticatable
         'is_synced',
         'is_fake',
         'city_id',
+        'neighborhood_id',
         'iyzico_card_user_key',
         'latitude',
         'longitude'
@@ -94,6 +96,10 @@ class User extends Authenticatable
     public function user_city()
     {
         return $this->belongsTo(City::class, 'city_id');
+    }
+    public function user_neighborhood()
+    {
+        return $this->belongsTo(Neighborhood::class, 'neighborhood_id');
     }
     public function user_introduction()
     {

@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Api\Client;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CityResource;
 use App\Http\Resources\CountryResource;
+use App\Http\Resources\NeighborhoodResource;
 use App\Http\Resources\StateResource;
 use Illuminate\Http\Request;
 use Modules\CountryManage\Entities\City;
 use Modules\CountryManage\Entities\Country;
+use Modules\CountryManage\Entities\Neighborhood;
 use Modules\CountryManage\Entities\State;
 
 class CountryManageController extends Controller
@@ -86,6 +88,34 @@ class CountryManageController extends Controller
 
         return response()->json([
             'msg'=> __('No city found'),
+        ]);
+
+    }
+
+    //get all neighborhood by city
+    public function neighborhood(Request $request)
+    {
+        $request->validate(['city_id'=>'required|integer']);
+
+        if(!empty($request->neighborhood)){
+            $neighborhood_list = Neighborhood::select(['id','city_id','neighborhood'])
+                ->where('city_id', $request->city_id)
+                ->where('status',1)
+                ->where('neighborhood', 'LIKE', "%". strip_tags($request->neighborhood) ."%")
+                ->paginate(10)->withQueryString();
+        }else{
+            $neighborhood_list = Neighborhood::select(['id','city_id','neighborhood'])
+                ->where('city_id', $request->city_id)
+                ->where('status',1)
+                ->paginate(10)->withQueryString();
+        }
+
+        if($neighborhood_list){
+            return NeighborhoodResource::collection($neighborhood_list);
+        }
+
+        return response()->json([
+            'msg'=> __('No neighborhood found'),
         ]);
 
     }

@@ -86,6 +86,11 @@ class ProjectController extends Controller
                 'basic_delivery'=>'required|string|max:191',
                 'checkbox_or_numeric_title'=>'required',
                 'video_url'=>'nullable|string|max:191',
+                'video'=>'nullable|mimetypes:video/mp4,video/quicktime,video/x-msvideo|max:20480',
+                'country_id'=>'required',
+                'state_id'=>'required',
+                'city_id'=>'required',
+                'neighborhood_id'=>'required',
             ]);
 
             $imageName = null;
@@ -146,6 +151,16 @@ class ProjectController extends Controller
                     }
                 }
 
+                $videoName = $request->video_url;
+                if ($video = $request->file('video')) {
+                    $videoName = time().'-'.uniqid().'.'.$video->getClientOriginalExtension();
+                    if (cloudStorageExist() && in_array(get_static_option('storage_driver'), ['s3', 'cloudFlareR2', 'wasabi'])) {
+                        add_frontend_cloud_image_if_module_exists($upload_folder, $video, $videoName,'public');
+                    } else {
+                        $video->move('assets/uploads/project', $videoName);
+                    }
+                }
+
                 $project = Project::create([
                     'user_id'=>$user_id,
                     'category_id'=>$request->category,
@@ -172,8 +187,12 @@ class ProjectController extends Controller
                     'status'=>$project_auto_approval,
                     'project_approve_request'=>$project_approve_request,
                     'offer_packages_available_or_not'=>$request->offer_packages_available_or_not,
-                    'video_url'=>$request->video_url,
+                    'video_url'=>$videoName,
                     'is_emergency'=>$request->is_emergency ?? 0,
+                    'country_id'=>$request->country_id,
+                    'state_id'=>$request->state_id,
+                    'city_id'=>$request->city_id,
+                    'neighborhood_id'=>$request->neighborhood_id,
                     'load_from' => in_array($storage_driver,['CustomUploader']) ? 0 : 1, //added for cloud storage 0=local 1=cloud
                 ]);
                 $project->project_sub_categories()->attach(json_decode($request->subcategory,true));
@@ -189,6 +208,7 @@ class ProjectController extends Controller
                                 'country_id' => $area['country_id'] ?? 15, // Default to Turkey if not provided
                                 'state_id' => $area['state_id'],
                                 'city_id' => $area['city_id'] ?? null,
+                                'neighborhood_id' => $area['neighborhood_id'] ?? null,
                                 'created_at' => now(),
                                 'updated_at' => now(),
                             ];
@@ -332,6 +352,11 @@ class ProjectController extends Controller
                 'basic_delivery'=>'required|string|max:191',
                 'checkbox_or_numeric_title'=>'required',
                 'video_url'=>'nullable|string|max:191',
+                'video'=>'nullable|mimetypes:video/mp4,video/quicktime,video/x-msvideo|max:20480',
+                'country_id'=>'required',
+                'state_id'=>'required',
+                'city_id'=>'required',
+                'neighborhood_id'=>'required',
             ]);
 
             $user_id  = auth('sanctum')->user()->id;
@@ -410,6 +435,20 @@ class ProjectController extends Controller
                     $imageNames = array_values($imageNames);
                 }
 
+                $videoName = $request->video_url;
+                if ($video = $request->file('video')) {
+                    $videoName = time().'-'.uniqid().'.'.$video->getClientOriginalExtension();
+                    if (cloudStorageExist() && in_array(Storage::getDefaultDriver(), ['s3', 'cloudFlareR2', 'wasabi'])) {
+                        add_frontend_cloud_image_if_module_exists($upload_folder, $video, $videoName,'public');
+                    } else {
+                        $video->move('assets/uploads/project', $videoName);
+                    }
+                    // delete old video if it exists
+                    if ($project_details->video_url && file_exists('assets/uploads/project/' . $project_details->video_url)) {
+                        File::delete('assets/uploads/project/' . $project_details->video_url);
+                    }
+                }
+
                 $project_details->update([
                     'user_id'=>$user_id,
                     'category_id'=>$request->category,
@@ -435,8 +474,12 @@ class ProjectController extends Controller
                     'project_on_off'=>1,
                     'project_approve_request'=>$project_details->project_approve_request == 1 ? 1 : 0,
                     'offer_packages_available_or_not'=>$request->offer_packages_available_or_not ?? 0,
-                    'video_url'=>$request->video_url,
+                    'video_url'=>$videoName,
                     'is_emergency'=>$request->is_emergency ?? 0,
+                    'country_id'=>$request->country_id,
+                    'state_id'=>$request->state_id,
+                    'city_id'=>$request->city_id,
+                    'neighborhood_id'=>$request->neighborhood_id,
                 ]);
                 //update product pivot table data
                 $project = Project::find($project_details->id);
@@ -454,6 +497,7 @@ class ProjectController extends Controller
                                 'country_id' => $area['country_id'] ?? 15,
                                 'state_id' => $area['state_id'],
                                 'city_id' => $area['city_id'] ?? null,
+                                'neighborhood_id' => $area['neighborhood_id'] ?? null,
                                 'created_at' => now(),
                                 'updated_at' => now(),
                             ];

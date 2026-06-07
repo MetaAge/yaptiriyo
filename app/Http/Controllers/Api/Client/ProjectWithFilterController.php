@@ -567,6 +567,16 @@ class ProjectWithFilterController extends Controller
             });
         }
 
+        if (!empty($request->neighborhood)) {
+            $query = $query->where(function($q) use ($request) {
+                $q->where('neighborhood_id', $request->neighborhood)
+                    ->orWhereHas('service_areas', function($sq) use($request){
+                        $sq->where('neighborhood_id', $request->neighborhood);
+                    })
+                    ->orDoesntHave('service_areas');
+            });
+        }
+
         if(!empty($request->min_price) || !empty($request->max_price)){
             $query->where(function($q) use ($request) {
                 $effectivePrice = DB::raw('COALESCE(NULLIF(basic_discount_charge, 0), basic_regular_charge)');

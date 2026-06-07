@@ -689,6 +689,17 @@ class FrontendProjectsController extends Controller
             });
         }
 
+        if (!empty($request->neighborhood)) {
+            $neighborhoods = is_array($request->neighborhood) ? $request->neighborhood : [$request->neighborhood];
+            $query = $query->where(function($q) use ($neighborhoods) {
+                $q->whereIn('neighborhood_id', $neighborhoods)
+                    ->orWhereHas('service_areas', function($sq) use($neighborhoods){
+                        $sq->whereIn('neighborhood_id', $neighborhoods);
+                    })
+                    ->orDoesntHave('service_areas');
+            });
+        }
+
         if (!empty($request->min_price) && !empty($request->max_price)) {
             $query = $query->whereBetween('basic_regular_charge', [$request->min_price, $request->max_price]);
         }

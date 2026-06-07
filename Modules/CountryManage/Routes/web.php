@@ -54,4 +54,21 @@ Route::group(['as'=>'admin.','prefix'=>'admin/location','middleware' => ['auth:a
         });
     });
 
+    Route::group(['prefix'=>'neighborhood'],function(){
+        Route::controller(\Modules\CountryManage\Http\Controllers\NeighborhoodController::class)->group(function () {
+            Route::match(['get','post'],'all-neighborhood','all_neighborhood')->name('neighborhood.all')->permission('city-list'); // fallback to city-list if neighborhood-list permission doesn't exist yet
+            Route::post('edit-neighborhood/{id?}','edit_neighborhood')->name('neighborhood.edit')->permission('city-edit');
+            Route::post('change-status/{id}','neighborhood_status')->name('neighborhood.status')->permission('city-status-change');
+            Route::post('delete/{id}','delete_neighborhood')->name('neighborhood.delete')->permission('city-delete');
+            Route::post('bulk-action', 'bulk_action_neighborhood')->name('neighborhood.delete.bulk.action')->permission('city-bulk-delete');
+
+            Route::get('paginate/data', 'pagination')->name('neighborhood.paginate.data');
+            Route::get('search-neighborhood', 'search_neighborhood')->name('neighborhood.search');
+
+            Route::get('csv/import','import_settings')->name('neighborhood.import.csv.settings')->permission('city-csv-file-import');
+            Route::post('csv/import','update_import_settings')->name('neighborhood.import.csv.update.settings');
+            Route::post('csv/import/database','import_to_database_settings')->name('neighborhood.import.database');
+        });
+    });
+
 });

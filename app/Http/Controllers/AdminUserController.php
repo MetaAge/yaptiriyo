@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Modules\CountryManage\Entities\City;
 use Modules\CountryManage\Entities\State;
+use Modules\CountryManage\Entities\Neighborhood;
 use Modules\Service\Entities\SubCategory;
 
 class AdminUserController extends Controller
@@ -27,6 +28,16 @@ class AdminUserController extends Controller
         return response()->json([
             'status' => 'success',
             'cities' => $cities,
+        ]);
+    }
+
+    // get neighborhood
+    public function get_city_neighborhood(Request $request)
+    {
+        $neighborhoods = Neighborhood::where('city_id', $request->city)->where('status', 1)->get();
+        return response()->json([
+            'status' => 'success',
+            'neighborhoods' => $neighborhoods,
         ]);
     }
 

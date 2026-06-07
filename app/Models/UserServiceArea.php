@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Modules\CountryManage\Entities\City;
 use Modules\CountryManage\Entities\Country;
+use Modules\CountryManage\Entities\Neighborhood;
 use Modules\CountryManage\Entities\State;
 
 class UserServiceArea extends Model
@@ -17,6 +18,7 @@ class UserServiceArea extends Model
         'country_id',
         'state_id',
         'city_id',
+        'neighborhood_id',
     ];
 
     public function user()
@@ -37,5 +39,10 @@ class UserServiceArea extends Model
     public function city()
     {
         return $this->belongsTo(City::class);
+    }
+
+    public function neighborhood()
+    {
+        return $this->belongsTo(Neighborhood::class);
     }
 }

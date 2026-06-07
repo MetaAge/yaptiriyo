@@ -130,6 +130,16 @@
                                 <a href="{{ route('admin.city.import.csv.settings') }}"> {{ __('Import Cities') }} </a>
                             </li>
                         @endcan
+                        @can('city-list')
+                            <li class="dashboard__bottom__list__item @if (request()->routeIs(['admin.neighborhood.all'])) selected @endif">
+                                <a href="{{ route('admin.neighborhood.all') }}"> {{ __('Neighborhood') }} </a>
+                            </li>
+                        @endcan
+                        @can('city-csv-file-import')
+                            <li class="dashboard__bottom__list__item @if (request()->routeIs(['admin.neighborhood.import.csv.settings'])) selected @endif">
+                                <a href="{{ route('admin.neighborhood.import.csv.settings') }}"> {{ __('Import Neighborhoods') }} </a>
+                            </li>
+                        @endcan
                     </ul>
                 </li>
 

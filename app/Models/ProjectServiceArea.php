@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Modules\CountryManage\Entities\City;
 use Modules\CountryManage\Entities\Country;
+use Modules\CountryManage\Entities\Neighborhood;
 use Modules\CountryManage\Entities\State;
 
 class ProjectServiceArea extends Model
@@ -17,6 +18,7 @@ class ProjectServiceArea extends Model
         'country_id',
         'state_id',
         'city_id',
+        'neighborhood_id',
     ];
 
     public function project()
@@ -37,5 +39,10 @@ class ProjectServiceArea extends Model
     public function city()
     {
         return $this->belongsTo(City::class, 'city_id');
+    }
+
+    public function neighborhood()
+    {
+        return $this->belongsTo(Neighborhood::class, 'neighborhood_id');
     }
 }

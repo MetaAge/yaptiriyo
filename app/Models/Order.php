@@ -45,6 +45,7 @@ class Order extends Model
         'appointment_time',
         'service_address',
         'city_id',
+        'neighborhood_id',
         'state_id',
         'phone'
         ];
@@ -128,5 +129,10 @@ class Order extends Model
     public function city()
     {
         return $this->belongsTo(\Modules\CountryManage\Entities\City::class, 'city_id');
+    }
+
+    public function neighborhood()
+    {
+        return $this->belongsTo(\Modules\CountryManage\Entities\Neighborhood::class, 'neighborhood_id');
     }
 }

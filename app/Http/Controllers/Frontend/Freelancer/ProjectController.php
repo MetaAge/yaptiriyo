@@ -58,8 +58,9 @@ class ProjectController extends Controller
                 'project_title' => 'required',
                 'project_description' => 'required|min:50',
                 'country_id' => 'required',
-                'state_id' => 'nullable',
-                'city_id' => 'nullable',
+                'state_id' => 'required',
+                'city_id' => 'required',
+                'neighborhood_id' => 'required',
                 'slug' => $slug_validation,
                 'images' => 'required|array|max:5',
                 'images.*' => 'required|mimes:jpg,jpeg,png,bmp,tiff,svg,webp,gif,avif,mp4,mov,avi,wmv,mkv|max:10240', // Added video mimes, increased max for videos
@@ -185,6 +186,7 @@ class ProjectController extends Controller
                     'country_id' => $request->country_id,
                     'state_id' => $request->state_id,
                     'city_id' => $request->city_id,
+                    'neighborhood_id' => $request->neighborhood_id,
                     'load_from' => in_array($storage_driver, ['CustomUploader']) ? 0 : 1, //added for cloud storage 0=local 1=cloud
                 ]);
                 $project->project_sub_categories()->attach($request->subcategory);
@@ -328,8 +330,9 @@ class ProjectController extends Controller
                 'project_title' => 'required|unique:projects,title,' . $id,
                 'project_description' => 'required|min:50',
                 'country_id' => 'required',
-                'state_id' => 'nullable',
-                'city_id' => 'nullable',
+                'state_id' => 'required',
+                'city_id' => 'required',
+                'neighborhood_id' => 'required',
                 'slug' => $slug_validation,
                 'basic_title' => 'required|max:191',
                 'basic_regular_charge' => $regular_charge_validation,
@@ -540,6 +543,7 @@ class ProjectController extends Controller
                     'country_id' => $request->country_id,
                     'state_id' => $request->state_id,
                     'city_id' => $request->city_id,
+                    'neighborhood_id' => $request->neighborhood_id,
                 ]);
 
                 //update product pivot table data
