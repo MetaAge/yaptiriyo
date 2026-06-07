@@ -23,7 +23,7 @@
                 <x-bulk-action.bulk-delete-checkbox :id="$neighborhood->id"/>
             </td>
             <td>{{ $neighborhood->id }}</td>
-            <td>{{ $neighborhood->name }}</td>
+            <td>{{ $neighborhood->neighborhood }}</td>
             <td>{{ optional($neighborhood->city)->city }}</td>
             <td>{{ optional($neighborhood->state)->state }}</td>
             <td>{{ optional($neighborhood->country)->country }}</td>
@@ -38,7 +38,7 @@
                         <a class="btn dropdown-item status_dropdown__list__link edit_neighborhood_modal"
                            data-bs-toggle="modal"
                            data-bs-target="#editNeighborhoodModal"
-                           data-neighborhood="{{ $neighborhood->name }}"
+                           data-neighborhood="{{ $neighborhood->neighborhood }}"
                            data-neighborhood_id="{{ $neighborhood->id }}"
                            data-city_id="{{ $neighborhood->city_id }}"
                            data-state_id="{{ $neighborhood->state_id }}"
