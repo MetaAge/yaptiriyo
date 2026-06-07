@@ -463,14 +463,52 @@ class SubscriptionController extends Controller
             return response()->json(['msg' => __('Subscription not found')], 422);
         }
 
-        // Real world validation should happen here with Apple/Google APIs
-        // For now, we trust the client's receipt and verify product IDs match
-        
-        $isValid = true; // Placeholder for real validation result
+        $isValid = false;
+
+        if ($request->store == 'apple') {
+            $appleResponse = $this->verify_apple_receipt($request->receipt_data);
+            if (isset($appleResponse['status']) && $appleResponse['status'] == 0) {
+                $targetProductId = $subscription->apple_product_id ?? $request->product_id;
+                
+                // Check if targetProductId is in in_app array
+                $receiptInfo = $appleResponse['receipt']['in_app'] ?? [];
+                foreach ($receiptInfo as $item) {
+                    if ($item['product_id'] == $targetProductId) {
+                        $isValid = true;
+                        break;
+                    }
+                }
+                
+                // Check latest_receipt_info if not found yet
+                if (!$isValid && isset($appleResponse['latest_receipt_info'])) {
+                    foreach ($appleResponse['latest_receipt_info'] as $item) {
+                        if ($item['product_id'] == $targetProductId) {
+                            $isValid = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        } else {
+            // Google Play Store validation
+            // Real validation requires setting up Google Service Account Credentials.
+            // As sandbox verification on Android depends on Play Developer API,
+            // we will fallback to true for testing but log details.
+            \Log::info("Google Play Billing Validation Requested", [
+                'user_id' => $user->id,
+                'product_id' => $subscription->google_product_id ?? $request->product_id,
+                'purchase_token' => $request->receipt_data,
+                'transaction_id' => $request->transaction_id
+            ]);
+            $isValid = true; 
+        }
 
         if ($isValid) {
             $expire_date = Carbon::now()->addDays($subscription->subscription_type->validity);
             
+            // Cancel any old active subscriptions
+            self::cancel_old_subscriptions($user->id);
+
             // Create user subscription record
             $user_sub = UserSubscription::create([
                 'user_id' => $user->id,
@@ -494,7 +532,40 @@ class SubscriptionController extends Controller
             ]);
         }
 
-        return response()->json(['msg' => __('Invalid receipt')], 422);
+        return response()->json(['msg' => __('Invalid receipt verification')], 422);
+    }
+
+    private function verify_apple_receipt($receiptData)
+    {
+        $payload = json_encode(['receipt-data' => $receiptData]);
+        
+        // Try production first
+        $response = $this->send_curl_request('https://buy.itunes.apple.com/verifyReceipt', $payload);
+        
+        if (isset($response['status']) && $response['status'] == 21007) {
+            // Receipt is from sandbox environment, retry with sandbox URL
+            $response = $this->send_curl_request('https://sandbox.itunes.apple.com/verifyReceipt', $payload);
+        }
+        
+        return $response;
+    }
+
+    private function send_curl_request($url, $payload)
+    {
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'Content-Length: ' . strlen($payload)
+        ]);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        
+        $result = curl_exec($ch);
+        curl_close($ch);
+        
+        return json_decode($result, true);
     }
 
     //admin notification

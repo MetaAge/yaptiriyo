@@ -87,10 +87,10 @@ class ProjectController extends Controller
                 'checkbox_or_numeric_title'=>'required',
                 'video_url'=>'nullable|string|max:191',
                 'video'=>'nullable|mimetypes:video/mp4,video/quicktime,video/x-msvideo|max:20480',
-                'country_id'=>'required',
-                'state_id'=>'required',
-                'city_id'=>'required',
-                'neighborhood_id'=>'required',
+                'country_id'=>'nullable',
+                'state_id'=>'nullable',
+                'city_id'=>'nullable',
+                'neighborhood_id'=>'nullable',
             ]);
 
             $imageName = null;
@@ -131,6 +131,21 @@ class ProjectController extends Controller
                 $standard_discount_charge = $request->standard_discount_charge;
                 $premium_regular_charge = $request->premium_regular_charge;
                 $premium_discount_charge = $request->premium_discount_charge;
+            }
+
+            $country_id = $request->country_id;
+            $state_id = $request->state_id;
+            $city_id = $request->city_id;
+            $neighborhood_id = $request->neighborhood_id;
+
+            if ($request->has('service_areas')) {
+                $areas = json_decode($request->service_areas, true);
+                if (is_array($areas) && !empty($areas)) {
+                    $country_id = $country_id ?? ($areas[0]['country_id'] ?? 15);
+                    $state_id = $state_id ?? ($areas[0]['state_id'] ?? null);
+                    $city_id = $city_id ?? ($areas[0]['city_id'] ?? null);
+                    $neighborhood_id = $neighborhood_id ?? ($areas[0]['neighborhood_id'] ?? null);
+                }
             }
 
             DB::beginTransaction();
@@ -189,10 +204,10 @@ class ProjectController extends Controller
                     'offer_packages_available_or_not'=>$request->offer_packages_available_or_not,
                     'video_url'=>$videoName,
                     'is_emergency'=>$request->is_emergency ?? 0,
-                    'country_id'=>$request->country_id,
-                    'state_id'=>$request->state_id,
-                    'city_id'=>$request->city_id,
-                    'neighborhood_id'=>$request->neighborhood_id,
+                    'country_id'=>$country_id,
+                    'state_id'=>$state_id,
+                    'city_id'=>$city_id,
+                    'neighborhood_id'=>$neighborhood_id,
                     'load_from' => in_array($storage_driver,['CustomUploader']) ? 0 : 1, //added for cloud storage 0=local 1=cloud
                 ]);
                 $project->project_sub_categories()->attach(json_decode($request->subcategory,true));
@@ -353,10 +368,10 @@ class ProjectController extends Controller
                 'checkbox_or_numeric_title'=>'required',
                 'video_url'=>'nullable|string|max:191',
                 'video'=>'nullable|mimetypes:video/mp4,video/quicktime,video/x-msvideo|max:20480',
-                'country_id'=>'required',
-                'state_id'=>'required',
-                'city_id'=>'required',
-                'neighborhood_id'=>'required',
+                'country_id'=>'nullable',
+                'state_id'=>'nullable',
+                'city_id'=>'nullable',
+                'neighborhood_id'=>'nullable',
             ]);
 
             $user_id  = auth('sanctum')->user()->id;
@@ -396,6 +411,21 @@ class ProjectController extends Controller
                 $standard_discount_charge = $request->standard_discount_charge;
                 $premium_regular_charge = $request->premium_regular_charge;
                 $premium_discount_charge = $request->premium_discount_charge;
+            }
+
+            $country_id = $request->country_id;
+            $state_id = $request->state_id;
+            $city_id = $request->city_id;
+            $neighborhood_id = $request->neighborhood_id;
+
+            if ($request->has('service_areas')) {
+                $areas = json_decode($request->service_areas, true);
+                if (is_array($areas) && !empty($areas)) {
+                    $country_id = $country_id ?? ($areas[0]['country_id'] ?? 15);
+                    $state_id = $state_id ?? ($areas[0]['state_id'] ?? null);
+                    $city_id = $city_id ?? ($areas[0]['city_id'] ?? null);
+                    $neighborhood_id = $neighborhood_id ?? ($areas[0]['neighborhood_id'] ?? null);
+                }
             }
 
             $old_image = is_array($project_details->image) ? ($project_details->image[0] ?? '') : $project_details->image;
@@ -476,10 +506,10 @@ class ProjectController extends Controller
                     'offer_packages_available_or_not'=>$request->offer_packages_available_or_not ?? 0,
                     'video_url'=>$videoName,
                     'is_emergency'=>$request->is_emergency ?? 0,
-                    'country_id'=>$request->country_id,
-                    'state_id'=>$request->state_id,
-                    'city_id'=>$request->city_id,
-                    'neighborhood_id'=>$request->neighborhood_id,
+                    'country_id'=>$country_id,
+                    'state_id'=>$state_id,
+                    'city_id'=>$city_id,
+                    'neighborhood_id'=>$neighborhood_id,
                 ]);
                 //update product pivot table data
                 $project = Project::find($project_details->id);
