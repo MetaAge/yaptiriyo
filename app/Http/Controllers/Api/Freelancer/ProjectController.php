@@ -169,6 +169,14 @@ class ProjectController extends Controller
                 $videoName = $request->video_url;
                 if ($video = $request->file('video')) {
                     $videoName = time().'-'.uniqid().'.'.$video->getClientOriginalExtension();
+                    
+                    if ($request->upload_as_reel == 1) {
+                        if (!file_exists(public_path('assets/uploads/reels'))) {
+                            mkdir(public_path('assets/uploads/reels'), 0777, true);
+                        }
+                        copy($video->getRealPath(), public_path('assets/uploads/reels/' . $videoName));
+                    }
+
                     if (cloudStorageExist() && in_array(get_static_option('storage_driver'), ['s3', 'cloudFlareR2', 'wasabi'])) {
                         add_frontend_cloud_image_if_module_exists($upload_folder, $video, $videoName,'public');
                     } else {
@@ -213,15 +221,13 @@ class ProjectController extends Controller
                 $project->project_sub_categories()->attach(json_decode($request->subcategory,true));
 
                 if ($request->upload_as_reel == 1 && !empty($videoName)) {
-                    $reelVideoPath = public_path('assets/uploads/reels/' . $videoName);
-                    if (!file_exists(public_path('assets/uploads/reels'))) {
-                        mkdir(public_path('assets/uploads/reels'), 0777, true);
-                    }
-                    if ($video = $request->file('video')) {
-                        copy($video->getRealPath(), $reelVideoPath);
-                    } else {
+                    if (!$request->hasFile('video')) {
                         $projectVideoPath = public_path('assets/uploads/project/' . $videoName);
-                        if (file_exists($projectVideoPath)) {
+                        $reelVideoPath = public_path('assets/uploads/reels/' . $videoName);
+                        if (!file_exists(public_path('assets/uploads/reels'))) {
+                            mkdir(public_path('assets/uploads/reels'), 0777, true);
+                        }
+                        if (file_exists($projectVideoPath) && !file_exists($reelVideoPath)) {
                             copy($projectVideoPath, $reelVideoPath);
                         }
                     }
@@ -490,6 +496,14 @@ class ProjectController extends Controller
                 $videoName = $request->video_url;
                 if ($video = $request->file('video')) {
                     $videoName = time().'-'.uniqid().'.'.$video->getClientOriginalExtension();
+                    
+                    if ($request->upload_as_reel == 1) {
+                        if (!file_exists(public_path('assets/uploads/reels'))) {
+                            mkdir(public_path('assets/uploads/reels'), 0777, true);
+                        }
+                        copy($video->getRealPath(), public_path('assets/uploads/reels/' . $videoName));
+                    }
+
                     if (cloudStorageExist() && in_array(Storage::getDefaultDriver(), ['s3', 'cloudFlareR2', 'wasabi'])) {
                         add_frontend_cloud_image_if_module_exists($upload_folder, $video, $videoName,'public');
                     } else {
@@ -538,15 +552,13 @@ class ProjectController extends Controller
                 $project->project_sub_categories()->sync(json_decode($request->subcategory,true));
 
                 if ($request->upload_as_reel == 1 && !empty($videoName)) {
-                    $reelVideoPath = public_path('assets/uploads/reels/' . $videoName);
-                    if (!file_exists(public_path('assets/uploads/reels'))) {
-                        mkdir(public_path('assets/uploads/reels'), 0777, true);
-                    }
-                    if ($video = $request->file('video')) {
-                        copy($video->getRealPath(), $reelVideoPath);
-                    } else {
+                    if (!$request->hasFile('video')) {
                         $projectVideoPath = public_path('assets/uploads/project/' . $videoName);
-                        if (file_exists($projectVideoPath)) {
+                        $reelVideoPath = public_path('assets/uploads/reels/' . $videoName);
+                        if (!file_exists(public_path('assets/uploads/reels'))) {
+                            mkdir(public_path('assets/uploads/reels'), 0777, true);
+                        }
+                        if (file_exists($projectVideoPath) && !file_exists($reelVideoPath)) {
                             copy($projectVideoPath, $reelVideoPath);
                         }
                     }
