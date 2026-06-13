@@ -212,6 +212,28 @@ class ProjectController extends Controller
                 ]);
                 $project->project_sub_categories()->attach(json_decode($request->subcategory,true));
 
+                if ($request->upload_as_reel == 1 && !empty($videoName)) {
+                    $reelVideoPath = public_path('assets/uploads/reels/' . $videoName);
+                    if (!file_exists(public_path('assets/uploads/reels'))) {
+                        mkdir(public_path('assets/uploads/reels'), 0777, true);
+                    }
+                    if ($video = $request->file('video')) {
+                        copy($video->getRealPath(), $reelVideoPath);
+                    } else {
+                        $projectVideoPath = public_path('assets/uploads/project/' . $videoName);
+                        if (file_exists($projectVideoPath)) {
+                            copy($projectVideoPath, $reelVideoPath);
+                        }
+                    }
+
+                    \App\Models\Reel::create([
+                        'user_id' => $user_id,
+                        'video' => $videoName,
+                        'thumbnail' => null,
+                        'description' => $request->reel_description ?? $request->project_title,
+                    ]);
+                }
+
                 // Handle multi-location service areas
                 if ($request->has('service_areas')) {
                     $areas = json_decode($request->service_areas, true);
@@ -514,6 +536,28 @@ class ProjectController extends Controller
                 //update product pivot table data
                 $project = Project::find($project_details->id);
                 $project->project_sub_categories()->sync(json_decode($request->subcategory,true));
+
+                if ($request->upload_as_reel == 1 && !empty($videoName)) {
+                    $reelVideoPath = public_path('assets/uploads/reels/' . $videoName);
+                    if (!file_exists(public_path('assets/uploads/reels'))) {
+                        mkdir(public_path('assets/uploads/reels'), 0777, true);
+                    }
+                    if ($video = $request->file('video')) {
+                        copy($video->getRealPath(), $reelVideoPath);
+                    } else {
+                        $projectVideoPath = public_path('assets/uploads/project/' . $videoName);
+                        if (file_exists($projectVideoPath)) {
+                            copy($projectVideoPath, $reelVideoPath);
+                        }
+                    }
+
+                    \App\Models\Reel::create([
+                        'user_id' => $user_id,
+                        'video' => $videoName,
+                        'thumbnail' => null,
+                        'description' => $request->reel_description ?? $request->project_title,
+                    ]);
+                }
 
                 // Handle multi-location service areas
                 if ($request->has('service_areas')) {
