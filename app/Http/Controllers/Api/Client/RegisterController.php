@@ -45,6 +45,10 @@ class RegisterController extends Controller
             'terms_conditions' =>1,
             'is_email_verified' => $is_verified,
             'email_verify_token'=> $email_verify_tokn,
+            'country_id' => $request->country,
+            'state_id' => $request->state,
+            'city_id' => $request->city,
+            'neighborhood_id' => $request->neighborhood,
         ]);
 
         if (!is_null($user)) {
