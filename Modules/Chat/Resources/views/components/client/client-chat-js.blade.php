@@ -126,7 +126,7 @@
                     ['payment_status', 'complete'],
                     ['status', 1],
                     ['user_id', auth()->id()],
-                ])->whereDate('expire_date', '>', Carbon::now())->exists();
+                ])->where('expire_date', '>', Carbon::now())->exists();
             }
         @endphp
 

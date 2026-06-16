@@ -14,8 +14,8 @@ class FreelancerSubscriptionController extends Controller
     public function all_subscription(Request $request)
     {
         $user_id = auth()->user()->id;
-        $all_subscriptions = UserSubscription::with('subscription:id,subscription_type_id')->latest()->where('user_id',$user_id)->paginate(10);
-        $total_limit = UserSubscription::where('user_id',$user_id)->where('payment_status','complete')->whereDate('expire_date', '>', Carbon::now())->sum('limit');
+        $all_subscriptions = UserSubscription::with('subscription:id,title,subscription_type_id')->latest()->where('user_id',$user_id)->paginate(10);
+        $total_limit = UserSubscription::where('user_id',$user_id)->where('payment_status','complete')->where('expire_date', '>', Carbon::now())->sum('limit');
 
         if(!$request->ajax()) {
             if ($request->has('mark_as_read') && $request->mark_as_read == 'true') {

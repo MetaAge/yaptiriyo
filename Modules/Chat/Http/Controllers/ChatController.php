@@ -92,7 +92,7 @@ class ChatController extends Controller
                     ->where('payment_status','complete')
                     ->where('status',1)
                     ->where('user_id',auth()->user()->id)
-                    ->whereDate('expire_date', '>', Carbon::now())->count();
+                    ->where('expire_date', '>', Carbon::now())->count();
 
                 if($active_subscription <= 0){
                     return back()->with(toastr_warning(__('You need an active subscription to send messages. Please purchase subscription.')));

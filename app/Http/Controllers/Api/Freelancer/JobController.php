@@ -124,7 +124,7 @@ class JobController extends Controller
             ])->setStatusCode(422);
         }
 
-        $total_limit = UserSubscription::where('user_id',$freelancer_id)->where('payment_status','complete')->whereDate('expire_date', '>', Carbon::now())->sum('limit');
+        $total_limit = UserSubscription::where('user_id',$freelancer_id)->where('payment_status','complete')->where('expire_date', '>', Carbon::now())->sum('limit');
 
         if(auth('sanctum')->user()->is_suspend == 1){
             return response()->json([
@@ -138,7 +138,7 @@ class JobController extends Controller
                 ->where('status', 1)
                 ->where('user_id', $freelancer_id)
                 ->where("limit", '>=', get_static_option('limit_settings'))
-                ->whereDate('expire_date', '>', Carbon::now())->first();
+                ->where('expire_date', '>', Carbon::now())->first();
 
             if ($total_limit >= get_static_option('limit_settings') ?? 2 && !empty($freelancer_subscription)) {
 

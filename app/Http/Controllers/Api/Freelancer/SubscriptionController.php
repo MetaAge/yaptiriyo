@@ -135,7 +135,7 @@ class SubscriptionController extends Controller
         $total_limit = UserSubscription::where('user_id',$user_id)
             ->where('payment_status','complete')
             ->where('status', 1)
-            ->whereDate('expire_date', '>', Carbon::now())
+            ->where('expire_date', '>', Carbon::now())
             ->sum('limit');
 
         return response()->json([

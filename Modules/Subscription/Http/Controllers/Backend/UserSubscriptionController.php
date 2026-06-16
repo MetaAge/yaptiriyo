@@ -21,7 +21,7 @@ class UserSubscriptionController extends Controller
     //user subscriptions
     public function all_subscription()
     {
-        $all_subscriptions = UserSubscription::whereHas('user')->with('subscription:id,subscription_type_id','user:id,user_type,email,first_name')->latest()->paginate(10);
+        $all_subscriptions = UserSubscription::whereHas('user')->with('subscription:id,title,subscription_type_id','user:id,user_type,email,first_name')->latest()->paginate(10);
         $active_subscription = UserSubscription::whereHas('user')->where('status',1)->count();
         $inactive_subscription = UserSubscription::whereHas('user')->where('status',0)->count();
         $manual_subscription = UserSubscription::whereHas('user')->where('payment_gateway','manual_payment')->count();
@@ -66,8 +66,8 @@ class UserSubscriptionController extends Controller
     {
         if($request->ajax()){
             $all_subscriptions = $request->string_search == ''
-                ? UserSubscription::whereHas('user')->with('subscription:id,subscription_type_id')->latest()->paginate(10)
-                : UserSubscription::whereHas('user')->with('subscription:id,subscription_type_id')->latest()->$this->query__($request);
+                ? UserSubscription::whereHas('user')->with('subscription:id,title,subscription_type_id')->latest()->paginate(10)
+                : UserSubscription::whereHas('user')->with('subscription:id,title,subscription_type_id')->latest()->$this->query__($request);
 
             $route = route("admin.user.subscription.paginate.data");
 
@@ -78,7 +78,7 @@ class UserSubscriptionController extends Controller
     // search string
     public function search_subscription(Request $request)
     {
-        $query = UserSubscription::whereHas('user')->with('subscription:id,subscription_type_id')->latest();
+        $query = UserSubscription::whereHas('user')->with('subscription:id,title,subscription_type_id')->latest();
         if($request->filter_val != ''){
             if($request->filter_val == 1){
                 $query->where('status',1);
@@ -137,8 +137,8 @@ class UserSubscriptionController extends Controller
     public function active_subscriptions(Request $request)
     {
         $all_subscriptions = $request->string_search == ''
-        ? UserSubscription::whereHas('user')->with('subscription:id,subscription_type_id')->where('status',1)->paginate(10)
-        : UserSubscription::whereHas('user')->with('subscription:id,subscription_type_id')->latest()->where('status',1)->$this->query__($request);
+        ? UserSubscription::whereHas('user')->with('subscription:id,title,subscription_type_id')->where('status',1)->paginate(10)
+        : UserSubscription::whereHas('user')->with('subscription:id,title,subscription_type_id')->latest()->where('status',1)->$this->query__($request);
 
         $route = route("admin.user.subscription.active");
 
@@ -149,8 +149,8 @@ class UserSubscriptionController extends Controller
     public function inactive_subscriptions(Request $request)
     {
         $all_subscriptions = $request->string_search == ''
-            ? UserSubscription::whereHas('user')->with('subscription:id,subscription_type_id')->where('status',0)->paginate(10)
-            : UserSubscription::whereHas('user')->with('subscription:id,subscription_type_id')->latest()->where('status',0)->$this->query__($request);
+            ? UserSubscription::whereHas('user')->with('subscription:id,title,subscription_type_id')->where('status',0)->paginate(10)
+            : UserSubscription::whereHas('user')->with('subscription:id,title,subscription_type_id')->latest()->where('status',0)->$this->query__($request);
         $route = route("admin.user.subscription.active");
 
         return $all_subscriptions->total() >= 1 ? view('subscription::backend.user-subscription.search-result', compact('all_subscriptions', 'route'))->render() : response()->json(['status'=>__('nothing')]);
@@ -160,8 +160,8 @@ class UserSubscriptionController extends Controller
     public function manual_subscriptions(Request $request)
     {
         $all_subscriptions = $request->string_search == ''
-            ? UserSubscription::whereHas('user')->with('subscription:id,subscription_type_id')->where('payment_gateway','manual_payment')->paginate(10)
-            : UserSubscription::whereHas('user')->with('subscription:id,subscription_type_id')->latest()->where('payment_gateway','manual_payment')->$this->query__($request);
+            ? UserSubscription::whereHas('user')->with('subscription:id,title,subscription_type_id')->where('payment_gateway','manual_payment')->paginate(10)
+            : UserSubscription::whereHas('user')->with('subscription:id,title,subscription_type_id')->latest()->where('payment_gateway','manual_payment')->$this->query__($request);
         $route = route("admin.user.subscription.active");
 
         return $all_subscriptions->total() >= 1 ? view('subscription::backend.user-subscription.search-result', compact('all_subscriptions', 'route'))->render() : response()->json(['status'=>__('nothing')]);
