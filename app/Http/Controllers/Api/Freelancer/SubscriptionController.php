@@ -464,6 +464,7 @@ class SubscriptionController extends Controller
         }
 
         $isValid = false;
+        $subscriptionExpiresDate = null; // Will hold Apple-reported expiry for auto-renewable
 
         if ($request->store == 'apple') {
             $rawReceipt = $request->receipt_data;
@@ -486,6 +487,16 @@ class SubscriptionController extends Controller
                 } elseif (isset($payload['product_id']) && $payload['product_id'] == $targetProductId) {
                     $isValid = true;
                 }
+
+                // Extract subscription expiry date from JWS payload (auto-renewable)
+                if ($isValid) {
+                    if (isset($payload['expiresDate'])) {
+                        // expiresDate is in milliseconds since epoch
+                        $subscriptionExpiresDate = Carbon::createFromTimestampMs($payload['expiresDate']);
+                    } elseif (isset($payload['expires_date_ms'])) {
+                        $subscriptionExpiresDate = Carbon::createFromTimestampMs($payload['expires_date_ms']);
+                    }
+                }
             } else {
                 // StoreKit 1 Legacy Receipt
                 $cleanedReceipt = str_replace(' ', '+', $rawReceipt);
@@ -499,20 +510,29 @@ class SubscriptionController extends Controller
                 if (isset($appleResponse['status']) && $appleResponse['status'] == 0) {
                     $targetProductId = $subscription->apple_product_id ?? $request->product_id;
                     
-                    // Check if targetProductId is in in_app array
-                    $receiptInfo = $appleResponse['receipt']['in_app'] ?? [];
-                    foreach ($receiptInfo as $item) {
-                        if ($item['product_id'] == $targetProductId) {
-                            $isValid = true;
-                            break;
-                        }
-                    }
-                    
-                    // Check latest_receipt_info if not found yet
-                    if (!$isValid && isset($appleResponse['latest_receipt_info'])) {
+                    // Check latest_receipt_info first for auto-renewable subscriptions
+                    if (isset($appleResponse['latest_receipt_info'])) {
                         foreach ($appleResponse['latest_receipt_info'] as $item) {
                             if ($item['product_id'] == $targetProductId) {
                                 $isValid = true;
+                                // Get the expiry date from the subscription info
+                                if (isset($item['expires_date_ms'])) {
+                                    $subscriptionExpiresDate = Carbon::createFromTimestampMs($item['expires_date_ms']);
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    
+                    // Fallback to in_app array
+                    if (!$isValid) {
+                        $receiptInfo = $appleResponse['receipt']['in_app'] ?? [];
+                        foreach ($receiptInfo as $item) {
+                            if ($item['product_id'] == $targetProductId) {
+                                $isValid = true;
+                                if (isset($item['expires_date_ms'])) {
+                                    $subscriptionExpiresDate = Carbon::createFromTimestampMs($item['expires_date_ms']);
+                                }
                                 break;
                             }
                         }
@@ -521,9 +541,6 @@ class SubscriptionController extends Controller
             }
         } else {
             // Google Play Store validation
-            // Real validation requires setting up Google Service Account Credentials.
-            // As sandbox verification on Android depends on Play Developer API,
-            // we will fallback to true for testing but log details.
             \Log::info("Google Play Billing Validation Requested", [
                 'user_id' => $user->id,
                 'product_id' => $subscription->google_product_id ?? $request->product_id,
@@ -534,7 +551,18 @@ class SubscriptionController extends Controller
         }
 
         if ($isValid) {
-            $expire_date = Carbon::now()->addDays($subscription->subscription_type->validity);
+            // Prevent duplicate transaction processing
+            $existingTransaction = UserSubscription::where('transaction_id', $request->transaction_id)->first();
+            if ($existingTransaction) {
+                return response()->json([
+                    'status' => 'success',
+                    'msg' => __('This transaction has already been processed'),
+                    'subscription_details' => $existingTransaction
+                ]);
+            }
+
+            // Use Apple-reported expiry date if available, otherwise calculate from validity
+            $expire_date = $subscriptionExpiresDate ?? Carbon::now()->addDays($subscription->subscription_type->validity);
             
             // Cancel any old active subscriptions
             self::cancel_old_subscriptions($user->id);
