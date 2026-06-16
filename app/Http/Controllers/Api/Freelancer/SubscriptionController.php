@@ -544,20 +544,27 @@ class SubscriptionController extends Controller
     {
         $payload = json_encode(['receipt-data' => $receiptData]);
         
-        // Try production first
-        $response = $this->send_curl_request('https://buy.itunes.apple.com/verifyReceipt', $payload);
-        
-        if (isset($response['status']) && $response['status'] == 21007) {
-            // Receipt is from sandbox environment, retry with sandbox URL
-            $response = $this->send_curl_request('https://sandbox.itunes.apple.com/verifyReceipt', $payload);
+        try {
+            // Try production first
+            $response = $this->send_curl_request('https://buy.itunes.apple.com/verifyReceipt', $payload);
+            
+            if (isset($response['status']) && $response['status'] == 21007) {
+                // Receipt is from sandbox environment, retry with sandbox URL
+                $response = $this->send_curl_request('https://sandbox.itunes.apple.com/verifyReceipt', $payload);
+            }
+            return $response;
+        } catch (\Exception $e) {
+            \Log::error("verify_apple_receipt Exception: " . $e->getMessage());
+            return ['status' => -1, 'exception' => $e->getMessage()];
         }
-        
-        return $response;
     }
 
     private function send_curl_request($url, $payload)
     {
         $ch = curl_init($url);
+        if ($ch === false) {
+            throw new \Exception("failed to initialize curl on: " . $url);
+        }
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
@@ -566,8 +573,15 @@ class SubscriptionController extends Controller
             'Content-Length: ' . strlen($payload)
         ]);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
         
         $result = curl_exec($ch);
+        if ($result === false) {
+            $error = curl_error($ch);
+            curl_close($ch);
+            throw new \Exception("cURL error: " . $error);
+        }
         curl_close($ch);
         
         return json_decode($result, true);
