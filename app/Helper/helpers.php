@@ -2710,8 +2710,56 @@ function commission_amount($price, $individual_commission, $subscription_commiss
     return $commission_amount;
 }
 
+function check_and_downgrade_expired_subscription($user_id)
+{
+    // Check if the user has an active, valid paid subscription
+    $active_paid_sub = \Modules\Subscription\Entities\UserSubscription::where('user_id', $user_id)
+        ->where('status', 1)
+        ->where('payment_status', 'complete')
+        ->where('expire_date', '>', now())
+        ->where('subscription_id', '!=', 10) // 10 is free plan
+        ->exists();
+
+    if (!$active_paid_sub) {
+        // Check if they already have an active Free subscription
+        $active_free_sub = \Modules\Subscription\Entities\UserSubscription::where('user_id', $user_id)
+            ->where('status', 1)
+            ->where('payment_status', 'complete')
+            ->where('subscription_id', 10)
+            ->where('expire_date', '>', now())
+            ->exists();
+
+        if (!$active_free_sub) {
+            $free_subscription = \Modules\Subscription\Entities\Subscription::with('subscription_type:id,validity')->find(10);
+            if ($free_subscription) {
+                // Pasify all old subscriptions
+                \Modules\Subscription\Entities\UserSubscription::where('user_id', $user_id)
+                    ->where('status', 1)
+                    ->update([
+                        'status' => 0,
+                        'expire_date' => \Illuminate\Support\Carbon::now()->subDay()
+                    ]);
+
+                // Create a new Free subscription
+                \Modules\Subscription\Entities\UserSubscription::create([
+                    'user_id' => $user_id,
+                    'subscription_id' => $free_subscription->id,
+                    'price' => 0,
+                    'limit' => $free_subscription->limit,
+                    'expire_date' => \Illuminate\Support\Carbon::now()->addDays($free_subscription->subscription_type->validity ?? 365),
+                    'payment_gateway' => 'free',
+                    'payment_status' => 'complete',
+                    'status' => 1,
+                ]);
+            }
+        }
+    }
+}
+
 function get_user_subscription_commission($user_id)
 {
+    check_and_downgrade_expired_subscription($user_id);
+
     $userSubscription = \Modules\Subscription\Entities\UserSubscription::where('user_id', $user_id)
         ->where('status', 1)
         ->where('expire_date', '>', now())
@@ -2750,6 +2798,8 @@ function get_user_subscription_commission($user_id)
 
 function is_pro_user($user_id)
 {
+    check_and_downgrade_expired_subscription($user_id);
+
     $userSubscription = \Modules\Subscription\Entities\UserSubscription::where('user_id', $user_id)
         ->where('status', 1)
         ->where('payment_status', 'complete')
@@ -2774,6 +2824,8 @@ function is_pro_user($user_id)
 
 function is_premium_user($user_id)
 {
+    check_and_downgrade_expired_subscription($user_id);
+
     $userSubscription = \Modules\Subscription\Entities\UserSubscription::where('user_id', $user_id)
         ->where('status', 1)
         ->where('payment_status', 'complete')

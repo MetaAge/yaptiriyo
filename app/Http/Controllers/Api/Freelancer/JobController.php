@@ -124,6 +124,7 @@ class JobController extends Controller
             ])->setStatusCode(422);
         }
 
+        check_and_downgrade_expired_subscription($freelancer_id);
         $total_limit = UserSubscription::where('user_id',$freelancer_id)->where('payment_status','complete')->where('expire_date', '>', Carbon::now())->sum('limit');
 
         if(auth('sanctum')->user()->is_suspend == 1){

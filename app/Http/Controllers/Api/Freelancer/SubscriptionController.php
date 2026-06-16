@@ -126,6 +126,7 @@ class SubscriptionController extends Controller
     public function all_subscription()
     {
         $user_id = auth('sanctum')->user()->id;
+        check_and_downgrade_expired_subscription($user_id);
         $all_subscriptions = UserSubscription::select('id','user_id','subscription_id','price','limit','status','payment_status','payment_gateway','expire_date','created_at')
             ->with(['user_subscription_type_api'])
             ->latest()
