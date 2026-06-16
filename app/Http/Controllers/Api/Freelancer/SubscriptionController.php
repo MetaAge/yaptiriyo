@@ -466,8 +466,19 @@ class SubscriptionController extends Controller
         $isValid = false;
 
         if ($request->store == 'apple') {
-            $cleanedReceipt = str_replace(' ', '+', $request->receipt_data);
+            $rawReceipt = $request->receipt_data;
+            \Log::info("Apple IAP Raw Receipt Info", [
+                'length' => strlen($rawReceipt),
+                'start' => substr($rawReceipt, 0, 50),
+                'end' => substr($rawReceipt, -50),
+            ]);
+            $cleanedReceipt = str_replace(' ', '+', $rawReceipt);
             $cleanedReceipt = preg_replace('/\s+/', '', $cleanedReceipt);
+            \Log::info("Apple IAP Cleaned Receipt Info", [
+                'length' => strlen($cleanedReceipt),
+                'start' => substr($cleanedReceipt, 0, 50),
+                'end' => substr($cleanedReceipt, -50),
+            ]);
             $appleResponse = $this->verify_apple_receipt($cleanedReceipt);
             \Log::info("Apple IAP Verify Response Status: " . ($appleResponse['status'] ?? 'None'), [
                 'target_product_id' => $subscription->apple_product_id,
