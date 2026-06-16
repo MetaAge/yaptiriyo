@@ -467,42 +467,54 @@ class SubscriptionController extends Controller
 
         if ($request->store == 'apple') {
             $rawReceipt = $request->receipt_data;
-            \Log::info("Apple IAP Raw Receipt Info", [
-                'length' => strlen($rawReceipt),
-                'start' => substr($rawReceipt, 0, 50),
-                'end' => substr($rawReceipt, -50),
-            ]);
-            $cleanedReceipt = str_replace(' ', '+', $rawReceipt);
-            $cleanedReceipt = preg_replace('/\s+/', '', $cleanedReceipt);
-            \Log::info("Apple IAP Cleaned Receipt Info", [
-                'length' => strlen($cleanedReceipt),
-                'start' => substr($cleanedReceipt, 0, 50),
-                'end' => substr($cleanedReceipt, -50),
-            ]);
-            $appleResponse = $this->verify_apple_receipt($cleanedReceipt);
-            \Log::info("Apple IAP Verify Response Status: " . ($appleResponse['status'] ?? 'None'), [
-                'target_product_id' => $subscription->apple_product_id,
-                'input_product_id' => $request->product_id,
-                'apple_response' => $appleResponse
-            ]);
-            if (isset($appleResponse['status']) && $appleResponse['status'] == 0) {
+            
+            // Check if it's a JWS token (StoreKit 2)
+            $parts = explode('.', $rawReceipt);
+            if (count($parts) === 3) {
+                // Decode payload (index 1)
+                $payloadJson = base64_decode(str_replace(['-', '_'], ['+', '/'], $parts[1]));
+                $payload = json_decode($payloadJson, true);
+                
+                \Log::info("Apple StoreKit 2 JWS Payload Decoded", [
+                    'payload' => $payload
+                ]);
+                
                 $targetProductId = $subscription->apple_product_id ?? $request->product_id;
                 
-                // Check if targetProductId is in in_app array
-                $receiptInfo = $appleResponse['receipt']['in_app'] ?? [];
-                foreach ($receiptInfo as $item) {
-                    if ($item['product_id'] == $targetProductId) {
-                        $isValid = true;
-                        break;
-                    }
+                if (isset($payload['productId']) && $payload['productId'] == $targetProductId) {
+                    $isValid = true;
+                } elseif (isset($payload['product_id']) && $payload['product_id'] == $targetProductId) {
+                    $isValid = true;
                 }
-                
-                // Check latest_receipt_info if not found yet
-                if (!$isValid && isset($appleResponse['latest_receipt_info'])) {
-                    foreach ($appleResponse['latest_receipt_info'] as $item) {
+            } else {
+                // StoreKit 1 Legacy Receipt
+                $cleanedReceipt = str_replace(' ', '+', $rawReceipt);
+                $cleanedReceipt = preg_replace('/\s+/', '', $cleanedReceipt);
+                $appleResponse = $this->verify_apple_receipt($cleanedReceipt);
+                \Log::info("Apple IAP Verify Response Status: " . ($appleResponse['status'] ?? 'None'), [
+                    'target_product_id' => $subscription->apple_product_id,
+                    'input_product_id' => $request->product_id,
+                    'apple_response' => $appleResponse
+                ]);
+                if (isset($appleResponse['status']) && $appleResponse['status'] == 0) {
+                    $targetProductId = $subscription->apple_product_id ?? $request->product_id;
+                    
+                    // Check if targetProductId is in in_app array
+                    $receiptInfo = $appleResponse['receipt']['in_app'] ?? [];
+                    foreach ($receiptInfo as $item) {
                         if ($item['product_id'] == $targetProductId) {
                             $isValid = true;
                             break;
+                        }
+                    }
+                    
+                    // Check latest_receipt_info if not found yet
+                    if (!$isValid && isset($appleResponse['latest_receipt_info'])) {
+                        foreach ($appleResponse['latest_receipt_info'] as $item) {
+                            if ($item['product_id'] == $targetProductId) {
+                                $isValid = true;
+                                break;
+                            }
                         }
                     }
                 }
