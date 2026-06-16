@@ -492,9 +492,9 @@ class SubscriptionController extends Controller
                 if ($isValid) {
                     if (isset($payload['expiresDate'])) {
                         // expiresDate is in milliseconds since epoch
-                        $subscriptionExpiresDate = Carbon::createFromTimestampMs($payload['expiresDate']);
+                        $subscriptionExpiresDate = Carbon::createFromTimestampMs($payload['expiresDate'])->setTimezone(config('app.timezone'));
                     } elseif (isset($payload['expires_date_ms'])) {
-                        $subscriptionExpiresDate = Carbon::createFromTimestampMs($payload['expires_date_ms']);
+                        $subscriptionExpiresDate = Carbon::createFromTimestampMs($payload['expires_date_ms'])->setTimezone(config('app.timezone'));
                     }
                 }
             } else {
@@ -517,7 +517,7 @@ class SubscriptionController extends Controller
                                 $isValid = true;
                                 // Get the expiry date from the subscription info
                                 if (isset($item['expires_date_ms'])) {
-                                    $subscriptionExpiresDate = Carbon::createFromTimestampMs($item['expires_date_ms']);
+                                    $subscriptionExpiresDate = Carbon::createFromTimestampMs($item['expires_date_ms'])->setTimezone(config('app.timezone'));
                                 }
                                 break;
                             }
@@ -531,7 +531,7 @@ class SubscriptionController extends Controller
                             if ($item['product_id'] == $targetProductId) {
                                 $isValid = true;
                                 if (isset($item['expires_date_ms'])) {
-                                    $subscriptionExpiresDate = Carbon::createFromTimestampMs($item['expires_date_ms']);
+                                    $subscriptionExpiresDate = Carbon::createFromTimestampMs($item['expires_date_ms'])->setTimezone(config('app.timezone'));
                                 }
                                 break;
                             }
