@@ -94,6 +94,13 @@ class PlanFeatureSeeder extends Seeder
 
     public function run()
     {
+        // Deactivate any plans outside our canonical 3 so they don't appear in the store.
+        $canonicalIds = array_keys($this->plans);
+        $deactivated = Subscription::whereNotIn('id', $canonicalIds)->where('status', 1)->update(['status' => 0]);
+        if ($deactivated > 0) {
+            $this->command?->info("PlanFeatureSeeder: deactivated {$deactivated} non-canonical plan(s).");
+        }
+
         foreach ($this->plans as $id => $data) {
             $plan = Subscription::find($id);
             if (!$plan) {
@@ -101,9 +108,8 @@ class PlanFeatureSeeder extends Seeder
                 continue;
             }
 
-            // Apply the canonical title/price/type/limit (ranking is now title-independent).
+            // Update price/type/limit/status — title korunur (admin tarafından değiştirilebilir).
             $plan->update([
-                'title' => $data['title'],
                 'price' => $data['price'],
                 'subscription_type_id' => $data['subscription_type_id'],
                 'limit' => $data['limit'],
