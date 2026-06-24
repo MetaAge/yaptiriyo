@@ -49,7 +49,6 @@ class PlanFeatureSeeder extends Seeder
             ],
         ],
         1 => [
-            'title' => 'Orta',
             'price' => 399,
             'subscription_type_id' => 1,
             'limit' => 50,
@@ -60,7 +59,7 @@ class PlanFeatureSeeder extends Seeder
                 'photo_limit'         => 50,
                 'reels_monthly_limit' => 8,
                 'story_monthly_limit' => 15,
-                'whatsapp_button'     => 1,
+                'whatsapp_button'     => 0,
                 'phone_call'          => 1,
                 'urgent_jobs_access'  => 'full',
                 'search_rank'         => 1,
@@ -70,7 +69,6 @@ class PlanFeatureSeeder extends Seeder
             ],
         ],
         6 => [
-            'title' => 'Pro',
             'price' => 899,
             'subscription_type_id' => 1,
             'limit' => 999999,
