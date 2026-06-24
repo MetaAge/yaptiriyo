@@ -11,8 +11,8 @@ class UserSubscription extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id','subscription_id','price','limit','expire_date','payment_gateway','payment_status','status','transaction_id','manual_payment_image','email_send'];
-    protected $casts = ['status'=>'integer', 'expire_date' => 'datetime'];
+    protected $fillable = ['user_id','subscription_id','price','limit','offers_used','reels_used','stories_used','usage_period_start','expire_date','payment_gateway','payment_status','status','is_trial','trial_ends_at','transaction_id','manual_payment_image','email_send'];
+    protected $casts = ['status'=>'integer', 'expire_date' => 'datetime', 'usage_period_start' => 'datetime', 'is_trial' => 'boolean', 'trial_ends_at' => 'datetime'];
 
     protected static function newFactory()
     {

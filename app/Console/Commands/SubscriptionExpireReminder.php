@@ -41,6 +41,23 @@ class SubscriptionExpireReminder extends Command
             }
         }
 
+        // Proactively downgrade expired free trials to the Basic plan, even for
+        // freelancers who have not logged in (the lazy downgrade only runs on access).
+        $expired_trials = UserSubscription::where('status', 1)
+            ->where('is_trial', 1)
+            ->where('expire_date', '<=', Carbon::now())
+            ->get(['id', 'user_id']);
+
+        foreach ($expired_trials as $trial) {
+            check_and_downgrade_expired_subscription($trial->user_id);
+            freelancer_notification(
+                $trial->id,
+                $trial->user_id,
+                'Subscription',
+                __('Deneme süreniz sona erdi. Ücretsiz Basic pakete geçtiniz. Özelliklere devam etmek için paketinizi yükseltin.')
+            );
+        }
+
         return 0;
     }
 }

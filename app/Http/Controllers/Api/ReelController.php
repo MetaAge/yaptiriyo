@@ -7,6 +7,7 @@ use App\Models\Reel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
+use Modules\Subscription\Services\PlanGate;
 
 class ReelController extends Controller
 {
@@ -132,6 +133,17 @@ class ReelController extends Controller
             'description' => 'nullable|string|max:500',
         ]);
 
+        // Subscription gate: reject before uploading the (large) video file if the
+        // monthly reels quota is exhausted. Basic = 0, so free users are blocked.
+        $userId = auth('sanctum')->user()->id;
+        $gate = PlanGate::for($userId);
+        if ($gate->remaining('reels_monthly_limit') <= 0) {
+            return PlanGate::denied(
+                'reels_monthly_limit',
+                __('Aylık Reels yükleme hakkınız doldu. Daha fazlası için paketinizi yükseltin.')
+            );
+        }
+
         $videoName = '';
         if ($video = $request->file('video')) {
             $videoName = time() . '-' . uniqid() . '.' . $video->getClientOriginalExtension();
@@ -143,6 +155,9 @@ class ReelController extends Controller
             $thumbnailName = 'thumb-' . time() . '-' . uniqid() . '.' . $thumbnail->getClientOriginalExtension();
             $thumbnail->move(public_path('assets/uploads/reels/thumbnails'), $thumbnailName);
         }
+
+        // Count this reel against the monthly quota now that the upload succeeded.
+        $gate->consume('reels_monthly_limit');
 
         $reel = Reel::create([
             'user_id' => auth('sanctum')->user()->id,

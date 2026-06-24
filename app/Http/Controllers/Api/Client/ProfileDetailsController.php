@@ -95,6 +95,13 @@ class ProfileDetailsController extends Controller
             $user->is_pro_tier = is_pro_user($user->id);
             $user->is_premium_tier = is_premium_user($user->id);
 
+            // Contact gating driven by the freelancer's plan (structured feature keys)
+            // instead of fragile tier-string checks. The app shows/hides the
+            // WhatsApp & call buttons based on these flags.
+            $freelancer_gate = \Modules\Subscription\Services\PlanGate::for($user->id);
+            $user->whatsapp_button = $freelancer_gate->can('whatsapp_button');
+            $user->phone_call = $freelancer_gate->can('phone_call');
+
 
             if(cloudStorageExist() && in_array(Storage::getDefaultDriver(), ['s3', 'cloudFlareR2', 'wasabi'])) {
                 $projects->transform(function ($project) {

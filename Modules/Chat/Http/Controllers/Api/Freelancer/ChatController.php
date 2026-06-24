@@ -152,11 +152,19 @@ class ChatController extends Controller
             ]);
         }
 
+        // Subscription gate: free-plan freelancers (chat_number_filter=1) cannot
+        // share phone numbers in chat — mask them to prevent platform bypass.
+        $number_masked = false;
+        $outgoing_message = $request->message;
+        if (\Modules\Subscription\Services\PlanGate::for(auth('sanctum')->id())->can('chat_number_filter')) {
+            [$outgoing_message, $number_masked] = mask_contact_info($outgoing_message);
+        }
+
         // send message
         $message_send = UserChatService::send(
             $request->client_id,
             auth('sanctum')->id(),
-            $request->message,2,
+            $outgoing_message,2,
             $request->file,
             $request->project_id ?? null);
 
@@ -179,7 +187,11 @@ class ChatController extends Controller
 
         return response()->json([
             'status'=>'Message successfully send',
-            'message' => $message_send
+            'message' => $message_send,
+            'number_masked' => $number_masked,
+            'number_masked_notice' => $number_masked
+                ? __('İletişim bilgisi paylaşımı ücretsiz pakette engellidir. Müşterilerinizle doğrudan iletişim için paketinizi yükseltin.')
+                : null,
         ]);
     }
 

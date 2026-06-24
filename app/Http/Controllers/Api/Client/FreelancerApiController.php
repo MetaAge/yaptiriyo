@@ -108,18 +108,17 @@ class FreelancerApiController extends Controller
                 }
             ]);
 
-        $query->selectRaw('users.*, 
-            (SELECT CASE 
-                WHEN s.title LIKE "%PREMIUM%" OR s.title LIKE "%PROFESSIONAL%" OR s.title LIKE "%PLUS%" OR s.title LIKE "%GOLD%" OR s.title LIKE "%VIP%" OR s.title LIKE "%ELITE%" THEN 2
-                WHEN s.title LIKE "%PRO%" THEN 1
-                ELSE 0 
-            END 
-            FROM user_subscriptions us 
-            JOIN subscriptions s ON s.id = us.subscription_id 
-            WHERE us.user_id = users.id 
-            AND us.status = 1 
-            AND us.payment_status = "complete" 
-            AND us.expire_date > ? 
+        // Ranking is read from the structured `search_rank` feature key
+        // (Basic=0, Orta=1, Pro=2) instead of fragile plan-title matching.
+        $query->selectRaw('users.*,
+            (SELECT COALESCE(CAST(sf.feature_value AS SIGNED), 0)
+            FROM user_subscriptions us
+            JOIN subscriptions s ON s.id = us.subscription_id
+            LEFT JOIN subscription_features sf ON sf.subscription_id = s.id AND sf.feature_key = "search_rank"
+            WHERE us.user_id = users.id
+            AND us.status = 1
+            AND us.payment_status = "complete"
+            AND us.expire_date > ?
             LIMIT 1) as sub_rank', [$this->current_date]);
 
 
@@ -401,15 +400,15 @@ class FreelancerApiController extends Controller
         $result = $freelancers->map(function ($user) use ($current_date) {
             $sub_rank = DB::table('user_subscriptions')
                 ->join('subscriptions', 'subscriptions.id', '=', 'user_subscriptions.subscription_id')
+                ->leftJoin('subscription_features', function ($j) {
+                    $j->on('subscription_features.subscription_id', '=', 'subscriptions.id')
+                      ->where('subscription_features.feature_key', 'search_rank');
+                })
                 ->where('user_subscriptions.user_id', $user->id)
                 ->where('user_subscriptions.status', 1)
                 ->where('user_subscriptions.payment_status', 'complete')
                 ->where('user_subscriptions.expire_date', '>', $current_date)
-                ->selectRaw('CASE 
-                    WHEN subscriptions.title LIKE "%PREMIUM%" OR subscriptions.title LIKE "%PROFESSIONAL%" OR subscriptions.title LIKE "%PLUS%" OR subscriptions.title LIKE "%GOLD%" OR subscriptions.title LIKE "%VIP%" OR subscriptions.title LIKE "%ELITE%" THEN 2
-                    WHEN subscriptions.title LIKE "%PRO%" THEN 1
-                    ELSE 0 
-                END as sub_rank')
+                ->selectRaw('COALESCE(CAST(subscription_features.feature_value AS SIGNED), 0) as sub_rank')
                 ->value('sub_rank') ?? 0;
 
             // Check if they have an active emergency service (project where is_emergency = 1 and status = 1)

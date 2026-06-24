@@ -108,6 +108,12 @@ Route::group(['prefix' => 'v1', 'middleware' => 'setlang'], function () {
                 Route::post('update/token', 'update_firebase_token');
                 Route::post('profile/location/update', 'location_update');
             });
+            //work categories (subscription-limited)
+            Route::controller(\App\Http\Controllers\Api\Freelancer\WorkCategoryController::class)->group(function () {
+                Route::get('work-categories', 'index');
+                Route::post('work-categories/store', 'store');
+                Route::post('work-categories/delete/{id}', 'destroy');
+            });
             //projects
             Route::controller(\App\Http\Controllers\Api\Freelancer\ProjectController::class)->group(function () {
                 Route::get('project/list', 'project_list');
@@ -237,6 +243,12 @@ Route::group(['prefix' => 'v1', 'middleware' => 'setlang'], function () {
                 Route::post('reels/comment/{id}', 'storeComment');
                 Route::post('reels/view-count/{id}', 'incrementViews');
             });
+
+            // Stories (Freelancer Side, subscription-limited)
+            Route::controller(\App\Http\Controllers\Api\StoryController::class)->group(function () {
+                Route::post('stories/store', 'store');
+                Route::post('stories/delete/{id}', 'destroy');
+            });
         });
     });
     //freelancer route end
@@ -245,6 +257,11 @@ Route::group(['prefix' => 'v1', 'middleware' => 'setlang'], function () {
     Route::get('reels', [\App\Http\Controllers\Api\ReelController::class, 'index']);
     Route::get('reels/user/{username}', [\App\Http\Controllers\Api\ReelController::class, 'userReels']);
     Route::get('reels/comments/{id}', [\App\Http\Controllers\Api\ReelController::class, 'getComments']);
+
+    // Public Stories
+    Route::get('stories', [\App\Http\Controllers\Api\StoryController::class, 'index']);
+    Route::get('stories/user/{username}', [\App\Http\Controllers\Api\StoryController::class, 'userStories']);
+    Route::post('stories/view-count/{id}', [\App\Http\Controllers\Api\StoryController::class, 'incrementViews']);
 
     //client route start
     Route::group(['prefix' => 'client'], function () {

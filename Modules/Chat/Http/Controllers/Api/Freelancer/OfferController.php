@@ -12,6 +12,7 @@ use Modules\Chat\Entities\OfferMilestone;
 use App\Models\Order;
 use App\Models\Rating;
 use Modules\Chat\Services\UserChatService;
+use Modules\Subscription\Services\PlanGate;
 
 class OfferController extends Controller
 {
@@ -50,6 +51,15 @@ class OfferController extends Controller
             return response()->json([
                 'msg' => __('You can not send offer because your account is suspended. please try to contact admin.')
             ])->setStatusCode(422);
+        }
+
+        // Subscription gate: enforce the monthly offer quota for the current plan.
+        $gate = PlanGate::for(auth('sanctum')->user()->id);
+        if (!$gate->consume('monthly_offer_limit')) {
+            return PlanGate::denied(
+                'monthly_offer_limit',
+                __('Aylık teklif hakkınız doldu. Daha fazla teklif göndermek için paketinizi yükseltin.')
+            );
         }
 
         $pay_by_milestone = $request->pay_by_milestone;

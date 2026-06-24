@@ -180,22 +180,12 @@ class ProjectWithFilterController extends Controller
                         ->where('user_subscriptions.payment_status', 'complete')
                         ->where('user_subscriptions.expire_date', '>', $this->current_date)
                         ->where(function($ssq) {
-                            // Premium users: All projects promoted
-                            $ssq->where(function($sssq) {
-                                $sssq->where('subscriptions.title', 'LIKE', '%PREMIUM%')
-                                    ->orWhere('subscriptions.title', 'LIKE', '%PROFESSIONAL%')
-                                    ->orWhere('subscriptions.title', 'LIKE', '%PLUS%')
-                                    ->orWhere('subscriptions.title', 'LIKE', '%GOLD%')
-                                    ->orWhere('subscriptions.title', 'LIKE', '%VIP%')
-                                    ->orWhere('subscriptions.title', 'LIKE', '%ELITE%');
-                            })
-                            // Pro users: Only manually selected projects
+                            // Top tier (search_rank >= 2): all projects promoted
+                            $ssq->whereRaw('(SELECT CAST(sf.feature_value AS SIGNED) FROM subscription_features sf WHERE sf.subscription_id = subscriptions.id AND sf.feature_key = "search_rank" LIMIT 1) >= 2')
+                            // Mid tier (search_rank = 1): only manually selected projects
                             ->orWhere(function($sssq) {
                                 $sssq->where('projects.is_subscription_promoted', 1)
-                                    ->where(function($ssssq) {
-                                        $ssssq->where('subscriptions.title', 'LIKE', '%PRO%')
-                                            ->orWhere('subscriptions.title', 'LIKE', '%PROFESSIONAL%');
-                                    });
+                                    ->whereRaw('(SELECT CAST(sf.feature_value AS SIGNED) FROM subscription_features sf WHERE sf.subscription_id = subscriptions.id AND sf.feature_key = "search_rank" LIMIT 1) >= 1');
                             });
                         });
                 });
@@ -497,19 +487,15 @@ class ProjectWithFilterController extends Controller
     {
         $query = $this->common_query($request)->withCount(['complete_orders','ratings'])->withAvg('ratings','rating');
 
-        $query->selectRaw('projects.*, 
-            (SELECT CASE 
-                WHEN s.title LIKE "%PREMIUM%" THEN 2
-                WHEN s.title LIKE "%PROFESSIONAL%" THEN 2
-                WHEN s.title LIKE "%PRO%" THEN 1
-                ELSE 0 
-            END 
-            FROM user_subscriptions us 
-            JOIN subscriptions s ON s.id = us.subscription_id 
-            WHERE us.user_id = projects.user_id 
-            AND us.status = 1 
-            AND us.payment_status = "complete" 
-            AND us.expire_date > ? 
+        $query->selectRaw('projects.*,
+            (SELECT COALESCE(CAST(sf.feature_value AS SIGNED), 0)
+            FROM user_subscriptions us
+            JOIN subscriptions s ON s.id = us.subscription_id
+            LEFT JOIN subscription_features sf ON sf.subscription_id = s.id AND sf.feature_key = "search_rank"
+            WHERE us.user_id = projects.user_id
+            AND us.status = 1
+            AND us.payment_status = "complete"
+            AND us.expire_date > ?
             LIMIT 1) as sub_rank,
             (SELECT COUNT(DISTINCT ip_address) 
              FROM project_views 
@@ -721,16 +707,15 @@ class ProjectWithFilterController extends Controller
         if ($project_details) {
             $sub_rank = DB::table('user_subscriptions')
                 ->join('subscriptions', 'subscriptions.id', '=', 'user_subscriptions.subscription_id')
+                ->leftJoin('subscription_features', function ($j) {
+                    $j->on('subscription_features.subscription_id', '=', 'subscriptions.id')
+                      ->where('subscription_features.feature_key', 'search_rank');
+                })
                 ->where('user_subscriptions.user_id', $project_details->user_id)
                 ->where('user_subscriptions.status', 1)
                 ->where('user_subscriptions.payment_status', 'complete')
                 ->where('user_subscriptions.expire_date', '>', now())
-                ->value(DB::raw('CASE 
-                    WHEN title LIKE "%PREMIUM%" THEN 2
-                    WHEN title LIKE "%PROFESSIONAL%" THEN 2
-                    WHEN title LIKE "%PRO%" THEN 1
-                    ELSE 0 
-                END'));
+                ->value(DB::raw('COALESCE(CAST(subscription_features.feature_value AS SIGNED), 0)'));
             $project_details->is_emergency = ($project_details->is_emergency == 1 && ($sub_rank ?? 0) > 0) ? 1 : 0;
         }
 

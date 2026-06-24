@@ -9,7 +9,7 @@ class SubscriptionFeature extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['subscription_id','feature','status'];
+    protected $fillable = ['subscription_id','feature','feature_key','feature_value','status'];
 
     protected static function newFactory()
     {

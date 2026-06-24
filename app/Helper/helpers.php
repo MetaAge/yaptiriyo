@@ -2796,58 +2796,61 @@ function get_user_subscription_commission($user_id)
     return null;
 }
 
+/**
+ * Mid tier (Orta). Driven by the structured `badge` feature key via PlanGate,
+ * replacing the old fragile title-string matching. Signature preserved so
+ * existing callers (ranking, commission fallback, views) keep working.
+ */
 function is_pro_user($user_id)
 {
-    check_and_downgrade_expired_subscription($user_id);
-
-    $userSubscription = \Modules\Subscription\Entities\UserSubscription::where('user_id', $user_id)
-        ->where('status', 1)
-        ->where('payment_status', 'complete')
-        ->where('expire_date', '>', now())
-        ->with('subscription')
-        ->first();
-
-    if ($userSubscription && $userSubscription->subscription) {
-        if (is_premium_user($user_id)) {
-            return false;
-        }
-        $title = strtoupper($userSubscription->subscription->title);
-        if (str_contains($title, 'PRO') && !str_contains($title, 'PROFESSIONAL')) {
-            return true;
-        }
-
+    // Top tier takes precedence — a Pro user is not "just" mid tier.
+    if (is_premium_user($user_id)) {
+        return false;
     }
-    return false;
+    return \Modules\Subscription\Services\PlanGate::for($user_id)->value('badge') === 'trusted';
 }
 
 
-
+/**
+ * Top tier (Pro). Driven by the structured `badge` feature key via PlanGate.
+ */
 function is_premium_user($user_id)
 {
-    check_and_downgrade_expired_subscription($user_id);
-
-    $userSubscription = \Modules\Subscription\Entities\UserSubscription::where('user_id', $user_id)
-        ->where('status', 1)
-        ->where('payment_status', 'complete')
-        ->where('expire_date', '>', now())
-        ->with('subscription')
-        ->first();
-
-    if ($userSubscription && $userSubscription->subscription) {
-        $title = strtoupper($userSubscription->subscription->title);
-        if (str_contains($title, 'PREMIUM') || str_contains($title, 'PROFESSIONAL') || str_contains($title, 'VITRIN') || str_contains($title, 'GOLD') || str_contains($title, 'PLUS') || str_contains($title, 'VIP') || str_contains($title, 'ELITE')) {
-
-            return true;
-        }
-
-    }
-    return false;
+    return \Modules\Subscription\Services\PlanGate::for($user_id)->value('badge') === 'pro';
 }
 
 
 function transaction_amount($price,$transaction_type,$transaction_charge)
 {
     return $transaction_type == 'fixed' ? $transaction_charge : ((float)$price*$transaction_charge/100);
+}
+
+/**
+ * Mask phone numbers / external contact details inside a chat message.
+ * Used to prevent free-plan freelancers from leaking contact info to bypass
+ * the platform (revenue leakage). Returns [masked_text, bool changed].
+ */
+function mask_contact_info(?string $text): array
+{
+    if (empty($text)) {
+        return [$text, false];
+    }
+
+    $original = $text;
+
+    // Phone-like digit runs: 10+ digits, possibly spaced/dotted/dashed,
+    // optional leading + or 0. Catches "05321234567", "+90 532 123 45 67",
+    // "0 5 3 2 1 2 3 4 5 6 7" style evasions.
+    $text = preg_replace_callback(
+        '/(\+?\d[\d\s().\-]{8,}\d)/u',
+        function ($m) {
+            // Only mask if it actually contains 10+ digits.
+            return preg_match_all('/\d/', $m[0]) >= 10 ? '***' : $m[0];
+        },
+        $text
+    );
+
+    return [$text, $text !== $original];
 }
 
 //admin notification

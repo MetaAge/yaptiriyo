@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
+use Modules\Subscription\Services\PlanGate;
 
 class PortfolioController extends Controller
 {
@@ -28,6 +29,20 @@ class PortfolioController extends Controller
             'title' => 'required|string|min:5|max:191',
             'description' => 'required|string|min:10',
         ]);
+
+        // Subscription gate: enforce the portfolio photo limit for the current plan.
+        $userId = auth('sanctum')->user()->id;
+        $gate = PlanGate::for($userId);
+        $photoLimit = $gate->limit('photo_limit');
+        if ($photoLimit !== PlanGate::UNLIMITED) {
+            $current = Portfolio::where('user_id', $userId)->count();
+            if ($current >= $photoLimit) {
+                return PlanGate::denied(
+                    'photo_limit',
+                    __('Fotoğraf yükleme limitinize ulaştınız (:limit). Daha fazlası için paketinizi yükseltin.', ['limit' => $photoLimit])
+                );
+            }
+        }
 
         $imageName = '';
         if ($image = $request->file('image')) {

@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Carbon;
+use Modules\Subscription\Services\PlanGate;
 
 class EmergencyController extends Controller
 {
@@ -71,6 +72,15 @@ class EmergencyController extends Controller
      */
     public function accept(Request $request, $id)
     {
+        // Subscription gate: Basic plan (view_delayed) can see urgent jobs but
+        // cannot submit an offer to them.
+        if (PlanGate::for(Auth::id())->value('urgent_jobs_access') === 'view_delayed') {
+            return PlanGate::denied(
+                'urgent_jobs_access',
+                __('Acil işlere teklif vermek Orta ve Pro paketlerine özeldir.')
+            );
+        }
+
         $request->validate([
             'offered_price' => 'required|numeric|min:1',
         ]);
@@ -170,9 +180,16 @@ class EmergencyController extends Controller
             ->where('expires_at', '<=', now())
             ->update(['status' => 'expired']);
 
-        $emergencies = EmergencyRequest::where('status', 'pending')
-            ->where('expires_at', '>', now())
-            ->latest()
+        $query = EmergencyRequest::where('status', 'pending')
+            ->where('expires_at', '>', now());
+
+        // Subscription gate: Basic plan sees urgent jobs with a 30-minute delay;
+        // paid plans (full/priority) see them in real time.
+        if (PlanGate::for(Auth::id())->value('urgent_jobs_access') === 'view_delayed') {
+            $query->where('created_at', '<=', now()->subMinutes(30));
+        }
+
+        $emergencies = $query->latest()
             ->get()
             ->map(function ($e) {
                 return $this->formatEmergencyResponse($e);

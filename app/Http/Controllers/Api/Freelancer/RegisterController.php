@@ -64,20 +64,9 @@ class RegisterController extends Controller
                 'status' => 1
             ]);
 
-            // assign free subscription
-            $free_subscription = Subscription::with('subscription_type:id,validity')->find(10);
-            if ($free_subscription) {
-                UserSubscription::create([
-                    'user_id' => $user->id,
-                    'subscription_id' => $free_subscription->id,
-                    'price' => 0,
-                    'limit' => $free_subscription->limit,
-                    'expire_date' => Carbon::now()->addDays($free_subscription->subscription_type->validity ?? 365),
-                    'payment_gateway' => 'free',
-                    'payment_status' => 'complete',
-                    'status' => 1,
-                ]);
-            }
+            // assign signup free-trial of a paid plan (founding members get longer);
+            // falls back to the free Basic plan if no trial plan is configured.
+            \Modules\Subscription\Services\TrialService::assignSignupTrial($user->id);
 
             //send register mail
             /* try {

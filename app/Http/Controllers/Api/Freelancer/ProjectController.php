@@ -36,16 +36,14 @@ class ProjectController extends Controller
         // Calculate sub_rank for this user once
         $subRank = DB::table('user_subscriptions as us')
             ->join('subscriptions as s', 's.id', '=', 'us.subscription_id')
+            ->leftJoin('subscription_features as sf', function ($j) {
+                $j->on('sf.subscription_id', '=', 's.id')->where('sf.feature_key', 'search_rank');
+            })
             ->where('us.user_id', $user_id)
             ->where('us.status', 1)
             ->where('us.payment_status', 'complete')
             ->where('us.expire_date', '>', $current_date)
-            ->select(DB::raw('CASE 
-                WHEN s.title LIKE "%PREMIUM%" THEN 2
-                WHEN s.title LIKE "%PROFESSIONAL%" THEN 2
-                WHEN s.title LIKE "%PRO%" THEN 1
-                ELSE 0 
-            END as sub_rank'))
+            ->select(DB::raw('COALESCE(CAST(sf.feature_value AS SIGNED), 0) as sub_rank'))
             ->orderByDesc('sub_rank')
             ->value('sub_rank') ?? 0;
 
@@ -774,16 +772,14 @@ class ProjectController extends Controller
         // Check subscription rank
         $subRankQuery = DB::table('user_subscriptions as us')
             ->join('subscriptions as s', 's.id', '=', 'us.subscription_id')
+            ->leftJoin('subscription_features as sf', function ($j) {
+                $j->on('sf.subscription_id', '=', 's.id')->where('sf.feature_key', 'search_rank');
+            })
             ->where('us.user_id', $user_id)
             ->where('us.status', 1)
             ->where('us.payment_status', 'complete')
             ->where('us.expire_date', '>', now())
-            ->select(DB::raw('CASE 
-                WHEN s.title LIKE "%PREMIUM%" THEN 2
-                WHEN s.title LIKE "%PROFESSIONAL%" THEN 2
-                WHEN s.title LIKE "%PRO%" THEN 1
-                ELSE 0 
-            END as sub_rank'))
+            ->select(DB::raw('COALESCE(CAST(sf.feature_value AS SIGNED), 0) as sub_rank'))
             ->orderByDesc('sub_rank')
             ->first();
 

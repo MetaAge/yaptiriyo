@@ -34,6 +34,16 @@ class Subscription extends Model
         return $this->hasMany(SubscriptionFeature::class, 'subscription_id', 'id');
     }
 
+    /**
+     * Read a structured feature value for this plan by its key.
+     * Returns null when the key is not set on the plan.
+     */
+    public function feature($key)
+    {
+        $feature = $this->features->firstWhere('feature_key', $key);
+        return $feature?->feature_value;
+    }
+
     public function subscription_type()
     {
         return $this->belongsTo(SubscriptionType::class, 'subscription_type_id', 'id');
