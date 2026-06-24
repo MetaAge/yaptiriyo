@@ -78,7 +78,7 @@ class SubscriptionController extends Controller
         $type_id = $request->type_id;
 
         if ($type_id == 'all') {
-            $query = Subscription::with(['subscription_type:id,type','features:id,subscription_id,feature,status'])
+            $query = Subscription::with(['subscription_type:id,type','features:id,subscription_id,feature,feature_key,feature_value,status'])
                 ->select(['id','subscription_type_id','title','logo','price','limit', 'apple_product_id', 'google_product_id'])
                 ->where('status',1)
                 ->latest()
@@ -94,7 +94,7 @@ class SubscriptionController extends Controller
         }else {
             $check_type = SubscriptionType::where('id',$type_id)->first();
             if($check_type) {
-                $query = Subscription::with(['subscription_type:id,type','features:id,subscription_id,feature,status'])
+                $query = Subscription::with(['subscription_type:id,type','features:id,subscription_id,feature,feature_key,feature_value,status'])
                     ->select(['id','subscription_type_id','title','logo','price','limit', 'apple_product_id', 'google_product_id'])
                     ->where('status',1)
                     ->where('subscription_type_id',$type_id)
