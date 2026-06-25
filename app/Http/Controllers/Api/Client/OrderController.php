@@ -305,17 +305,17 @@ class OrderController extends Controller
 
             //email to admin
             try {
-                Mail::to(get_static_option('site_global_email'))->send(new OrderMail($last_order_id,'admin'));
+                send_mail_deferred(get_static_option('site_global_email'), new OrderMail($last_order_id,'admin'));
             } catch (\Exception $e) {}
 
             //email to client
             try {
-                Mail::to($client->email)->send(new OrderMail($last_order_id,'client'));
+                send_mail_deferred($client->email, new OrderMail($last_order_id,'client'));
             } catch (\Exception $e) {}
 
             //email to freelancer
             try {
-                Mail::to($freelancer->email)->send(new OrderMail($last_order_id,'freelancer'));
+                send_mail_deferred($freelancer->email, new OrderMail($last_order_id,'freelancer'));
             } catch (\Exception $e) {}
 
             (new OrderServiceApi())->send_order_chat_message($order);

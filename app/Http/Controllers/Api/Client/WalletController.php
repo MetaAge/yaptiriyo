@@ -102,11 +102,11 @@ class WalletController extends Controller
 
             try {
                 $message_body = __('Hello a') . ' ' . $user_type . __('just deposit to his wallet. Please check and confirm') . '</br>' . '<span class="verify-code">' . __('Deposit ID: ') . $last_deposit_id . '</span>';
-                Mail::to(get_static_option('site_global_email'))->send(new BasicMail([
+                send_mail_deferred(get_static_option('site_global_email'), new BasicMail([
                     'subject' => __('Deposit Confirmation'),
                     'message' => $message_body
                 ]));
-                Mail::to($email)->send(new BasicMail([
+                send_mail_deferred($email, new BasicMail([
                     'subject' => __('Deposit Confirmation'),
                     'message' => __('Manual deposit success. Your wallet will credited after admin approval') . '</br>' . '<span class="verify-code">' . __('Deposit ID: ') . $last_deposit_id . '</span>'
                 ]));
@@ -120,11 +120,11 @@ class WalletController extends Controller
         }else{
             try {
                 $message_body = __('Hello a') . ' ' . $user_type . __('just deposit to his wallet. Please check and confirm') . '</br>' . '<span class="verify-code">' . __('Deposit ID: ') . $last_deposit_id . '</span>';
-                Mail::to(get_static_option('site_global_email'))->send(new BasicMail([
+                send_mail_deferred(get_static_option('site_global_email'), new BasicMail([
                     'subject' => __('Deposit Confirmation'),
                     'message' => $message_body
                 ]));
-                Mail::to($email)->send(new BasicMail([
+                send_mail_deferred($email, new BasicMail([
                     'subject' => __('Deposit Confirmation'),
                     'message' => __('Manual deposit success. Your wallet will credited after admin approval') . '</br>' . '<span class="verify-code">' . __('Deposit ID: ') . $last_deposit_id . '</span>'
                 ]));

@@ -417,7 +417,7 @@ class SubscriptionController extends Controller
         try {
             $message = get_static_option('user_subscription_purchase_admin_email_message') ?? __('A user just purchase a subscription.');
             $message = str_replace(["@name","@subscription_id"],[$name, $last_subscription_id], $message);
-            Mail::to(get_static_option('site_global_email'))->queue(new BasicMail([
+            send_mail_deferred(get_static_option('site_global_email'), new BasicMail([
                 'subject' => get_static_option('user_subscription_purchase_admin_email_subject') ?? __('Subscription purchase email'),
                 'message' => $message
             ]));
@@ -429,7 +429,7 @@ class SubscriptionController extends Controller
         try {
             $message = get_static_option('user_subscription_purchase_message') ?? __('Your subscription purchase successfully completed.');
             $message = str_replace(["@name","@subscription_id"],[$name, $last_subscription_id], $message);
-            Mail::to($email)->queue(new BasicMail([
+            send_mail_deferred($email, new BasicMail([
                 'subject' => get_static_option('user_subscription_purchase_subject') ?? __('Subscription purchase email'),
                 'message' => $message
             ]));

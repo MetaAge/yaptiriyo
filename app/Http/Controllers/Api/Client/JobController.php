@@ -137,7 +137,7 @@ class JobController extends Controller
             try {
                 $message = get_static_option('job_create_email_message') ?? __('New job has been published.');
                 $message = str_replace(["@job_title"],[$job->title], $message);
-                Mail::to(get_static_option('site_global_email'))->send(new BasicMail([
+                send_mail_deferred(get_static_option('site_global_email'), new BasicMail([
                     'subject' => get_static_option('job_create_email_subject') ?? __('New Job'),
                     'message' => $message
                 ]));
@@ -294,7 +294,7 @@ class JobController extends Controller
             try {
                 $message = get_static_option('job_edit_email_message') ?? __('A job has been edited.');
                 $message = str_replace(["@job_title"],[$job->title], $message);
-                Mail::to(get_static_option('site_global_email'))->send(new BasicMail([
+                send_mail_deferred(get_static_option('site_global_email'), new BasicMail([
                     'subject' => get_static_option('job_edit_email_subject') ?? __('Job Edit Email'),
                     'message' => $message
                 ]));

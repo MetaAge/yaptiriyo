@@ -3645,3 +3645,28 @@ if (! function_exists('is_test_domain')) {
         return Request::getHost() === 'xilancer.xgenious.com';
     }
 }
+
+if (! function_exists('send_mail_deferred')) {
+    /**
+     * Send an email AFTER the HTTP response has been returned to the client.
+     *
+     * The app runs on the "sync" queue driver, so both Mail::send() and
+     * Mail::queue() block the request while SMTP is contacted. A slow or
+     * misconfigured mail server can push the response past the mobile app's
+     * timeout, making an action look like it failed even though it succeeded
+     * server-side (e.g. an order/listing was created but the app hung).
+     *
+     * Deferring the send keeps the response fast; any mail failure is logged
+     * rather than thrown, so it can never break the request's success path.
+     */
+    function send_mail_deferred($to, $mailable): void
+    {
+        defer(function () use ($to, $mailable) {
+            try {
+                \Illuminate\Support\Facades\Mail::to($to)->send($mailable);
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('send_mail_deferred failed: ' . $e->getMessage());
+            }
+        });
+    }
+}

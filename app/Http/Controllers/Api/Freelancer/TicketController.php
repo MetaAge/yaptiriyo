@@ -46,7 +46,7 @@ class TicketController extends Controller
         try {
             $message = get_static_option('support_ticket_message') ?? __('Support Ticket Message');
             $message = str_replace(["@name","@ticket_id"],[__('Admin'),$ticket->id], $message);
-            Mail::to(get_static_option('site_global_email'))->send(new BasicMail([
+            send_mail_deferred(get_static_option('site_global_email'), new BasicMail([
                 'subject' => get_static_option('support_ticket_subject') ?? __('Support Ticket'),
                 'message' => $message
             ]));
@@ -152,7 +152,7 @@ class TicketController extends Controller
             try {
                 $message = get_static_option('support_ticket_message_email_message') ?? __('Support Ticket Message Email Notify');
                 $message = str_replace(["@name","@ticket_id"],[__('Admin') ,$request->ticket_id], $message);
-                Mail::to(get_static_option('site_global_email'))->send(new BasicMail([
+                send_mail_deferred(get_static_option('site_global_email'), new BasicMail([
                     'subject' => get_static_option('support_ticket_message_email_subject') ?? __('Support Ticket Message Email'),
                     'message' => $message
                 ]));

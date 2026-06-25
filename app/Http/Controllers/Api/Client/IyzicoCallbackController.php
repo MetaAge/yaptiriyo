@@ -92,9 +92,9 @@ class IyzicoCallbackController extends Controller
             freelancer_notification($order->id, $order->freelancer_id, 'Order', __('You have a new order'));
 
             // Emails
-            try { Mail::to(get_static_option('site_global_email'))->queue(new OrderMail($order->id, 'admin')); } catch (\Exception $e) {}
-            try { Mail::to($client->email)->queue(new OrderMail($order->id, 'client')); } catch (\Exception $e) {}
-            try { Mail::to($freelancer->email)->queue(new OrderMail($order->id, 'freelancer')); } catch (\Exception $e) {}
+            try { send_mail_deferred(get_static_option('site_global_email'), new OrderMail($order->id, 'admin')); } catch (\Exception $e) {}
+            try { send_mail_deferred($client->email, new OrderMail($order->id, 'client')); } catch (\Exception $e) {}
+            try { send_mail_deferred($freelancer->email, new OrderMail($order->id, 'freelancer')); } catch (\Exception $e) {}
 
             (new OrderServiceApi())->send_order_chat_message($order);
 

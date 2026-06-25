@@ -21,7 +21,7 @@ class ForgetPasswordController extends Controller
             //send otp mail
             $otp_code = sprintf("%d", random_int(123456, 999999));
             try {
-                Mail::to($email->email)->send(new BasicMail([
+                send_mail_deferred($email->email, new BasicMail([
                     'subject' =>  __('Otp Email'),
                     'message' => __('Your otp code').' '.$otp_code
                 ]));

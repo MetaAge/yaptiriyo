@@ -65,7 +65,7 @@ class RegisterController extends Controller
             /* try {
                 $message = get_static_option('user_register_message') ?? __('You have successfully registered as a freelancer');
                 $message = str_replace(["@name","@email","@username","@password"],[$user->first_name.' '.$user->last_name, $user->email, $user->username, $request->password], $message);
-                Mail::to(get_static_option('site_global_email'))->send(new BasicMail([
+                send_mail_deferred(get_static_option('site_global_email'), new BasicMail([
                     'subject' => get_static_option('user_register_subject') ?? __('New User Register Email'),
                     'message' => $message
                 ]));
@@ -75,7 +75,7 @@ class RegisterController extends Controller
             /* try {
                 $message = get_static_option('user_register_welcome_message') ?? __('Your registration successfully completed.');
                 $message = str_replace(["@name","@email","@username","@password","@userType"],[$user->first_name.' '.$user->last_name, $user->email, $user->username, $request->password, 'client'], $message);
-                Mail::to($user->email)->send(new BasicMail([
+                send_mail_deferred($user->email, new BasicMail([
                     'subject' => get_static_option('user_register_welcome_subject') ?? __('User Register Welcome Email'),
                     'message' => $message
                 ]));
@@ -84,7 +84,7 @@ class RegisterController extends Controller
 
             //send otp mail
             /* try {
-                Mail::to($user->email)->send(new BasicMail([
+                send_mail_deferred($user->email, new BasicMail([
                     'subject' =>  __('Otp Email'),
                     'message' => __('Your otp code').' '.$email_verify_tokn
                 ]));
@@ -114,7 +114,7 @@ class RegisterController extends Controller
             User::where('email', $user_email->email)->update(['email_verify_token' => $otp_code]);
 
             try {
-                Mail::to($request->email)->send(new BasicMail([
+                send_mail_deferred($request->email, new BasicMail([
                     'subject' => __('Otp Email'),
                     'message' => __('Your otp code') . ' ' . $otp_code
                 ]));

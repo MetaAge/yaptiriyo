@@ -548,7 +548,7 @@ class BuyPromotePackageController extends Controller
         try {
             $message = get_static_option('user_promote_package_purchase_message_admin') ?? __('A user just purchase a promotion package.');
             $message = str_replace(["@package_id"],[$last_package_id], $message);
-            Mail::to(get_static_option('site_global_email'))->send(new BasicMail([
+            send_mail_deferred(get_static_option('site_global_email'), new BasicMail([
                 'subject' => get_static_option('user_promote_package_purchase_subject_admin') ?? __('Promotion package purchase email'),
                 'message' => $message
             ]));
@@ -558,7 +558,7 @@ class BuyPromotePackageController extends Controller
         try {
             $message = get_static_option('user_promote_package_purchase_message') ?? __('Your promotion package purchase successfully completed.');
             $message = str_replace(["@name","@package_id"],[$name, $last_package_id], $message);
-            Mail::to($email)->send(new BasicMail([
+            send_mail_deferred($email, new BasicMail([
                 'subject' => get_static_option('user_promote_package_purchase_subject') ?? __('Promotion package purchase email'),
                 'message' => $message
             ]));

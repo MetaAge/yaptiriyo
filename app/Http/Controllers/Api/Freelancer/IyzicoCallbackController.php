@@ -197,11 +197,11 @@ class IyzicoCallbackController extends Controller
     private function sendWalletEmail($name, $id, $email)
     {
         try {
-            Mail::to(get_static_option('site_global_email'))->queue(new BasicMail([
+            send_mail_deferred(get_static_option('site_global_email'), new BasicMail([
                 'subject' => __('Deposit Confirmation'),
                 'message' => __('A user just deposited to his wallet via Iyzico. ID: ') . $id
             ]));
-            Mail::to($email)->queue(new BasicMail([
+            send_mail_deferred($email, new BasicMail([
                 'subject' => __('Deposit Confirmation'),
                 'message' => __('Your wallet deposit was successful via Iyzico. ID: ') . $id
             ]));
@@ -211,11 +211,11 @@ class IyzicoCallbackController extends Controller
     private function sendPromotionEmail($name, $id, $email)
     {
         try {
-            Mail::to(get_static_option('site_global_email'))->queue(new BasicMail([
+            send_mail_deferred(get_static_option('site_global_email'), new BasicMail([
                 'subject' => __('Promotion package purchase email'),
                 'message' => __('A user just purchased a promotion package via Iyzico. ID: ') . $id
             ]));
-            Mail::to($email)->queue(new BasicMail([
+            send_mail_deferred($email, new BasicMail([
                 'subject' => __('Promotion package purchase email'),
                 'message' => __('Your promotion package purchase successfully completed via Iyzico. ID: ') . $id
             ]));
@@ -225,11 +225,11 @@ class IyzicoCallbackController extends Controller
     private function sendSubscriptionEmail($name, $id, $email)
     {
         try {
-            Mail::to(get_static_option('site_global_email'))->queue(new BasicMail([
+            send_mail_deferred(get_static_option('site_global_email'), new BasicMail([
                 'subject' => __('Subscription purchase email'),
                 'message' => __('A user just purchased a subscription via Iyzico. ID: ') . $id
             ]));
-            Mail::to($email)->queue(new BasicMail([
+            send_mail_deferred($email, new BasicMail([
                 'subject' => __('Subscription purchase email'),
                 'message' => __('Your subscription purchase successfully completed via Iyzico. ID: ') . $id
             ]));
