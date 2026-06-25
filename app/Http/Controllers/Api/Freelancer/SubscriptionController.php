@@ -596,8 +596,26 @@ class SubscriptionController extends Controller
 
     private function verify_apple_receipt($receiptData)
     {
-        $payload = json_encode(['receipt-data' => $receiptData]);
-        
+        // Apple REQUIRES the app's shared secret in the `password` field for any
+        // receipt that contains an auto-renewable subscription. Without it Apple
+        // returns a non-zero status (e.g. 21004) and omits latest_receipt_info,
+        // so validation fails even though the purchase succeeded on Apple's side
+        // — the user is charged and granted the subscription, but the app shows
+        // "payment failed". Set APPLE_IAP_SHARED_SECRET in .env (App Store
+        // Connect → your app → App Information → App-Specific Shared Secret).
+        $sharedSecret = env('APPLE_IAP_SHARED_SECRET') ?: get_static_option('apple_iap_shared_secret');
+
+        $payloadData = ['receipt-data' => $receiptData];
+        if (!empty($sharedSecret)) {
+            $payloadData['password'] = $sharedSecret;
+        } else {
+            \Log::warning('verify_apple_receipt: APPLE_IAP_SHARED_SECRET is not set — auto-renewable subscription validation will fail.');
+        }
+        // Keep latest_receipt_info focused on the most recent renewals.
+        $payloadData['exclude-old-transactions'] = true;
+
+        $payload = json_encode($payloadData);
+
         try {
             // Try production first
             $response = $this->send_curl_request('https://buy.itunes.apple.com/verifyReceipt', $payload);
