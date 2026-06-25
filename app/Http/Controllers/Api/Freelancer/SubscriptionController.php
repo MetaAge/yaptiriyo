@@ -46,7 +46,13 @@ class SubscriptionController extends Controller
             'subscription_id' => $free_subscription->id,
             'price' => 0,
             'limit' => $free_subscription->limit,
-            'expire_date' => Carbon::now()->addDays($free_subscription->subscription_type->validity ?? 365),
+            // The free plan never expires. Using the plan's `validity` here gave
+            // it a ~30-day expiry, so it showed a misleading countdown and would
+            // later be treated as "expired" and downgraded. Use a far-future
+            // sentinel so it stays active indefinitely. NOTE: expire_date is a
+            // MySQL TIMESTAMP column (max 2038-01-19), so we cap at 2037 instead
+            // of e.g. +100 years, which would overflow and throw.
+            'expire_date' => Carbon::create(2037, 12, 31, 23, 59, 59),
             'payment_gateway' => 'free',
             'payment_status' => 'complete',
             'status' => 1,
@@ -128,7 +134,7 @@ class SubscriptionController extends Controller
         $user_id = auth('sanctum')->user()->id;
         check_and_downgrade_expired_subscription($user_id);
         $all_subscriptions = UserSubscription::select('id','user_id','subscription_id','price','limit','status','payment_status','payment_gateway','expire_date','created_at')
-            ->with(['user_subscription_type_api'])
+            ->with(['user_subscription_type_api', 'subscription:id,title'])
             ->latest()
             ->where('user_id',$user_id)
             ->paginate(10)->withQueryString();

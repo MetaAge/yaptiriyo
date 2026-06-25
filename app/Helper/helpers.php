@@ -2740,13 +2740,18 @@ function check_and_downgrade_expired_subscription($user_id)
                         'expire_date' => \Illuminate\Support\Carbon::now()->subDay()
                     ]);
 
-                // Create a new Free subscription
+                // Create a new Free subscription. The free plan never expires —
+                // using `validity` here gave it a ~30-day window, after which it
+                // would be treated as expired and downgraded again. Use a
+                // far-future sentinel so it stays active indefinitely. NOTE:
+                // expire_date is a MySQL TIMESTAMP column (max 2038-01-19), so
+                // we cap at 2037 — +100 years would overflow and throw.
                 \Modules\Subscription\Entities\UserSubscription::create([
                     'user_id' => $user_id,
                     'subscription_id' => $free_subscription->id,
                     'price' => 0,
                     'limit' => $free_subscription->limit,
-                    'expire_date' => \Illuminate\Support\Carbon::now()->addDays($free_subscription->subscription_type->validity ?? 365),
+                    'expire_date' => \Illuminate\Support\Carbon::create(2037, 12, 31, 23, 59, 59),
                     'payment_gateway' => 'free',
                     'payment_status' => 'complete',
                     'status' => 1,
