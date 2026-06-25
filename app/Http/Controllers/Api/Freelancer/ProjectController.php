@@ -313,15 +313,6 @@ class ProjectController extends Controller
                 ])->setStatusCode(422);
             }
 
-            try {
-                $message = get_static_option('project_create_email_message') ?? __('A new project is just created.');
-                $message = str_replace(["@project_title"],[$project->title], $message);
-                Mail::to(get_static_option('site_global_email'))->send(new BasicMail([
-                    'subject' => get_static_option('project_create_email_subject') ?? __('Project Create Email'),
-                    'message' => $message
-                ]));
-            }catch (\Exception $e) {}
-
             //create project notification to admin
             AdminNotification::create([
                 'identity'=>$project->id,
@@ -329,6 +320,24 @@ class ProjectController extends Controller
                 'type'=>__('Create Project'),
                 'message'=>__('A new project has been created'),
             ]);
+
+            // Send the admin notification email AFTER the response is sent to the
+            // client. SMTP can block for many seconds (especially when mail is
+            // misconfigured), which previously pushed the total response time past
+            // the app's upload timeout — the listing got created but the app
+            // showed an error and hung. Deferring keeps the response fast.
+            $projectTitle = $project->title;
+            defer(function () use ($projectTitle) {
+                try {
+                    $message = get_static_option('project_create_email_message') ?? __('A new project is just created.');
+                    $message = str_replace(["@project_title"],[$projectTitle], $message);
+                    Mail::to(get_static_option('site_global_email'))->send(new BasicMail([
+                        'subject' => get_static_option('project_create_email_subject') ?? __('Project Create Email'),
+                        'message' => $message
+                    ]));
+                } catch (\Exception $e) {}
+            });
+
             return response()->json([
                 'msg'=>('Project Successfully Created')
             ]);
@@ -663,15 +672,6 @@ class ProjectController extends Controller
 
             }
 
-            try {
-                $message = get_static_option('project_create_email_message') ?? __('A new project is just created.');
-                $message = str_replace(["@project_title"],[$project->title], $message);
-                Mail::to(get_static_option('site_global_email'))->send(new BasicMail([
-                    'subject' => get_static_option('project_create_email_subject') ?? __('Project Create Email'),
-                    'message' => $message
-                ]));
-            }catch (\Exception $e) {}
-
             //create project notification to admin
             AdminNotification::create([
                 'identity'=>$project_details->id,
@@ -679,6 +679,21 @@ class ProjectController extends Controller
                 'type'=>__('Edit Project'),
                 'message'=>__('A project has been edited.'),
             ]);
+
+            // Defer the email so a slow/blocking SMTP send doesn't keep the
+            // client waiting past its upload timeout (see create_project).
+            $projectTitle = $project->title;
+            defer(function () use ($projectTitle) {
+                try {
+                    $message = get_static_option('project_create_email_message') ?? __('A new project is just created.');
+                    $message = str_replace(["@project_title"],[$projectTitle], $message);
+                    Mail::to(get_static_option('site_global_email'))->send(new BasicMail([
+                        'subject' => get_static_option('project_create_email_subject') ?? __('Project Create Email'),
+                        'message' => $message
+                    ]));
+                } catch (\Exception $e) {}
+            });
+
             return response()->json([
                 'msg'=>('Project Successfully Updated')
             ]);
