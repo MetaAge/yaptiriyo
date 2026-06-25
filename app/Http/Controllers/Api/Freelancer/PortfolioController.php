@@ -27,7 +27,7 @@ class PortfolioController extends Controller
         $request->validate([
             'image' => 'required|image|mimes:jpg,png,jpeg,gif,svg|max:20480',
             'title' => 'required|string|min:5|max:191',
-            'description' => 'required|string|min:10',
+            'description' => 'required|string',
         ]);
 
         // Subscription gate: enforce the portfolio photo limit for the current plan.
@@ -82,7 +82,7 @@ class PortfolioController extends Controller
     {
         $request->validate([
             'title' => 'required|string|min:5|max:191',
-            'description' => 'required|string|min:10',
+            'description' => 'required|string',
         ]);
 
         $portfolio = Portfolio::where('user_id', auth('sanctum')->user()->id)->findOrFail($id);
