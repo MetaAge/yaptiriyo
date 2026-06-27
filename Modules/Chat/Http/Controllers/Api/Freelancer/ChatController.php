@@ -213,12 +213,23 @@ class ChatController extends Controller
     //unseen message count
     public function unseen_message_count()
     {
+        $userId = auth('sanctum')->user()->id;
         $message = User::select('id')->withCount(['freelancer_unseen_message' => function($q){
             $q->where('is_seen',0)->where('from_user',1);
-        }])->where('id', auth('sanctum')->user()->id)->first();
+        }])->where('id', $userId)->first();
+
+        // Orders still in progress for the freelancer — every stage until the
+        // order is completed/cancelled: 0=pending(queue), 1=active, 2=delivered.
+        // (3=completed and 4=cancelled are excluded.) Surfaced as a badge on the
+        // app's "orders" tab.
+        $ongoing_order_count = \App\Models\Order::where('freelancer_id', $userId)
+            ->where('payment_status', 'complete')
+            ->whereIn('status', [0, 1, 2])
+            ->count();
 
         return response()->json([
             'unseen_message' => $message,
+            'ongoing_order_count' => $ongoing_order_count,
         ]);
     }
 
