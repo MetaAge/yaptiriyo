@@ -53,7 +53,7 @@ class Category extends Model
 
     public function sub_categories()
     {
-        return $this->hasMany(SubCategory::class, 'category_id', 'id')->select(['id', 'category_id', 'sub_category', 'slug', 'image'])->where('status', '1');
+        return $this->hasMany(SubCategory::class, 'category_id', 'id')->select(['id', 'category_id', 'sub_category', 'slug', 'image', 'pricing_type'])->where('status', '1');
     }
 
     public function projects()
