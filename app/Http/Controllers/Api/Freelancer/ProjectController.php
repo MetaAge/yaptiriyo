@@ -9,6 +9,8 @@ use App\Models\Project;
 use App\Models\ProjectAttribute;
 use App\Models\ProjectHistory;
 use App\Models\User;
+use App\Enums\PricingType;
+use Modules\Service\Entities\SubCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -210,6 +212,7 @@ class ProjectController extends Controller
                     'offer_packages_available_or_not'=>$request->offer_packages_available_or_not,
                     'video_url'=>$videoName,
                     'is_emergency'=>$request->is_emergency ?? 0,
+                    'pricing_type' => $this->resolvePricingType($request->subcategory),
                     'country_id'=>$country_id,
                     'state_id'=>$state_id,
                     'city_id'=>$city_id,
@@ -549,6 +552,7 @@ class ProjectController extends Controller
                     'offer_packages_available_or_not'=>$request->offer_packages_available_or_not ?? 0,
                     'video_url'=>$videoName,
                     'is_emergency'=>$request->is_emergency ?? 0,
+                    'pricing_type' => $this->resolvePricingType($request->subcategory),
                     'country_id'=>$country_id,
                     'state_id'=>$state_id,
                     'city_id'=>$city_id,
@@ -832,5 +836,15 @@ class ProjectController extends Controller
         $project->save();
 
         return response()->json(['msg' => $msg, 'is_subscription_promoted' => $project->is_subscription_promoted]);
+    }
+
+    private function resolvePricingType(?string $subcategoryJson): string
+    {
+        if (empty($subcategoryJson)) return PricingType::FIXED;
+        $ids = json_decode($subcategoryJson, true);
+        if (empty($ids) || !is_array($ids)) return PricingType::FIXED;
+        $firstId = $ids[0];
+        $sub = SubCategory::select('pricing_type')->find($firstId);
+        return $sub?->pricing_type ?? PricingType::FIXED;
     }
 }

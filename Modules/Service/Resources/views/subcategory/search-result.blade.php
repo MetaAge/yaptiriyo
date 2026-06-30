@@ -55,7 +55,8 @@
                             data-meta_description="{{ $sub_cat->meta_description }}"
                             data-short_description="{{ $sub_cat->short_description }}"
                             data-slug="{{ $sub_cat->slug }}"
-                            data-category="{{ $sub_cat->category_id }}">
+                            data-category="{{ $sub_cat->category_id }}"
+                            data-pricing_type="{{ $sub_cat->pricing_type ?? 'fixed' }}">
                             {{ __('Edit Subcategory') }}
                         </a>
                     </li>

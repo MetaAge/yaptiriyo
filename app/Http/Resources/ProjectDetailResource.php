@@ -113,11 +113,14 @@ class ProjectDetailResource extends JsonResource
                     'slug' => $this->project_category->slug,
                 ],
 
+                'pricing_type' => $this->pricing_type ?? 'fixed',
+
                 'subcategories' => $this->project_sub_categories->map(function ($subcategory) {
                     return [
                         'id' => $subcategory->id,
                         'name' => $subcategory->sub_category,
                         'slug' => $subcategory->slug,
+                        'pricing_type' => $subcategory->pricing_type ?? 'fixed',
                     ];
                 }),
 

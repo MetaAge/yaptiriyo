@@ -51,7 +51,8 @@ class Project extends Model
         'city_id',
         'neighborhood_id',
         'video_url',
-        'is_emergency'
+        'is_emergency',
+        'pricing_type'
     ];
 
     protected $casts = [

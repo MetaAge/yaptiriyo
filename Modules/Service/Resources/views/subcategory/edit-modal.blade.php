@@ -16,6 +16,16 @@
                     <x-form.textarea :title="__('Meta Description - ideal length is 150-160 characters')" :name="'edit_meta_description'" :id="'edit_meta_description'" :value="''" :placeholder="__('Enter meta description')"/>
                     <x-form.textarea :title="__('Short Description')" :name="'edit_short_description'" :id="'edit_short_description'" :value="old('short_description', '')" :placeholder="__('Max 190 character')"/>
                     <x-form.category-dropdown :title="__('Select Category')" :name="'edit_category'" :id="'edit_category'" :class="'form-control category_select22'" />
+                    <div class="form-group mt-3">
+                        <label>{{ __('Fiyatlandırma Tipi') }}</label>
+                        <select name="pricing_type" id="edit_pricing_type" class="form-control">
+                            <option value="fixed">{{ __('Sabit (Paket)') }}</option>
+                            <option value="per_m2">{{ __('Metrekare (₺/m²)') }}</option>
+                            <option value="hourly">{{ __('Saatlik (₺/saat)') }}</option>
+                            <option value="per_unit">{{ __('Adet (₺/adet)') }}</option>
+                        </select>
+                        <small class="text-muted">{{ __('Sipariş sırasında nasıl fiyatlandırılacağını belirler.') }}</small>
+                    </div>
                     <x-backend.image :title="__('')" :name="'image'" :dimentions="__('3000x300(optional)')"/>
                 </div>
                 <div class="modal-footer">

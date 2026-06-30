@@ -20,6 +20,7 @@ class SubCategoryController extends Controller
                 'slug' => 'nullable|unique:sub_categories|max:191',
                 'meta_title' => 'nullable|max:250',
                 'meta_description' => 'nullable|max:300',
+                'pricing_type' => 'nullable|in:fixed,per_m2,hourly,per_unit',
             ]);
 
             $slug = !empty($request->slug) ? $request->slug : $request->sub_category;
@@ -32,6 +33,7 @@ class SubCategoryController extends Controller
                 'meta_title' => $request->meta_title,
                 'meta_description' => $request->meta_description,
                 'image' => $request->image,
+                'pricing_type' => $request->pricing_type ?? 'fixed',
             ]);
             toastr_success(__('New Sub Category Successfully Added'));
         }
@@ -48,6 +50,7 @@ class SubCategoryController extends Controller
             'edit_slug'=> 'required|max:191|unique:sub_categories,slug,'.$request->edit_sub_category_id,
             'edit_meta_title' => 'nullable|max:250',
             'edit_meta_description' => 'nullable|max:300',
+            'pricing_type' => 'nullable|in:fixed,per_m2,hourly,per_unit',
         ]);
 
         $slug = !empty($request->edit_slug) ? $request->edit_slug : $request->edit_sub_category;
@@ -59,6 +62,7 @@ class SubCategoryController extends Controller
             'meta_title' => $request->edit_meta_title,
             'meta_description' => $request->edit_meta_description,
             'image' => $request->image,
+            'pricing_type' => $request->pricing_type ?? 'fixed',
         ]);
         return redirect()->back()->with(toastr_success(__('Subcategory Successfully Updated')));
     }

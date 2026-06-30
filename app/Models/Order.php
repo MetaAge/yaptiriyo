@@ -47,7 +47,10 @@ class Order extends Model
         'city_id',
         'neighborhood_id',
         'state_id',
-        'phone'
+        'phone',
+        'quantity',
+        'unit_price',
+        'pricing_type'
         ];
 
     protected $casts = ['status'=>'integer','is_custom'=>'integer','refund_status'=>'integer','status_before_hold'=>'integer'];

@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\Validator;
 use Modules\Wallet\Entities\WalletHistory;
 use App\Models\IndividualCommissionSetting;
 use App\Http\Services\Frontend\OrderService;
+use App\Enums\PricingType;
 use Illuminate\Validation\ValidationException;
 use App\Http\Services\Frontend\OrderServiceApi;
 
@@ -79,6 +80,13 @@ class OrderController extends Controller
 
             $project_or_job = 'project';
             $freelancer_id = $project->user_id;
+
+            // For non-fixed pricing, quantity × unit_price is the actual price
+            $projectPricingType = $project->pricing_type ?? PricingType::FIXED;
+            if (PricingType::requiresQuantity($projectPricingType)) {
+                $quantity = max(0.01, (float) ($request->quantity ?? 1));
+                $price = round($price * $quantity, 2);
+            }
 
         }else{
             if($job){

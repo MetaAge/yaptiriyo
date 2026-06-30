@@ -105,6 +105,7 @@
                 let category = $(this).data('category');
                 let image = $(this).data('img_url');
                 let image_id = $(this).data('img_id');
+                let pricing_type = $(this).data('pricing_type') || 'fixed';
 
                 $('#edit_sub_category_id').val(id).trigger("change");
                 $('#edit_sub_category').val(subcategory).trigger("change");
@@ -113,6 +114,7 @@
                 $('#edit_short_description').val(short_description).trigger("change");
                 $('#edit_slug').val(slug).trigger("change");
                 $("#edit_category").val(category).trigger("change");
+                $('#edit_pricing_type').val(pricing_type);
 
                 $('#editSubCategoryModal').find('.media-upload-btn-wrapper .img-wrap').html('');
                 $('#editSubCategoryModal').find('.media-upload-btn-wrapper input').val('');

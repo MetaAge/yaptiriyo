@@ -17,6 +17,16 @@
                     <x-form.textarea :title="__('Short Description')" :name="'short_description'" :id="'short_description'" :value="old('short_description', '')" :placeholder="__('Max 190 character')"/>
                     <x-form.category-dropdown :title="__('Select Category')" :name="'category'" :id="'category'" :class="'form-control category_select2'" />
                     <x-form.active-inactive :title="__('Select Status')" :info="__('If you select inactive the services will off for the category')" />
+                    <div class="form-group mt-3">
+                        <label>{{ __('Fiyatlandırma Tipi') }}</label>
+                        <select name="pricing_type" class="form-control">
+                            <option value="fixed">{{ __('Sabit (Paket)') }}</option>
+                            <option value="per_m2">{{ __('Metrekare (₺/m²)') }}</option>
+                            <option value="hourly">{{ __('Saatlik (₺/saat)') }}</option>
+                            <option value="per_unit">{{ __('Adet (₺/adet)') }}</option>
+                        </select>
+                        <small class="text-muted">{{ __('Sipariş sırasında nasıl fiyatlandırılacağını belirler.') }}</small>
+                    </div>
                     <x-backend.image :title="__('')" :name="'image'" :dimentions="__('3000x300(optional)')"/>
                 </div>
                 <div class="modal-footer">

@@ -23,6 +23,7 @@ class CategoryResource extends JsonResource
                     "id" => $sub_category->id,
                     "name" => $sub_category->sub_category,
                     "image" => get_attachment_url_only($sub_category->image),
+                    "pricing_type" => $sub_category->pricing_type ?? 'fixed',
                 ];
             })
         ];

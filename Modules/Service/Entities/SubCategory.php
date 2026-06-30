@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class SubCategory extends Model
 {
     use HasFactory;
-    protected $fillable = ['sub_category','short_description','category_id','status','slug','meta_title','meta_description','image'];
+    protected $fillable = ['sub_category','short_description','category_id','status','slug','meta_title','meta_description','image','pricing_type'];
     protected $casts = ['status'=>'integer'];
 
     protected static function newFactory()

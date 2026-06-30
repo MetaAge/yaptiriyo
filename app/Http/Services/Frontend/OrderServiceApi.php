@@ -16,6 +16,7 @@ use Intervention\Image\Facades\Image;
 use Modules\Chat\Entities\Offer;
 use Modules\Wallet\Entities\Wallet;
 use App\Http\Services\Frontend\IyzicoPaymentService;
+use App\Enums\PricingType;
 use Modules\Chat\Services\UserChatService;
 
 class OrderServiceApi
@@ -76,6 +77,9 @@ class OrderServiceApi
                   'city_id' => $request->city_id,
                   'state_id' => $request->state_id,
                   'phone' => $request->phone,
+                  'quantity' => max(0.01, (float) ($request->quantity ?? 1)),
+                  'unit_price' => (float) ($request->unit_price ?? $price),
+                  'pricing_type' => $request->pricing_type ?? PricingType::FIXED,
               ]);
               $last_order_id = $order->id;
               $type_ = 'Order';
@@ -178,6 +182,9 @@ class OrderServiceApi
             'city_id' => $request->city_id,
             'state_id' => $request->state_id,
             'phone' => $request->phone,
+            'quantity' => max(0.01, (float) ($request->quantity ?? 1)),
+            'unit_price' => (float) ($request->unit_price ?? $price),
+            'pricing_type' => $request->pricing_type ?? PricingType::FIXED,
         ]);
 
         $last_order_id = $order->id;
@@ -285,6 +292,9 @@ class OrderServiceApi
             'city_id' => $request->city_id,
             'state_id' => $request->state_id,
             'phone' => $request->phone,
+            'quantity' => max(0.01, (float) ($request->quantity ?? 1)),
+            'unit_price' => (float) ($request->unit_price ?? $price),
+            'pricing_type' => $request->pricing_type ?? PricingType::FIXED,
         ]);
 
         $last_order_id = $order->id;
@@ -345,7 +355,10 @@ class OrderServiceApi
             'payment_status' => $payment_status,
             'status' => 0,
             'is_fixed_hourly' => 'hourly',
-            'order_type' => $order_type
+            'order_type' => $order_type,
+            'quantity' => max(0.01, (float) ($request->quantity ?? 1)),
+            'unit_price' => (float) ($request->unit_price ?? $price),
+            'pricing_type' => $request->pricing_type ?? PricingType::FIXED,
         ]);
 
         $last_order_id = $order->id;
@@ -491,6 +504,9 @@ class OrderServiceApi
             'city_id' => $request->city_id,
             'state_id' => $request->state_id,
             'phone' => $request->phone,
+            'quantity' => max(0.01, (float) ($request->quantity ?? 1)),
+            'unit_price' => (float) ($request->unit_price ?? $price),
+            'pricing_type' => $request->pricing_type ?? PricingType::FIXED,
         ]);
 
         $last_order_id = $order->id;
