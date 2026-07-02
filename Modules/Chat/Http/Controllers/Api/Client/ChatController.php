@@ -166,6 +166,18 @@ class ChatController extends Controller
                 $request->interview_message ?? '',
             );
 
+            // Push notification to the recipient (delivered even when the app is
+            // closed/in background).
+            try {
+                $sender = auth('sanctum')->user();
+                $sender_name = trim(($sender->first_name ?? '') . ' ' . ($sender->last_name ?? ''));
+                send_chat_push_notification(
+                    $request->freelancer_id,
+                    $sender_name,
+                    $request->message
+                );
+            } catch (\Exception $e) {}
+
             if(get_static_option('chat_email_enable_disable') == 'enable'){
                 if($request->freelancer_id){
                     if (!Cache::has('user_is_online_' . $request->freelancer_id)){

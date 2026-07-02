@@ -3088,6 +3088,83 @@ function send_voice_call_notification($receiver_id, $data)
     }
 }
 
+/**
+ * Send a visible push notification for a new chat message so it is delivered
+ * even when the app is in the background or fully closed. Uses withNotification()
+ * (not data-only) so the OS renders it without the app running.
+ */
+function send_chat_push_notification($receiver_id, $sender_name, $message, $live_chat_id = null)
+{
+    $receiver = User::select('id', 'firebase_device_token')->find($receiver_id);
+    if (!$receiver || empty($receiver->firebase_device_token)) {
+        return;
+    }
+
+    $title = $sender_name ?: __('New message');
+    $body = $message ?: __('You have a new message');
+
+    // FCM data payload requires ALL values to be strings.
+    $notificationBody = [
+        'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+        'title' => strval($title),
+        'body' => strval($body),
+        'type' => 'Message',
+        'live_chat_id' => strval($live_chat_id ?? ''),
+        'sound' => 'default',
+    ];
+
+    try {
+        $credentialsPath = storage_path('app/firebase/firebase_credentials.json');
+        if (!file_exists($credentialsPath)) {
+            Log::error("send_chat_push_notification: Firebase credentials not found at: " . $credentialsPath);
+            return;
+        }
+
+        $factory = (new Factory)->withServiceAccount($credentialsPath);
+        $messaging = $factory->createMessaging();
+
+        $message_obj = CloudMessage::new()
+            ->withNotification(Notification::create($title, $body))
+            ->withAndroidConfig(AndroidConfig::fromArray([
+                'priority' => 'high',
+                'notification' => [
+                    'channel_id' => 'high_importance_channel',
+                ],
+            ]))
+            ->withApnsConfig(ApnsConfig::fromArray([
+                'headers' => [
+                    'apns-priority' => '10',
+                ],
+                'payload' => [
+                    'aps' => [
+                        'alert' => [
+                            'title' => $title,
+                            'body' => $body,
+                        ],
+                        'sound' => 'default',
+                        'badge' => 1,
+                    ],
+                ],
+            ]))
+            ->withData($notificationBody);
+
+        $tokens = is_array($receiver->firebase_device_token)
+            ? $receiver->firebase_device_token
+            : [$receiver->firebase_device_token];
+
+        foreach ($tokens as $token) {
+            try {
+                $messaging->send($message_obj->withChangedTarget('token', $token));
+                Log::info("send_chat_push_notification: Sent FCM to User: " . $receiver->id . " | Token: " . $token);
+            } catch (\Exception $sendError) {
+                Log::error("send_chat_push_notification FCM FAILURE for token " . $token . ": " . $sendError->getMessage());
+            }
+        }
+    } catch (\Exception $e) {
+        Log::error("send_chat_push_notification ERROR: " . $e->getMessage());
+    }
+}
+
 function getLastOrderId($order_id)
 {
     $random_order_id_1 = Str::random(30);
