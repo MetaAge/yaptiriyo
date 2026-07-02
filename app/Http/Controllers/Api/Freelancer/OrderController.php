@@ -236,6 +236,16 @@ class OrderController extends Controller
             ->first();
 
         if($find_order){
+            // Milestone (hakediş) orders must be submitted milestone-by-milestone.
+            // Block whole-order submission so the flow can't collapse into a
+            // single full-amount payout.
+            $hasMilestones = $find_order->order_mile_stones->count() > 0;
+            if ($hasMilestones && empty($request->order_milestone_id)) {
+                return response()->json([
+                    'msg' => __('This is a milestone order. Please submit each milestone individually.')
+                ])->setStatusCode('422');
+            }
+
             if ($request->hasFile('attachment')) {
                 $attachment = $request->attachment;
                 $attachment_ext = $attachment->extension();

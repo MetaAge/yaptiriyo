@@ -711,6 +711,17 @@ class OrderController extends Controller
         }else{
             $id = $request->order_id;
             $order = Order::where('id',$id)->first();
+
+            // Milestone (hakediş) orders must be approved milestone-by-milestone.
+            // Reject whole-order approval so the freelancer isn't paid the full
+            // amount at once for a milestone-based order.
+            $hasMilestones = OrderMilestone::where('order_id', $id)->exists();
+            if ($hasMilestones) {
+                return response()->json([
+                    'msg' => __('This is a milestone order. Please approve each milestone individually.')
+                ])->setStatusCode('422');
+            }
+
             $total_earning = UserEarning::where('user_id',$order->freelancer_id)->first();
 
             if($total_earning){
