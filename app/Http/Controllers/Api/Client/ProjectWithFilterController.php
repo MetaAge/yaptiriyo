@@ -122,7 +122,7 @@ class ProjectWithFilterController extends Controller
                 }]);
             },'project_attributes'])
                 ->whereHas('project_creator')
-                ->select(['id', 'title','slug','user_id','basic_regular_charge','basic_discount_charge','basic_delivery','description','image','load_from','is_pro','pro_expire_date','is_emergency'])
+                ->select(['id', 'title','slug','user_id','basic_regular_charge','basic_discount_charge','basic_delivery','description','image','load_from','is_pro','pro_expire_date','is_emergency','pricing_type'])
                 ->where('project_on_off','1')
                 ->where('pro_expire_date','>',$this->current_date)
                 ->where('is_pro','yes')
@@ -136,7 +136,7 @@ class ProjectWithFilterController extends Controller
                 }]);
             },'project_attributes'])
                 ->whereHas('project_creator')
-                ->select(['id', 'title','slug','user_id','basic_regular_charge','basic_discount_charge','basic_delivery','description','image','load_from','is_pro','pro_expire_date','is_emergency'])
+                ->select(['id', 'title','slug','user_id','basic_regular_charge','basic_discount_charge','basic_delivery','description','image','load_from','is_pro','pro_expire_date','is_emergency','pricing_type'])
                 ->where('project_on_off','1')
                 ->where('status','1');
         }

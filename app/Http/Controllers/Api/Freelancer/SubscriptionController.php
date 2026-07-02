@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api\Freelancer;
 
 use App\Helper\PaymentGatewayRequestHelper;
 use App\Http\Controllers\Controller;
+use App\Services\AppleJwsVerifier;
+use App\Services\GooglePlayVerifier;
 use App\Mail\BasicMail;
 use App\Models\AdminNotification;
 use App\Models\User;
@@ -479,30 +481,28 @@ class SubscriptionController extends Controller
             // Check if it's a JWS token (StoreKit 2)
             $parts = explode('.', $rawReceipt);
             if (count($parts) === 3) {
-                // Decode payload (index 1)
-                $payloadJson = base64_decode(str_replace(['-', '_'], ['+', '/'], $parts[1]));
-                $payload = json_decode($payloadJson, true);
-                
-                \Log::info("Apple StoreKit 2 JWS Payload Decoded", [
-                    'payload' => $payload
-                ]);
-                
+                // StoreKit 2 signed transaction. We MUST cryptographically verify
+                // the JWS signature and its x5c chain up to the pinned Apple Root
+                // CA - G3 — never trust a base64-decoded payload on its own.
                 $targetProductId = $subscription->apple_product_id ?? $request->product_id;
-                
-                if (isset($payload['productId']) && $payload['productId'] == $targetProductId) {
-                    $isValid = true;
-                } elseif (isset($payload['product_id']) && $payload['product_id'] == $targetProductId) {
-                    $isValid = true;
-                }
+                $expectedBundleId = env('APPLE_APP_BUNDLE_ID')
+                    ?: get_static_option('apple_app_bundle_id') ?: null;
 
-                // Extract subscription expiry date from JWS payload (auto-renewable)
-                if ($isValid) {
-                    if (isset($payload['expiresDate'])) {
-                        // expiresDate is in milliseconds since epoch
-                        $subscriptionExpiresDate = Carbon::createFromTimestampMs($payload['expiresDate'])->setTimezone(config('app.timezone'));
-                    } elseif (isset($payload['expires_date_ms'])) {
-                        $subscriptionExpiresDate = Carbon::createFromTimestampMs($payload['expires_date_ms'])->setTimezone(config('app.timezone'));
+                $verifier = new AppleJwsVerifier();
+                if ($verifier->verify($rawReceipt, $targetProductId, $expectedBundleId ?: null)) {
+                    // Require an unexpired auto-renewable subscription window.
+                    $subscriptionExpiresDate = $verifier->expiresAt();
+                    if ($subscriptionExpiresDate === null || $subscriptionExpiresDate->isFuture()) {
+                        $isValid = true;
+                    } else {
+                        \Log::warning('Apple JWS verified but subscription already expired', [
+                            'expires_at' => (string) $subscriptionExpiresDate,
+                        ]);
                     }
+                } else {
+                    \Log::warning('Apple StoreKit 2 JWS verification failed', [
+                        'reason' => $verifier->error,
+                    ]);
                 }
             } else {
                 // StoreKit 1 Legacy Receipt
@@ -547,14 +547,21 @@ class SubscriptionController extends Controller
                 }
             }
         } else {
-            // Google Play Store validation
-            \Log::info("Google Play Billing Validation Requested", [
-                'user_id' => $user->id,
-                'product_id' => $subscription->google_product_id ?? $request->product_id,
-                'purchase_token' => $request->receipt_data,
-                'transaction_id' => $request->transaction_id
-            ]);
-            $isValid = true; 
+            // Google Play Store validation — verify the purchase token against the
+            // Android Publisher API. Fail-closed: if verification cannot be performed
+            // the purchase is NOT granted.
+            $googleProductId = $subscription->google_product_id ?? $request->product_id;
+            $verifier = new GooglePlayVerifier();
+            if ($verifier->verify($googleProductId, $request->receipt_data)) {
+                $isValid = true;
+                $subscriptionExpiresDate = $verifier->expiresAt;
+            } else {
+                \Log::warning('Google Play verification failed', [
+                    'user_id' => $user->id,
+                    'product_id' => $googleProductId,
+                    'reason' => $verifier->error,
+                ]);
+            }
         }
 
         if ($isValid) {
