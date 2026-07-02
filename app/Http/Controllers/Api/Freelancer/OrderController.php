@@ -138,6 +138,9 @@ class OrderController extends Controller
         if($order_details){
             return response()->json([
                 'order_details' => $order_details,
+                // Expose milestones as a top-level key so the app renders the
+                // "Hakedişler" tab and per-milestone submit for the freelancer.
+                'mile_stones' => OrderMilestone::where('order_id', $order_details->id)->get(),
                 'image_path' => asset('assets/uploads/profile/'.$order_details?->user?->image),
                 'order_submit_history_path' => asset('assets/uploads/attachment/order/'),
                 'country' => $order_details?->user?->user_country?->country,
