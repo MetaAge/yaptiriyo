@@ -46,6 +46,8 @@ class PlanFeatureSeeder extends Seeder
                 'homepage_showcase'   => 0,
                 'badge'               => null,
                 'chat_number_filter'  => 1,
+                'commission_type'     => 'percentage',
+                'commission_rate'     => 20,
             ],
         ],
         1 => [
@@ -66,6 +68,8 @@ class PlanFeatureSeeder extends Seeder
                 'homepage_showcase'   => 0,
                 'badge'               => 'trusted',
                 'chat_number_filter'  => 0,
+                'commission_type'     => 'percentage',
+                'commission_rate'     => 15,
             ],
         ],
         6 => [
@@ -86,6 +90,8 @@ class PlanFeatureSeeder extends Seeder
                 'homepage_showcase'   => 1,
                 'badge'               => 'pro',
                 'chat_number_filter'  => 0,
+                'commission_type'     => 'percentage',
+                'commission_rate'     => 10,
             ],
         ],
     ];

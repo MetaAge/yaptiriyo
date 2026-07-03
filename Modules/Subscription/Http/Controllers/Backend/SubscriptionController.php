@@ -130,7 +130,12 @@ class SubscriptionController extends Controller
                     'google_product_id' => $request->google_product_id,
                 ]);
 
-                SubscriptionFeature::where('subscription_id',$id)->delete();
+                // Only replace the free-text display rows. Structured feature_key
+                // rows drive ALL plan gating (PlanGate) — deleting them here used
+                // to silently reset every edited plan to Basic defaults.
+                SubscriptionFeature::where('subscription_id',$id)
+                    ->whereNull('feature_key')
+                    ->delete();
 
                 $arr = [];
                 foreach($request->feature as $key => $attr) {
@@ -145,6 +150,22 @@ class SubscriptionController extends Controller
                 $data = Validator::make($arr,["*.feature" => "required"]);
                 $data->validated();
                 SubscriptionFeature::insert($arr);
+
+                // Structured feature keys editor (feature_keys[<key>] = <value>).
+                if (is_array($request->feature_keys)) {
+                    foreach ($request->feature_keys as $fKey => $fValue) {
+                        $fKey = trim((string) $fKey);
+                        if ($fKey === '') continue;
+                        SubscriptionFeature::updateOrCreate(
+                            ['subscription_id' => $id, 'feature_key' => $fKey],
+                            [
+                                'feature_value' => $fValue === '' ? null : (string) $fValue,
+                                'feature' => $fKey,
+                                'status' => 'on',
+                            ]
+                        );
+                    }
+                }
                 toastr_success(__('Subscription Successfully Updated'));
                 DB::commit();
             }catch(Exception $e){

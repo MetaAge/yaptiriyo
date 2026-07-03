@@ -2712,12 +2712,22 @@ function commission_amount($price, $individual_commission, $subscription_commiss
 
 function check_and_downgrade_expired_subscription($user_id)
 {
+    // Run at most once per request per user — this is called from PlanGate::for()
+    // and several controllers, and repeating the queries adds needless load.
+    static $checked = [];
+    if (isset($checked[$user_id])) {
+        return;
+    }
+    $checked[$user_id] = true;
+
+    $free_plan_id = \Modules\Subscription\Entities\Subscription::FREE_PLAN_ID;
+
     // Check if the user has an active, valid paid subscription
     $active_paid_sub = \Modules\Subscription\Entities\UserSubscription::where('user_id', $user_id)
         ->where('status', 1)
         ->where('payment_status', 'complete')
         ->where('expire_date', '>', now())
-        ->where('subscription_id', '!=', 10) // 10 is free plan
+        ->where('subscription_id', '!=', $free_plan_id)
         ->exists();
 
     if (!$active_paid_sub) {
@@ -2725,12 +2735,23 @@ function check_and_downgrade_expired_subscription($user_id)
         $active_free_sub = \Modules\Subscription\Entities\UserSubscription::where('user_id', $user_id)
             ->where('status', 1)
             ->where('payment_status', 'complete')
-            ->where('subscription_id', 10)
+            ->where('subscription_id', $free_plan_id)
             ->where('expire_date', '>', now())
             ->exists();
 
         if (!$active_free_sub) {
-            $free_subscription = \Modules\Subscription\Entities\Subscription::with('subscription_type:id,validity')->find(10);
+            // Subscriptions are a freelancer concept. Don't create free-plan rows
+            // for pure clients (user_type 1) that never had a subscription —
+            // it only bloats the table. (Profile-switch users get one the first
+            // time they act as a freelancer, via signup/downgrade elsewhere.)
+            $user_type = \App\Models\User::where('id', $user_id)->value('user_type');
+            $had_any_sub = \Modules\Subscription\Entities\UserSubscription::where('user_id', $user_id)->exists();
+            if ((int) $user_type === 1 && !$had_any_sub
+                && get_static_option('profile_switch_enable_disable') != 'enable') {
+                return;
+            }
+
+            $free_subscription = \Modules\Subscription\Entities\Subscription::with('subscription_type:id,validity')->find($free_plan_id);
             if ($free_subscription) {
                 // Pasify all old subscriptions
                 \Modules\Subscription\Entities\UserSubscription::where('user_id', $user_id)
@@ -2773,7 +2794,7 @@ function get_user_subscription_commission($user_id)
     
     if ($userSubscription && $userSubscription->subscription) {
         $subscription = $userSubscription->subscription;
-        
+
         if ($subscription->commission_rate !== null && $subscription->commission_type !== null) {
             return [
                 'type' => $subscription->commission_type,
@@ -2781,7 +2802,18 @@ function get_user_subscription_commission($user_id)
             ];
         }
 
-        // Fallback Tier-based Commission
+        // Structured feature keys (seeded per plan) — preferred over the old
+        // hardcoded badge-based fallback.
+        $gate = \Modules\Subscription\Services\PlanGate::for($user_id);
+        $featureRate = $gate->value('commission_rate');
+        if ($featureRate !== null && $featureRate !== '') {
+            return [
+                'type' => $gate->value('commission_type') ?: 'percentage',
+                'rate' => (float) $featureRate,
+            ];
+        }
+
+        // Legacy tier-based fallback (kept for plans without commission keys).
         if (is_premium_user($user_id)) {
             return [
                 'type' => 'percentage',
@@ -2805,6 +2837,9 @@ function get_user_subscription_commission($user_id)
  * Mid tier (Orta). Driven by the structured `badge` feature key via PlanGate,
  * replacing the old fragile title-string matching. Signature preserved so
  * existing callers (ranking, commission fallback, views) keep working.
+ *
+ * @deprecated Use PlanGate::for($user_id)->value('badge') === 'trusted'.
+ *             NOTE: despite the name this is the MID (Orta) tier, not Pro.
  */
 function is_pro_user($user_id)
 {
@@ -2818,6 +2853,8 @@ function is_pro_user($user_id)
 
 /**
  * Top tier (Pro). Driven by the structured `badge` feature key via PlanGate.
+ *
+ * @deprecated Use PlanGate::for($user_id)->value('badge') === 'pro'.
  */
 function is_premium_user($user_id)
 {
@@ -3086,6 +3123,22 @@ function send_voice_call_notification($receiver_id, $data)
     } catch (\Exception $e) {
         Log::error("send_voice_call_notification ERROR: " . $e->getMessage());
     }
+}
+
+/**
+ * Deterministic appAccountToken (UUID v5) binding a store purchase to a user.
+ * The app sets this as applicationUserName/appAccountToken at purchase time;
+ * validate_iap compares it against the receipt to prevent receipt replay from
+ * another account. Namespace is a fixed project UUID.
+ */
+function iap_app_account_token($user_id): string
+{
+    return strtolower(
+        (string) \Ramsey\Uuid\Uuid::uuid5(
+            \Ramsey\Uuid\Uuid::NAMESPACE_DNS,
+            'xilancer-iap-user-' . $user_id
+        )
+    );
 }
 
 /**

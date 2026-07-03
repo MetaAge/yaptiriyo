@@ -53,15 +53,6 @@ class OfferController extends Controller
             ])->setStatusCode(422);
         }
 
-        // Subscription gate: enforce the monthly offer quota for the current plan.
-        $gate = PlanGate::for(auth('sanctum')->user()->id);
-        if (!$gate->consume('monthly_offer_limit')) {
-            return PlanGate::denied(
-                'monthly_offer_limit',
-                __('Aylık teklif hakkınız doldu. Daha fazla teklif göndermek için paketinizi yükseltin.')
-            );
-        }
-
         $pay_by_milestone = $request->pay_by_milestone;
         $pay_at_once = $request->pay_at_once;
 
@@ -74,23 +65,8 @@ class OfferController extends Controller
             ]);
         }
 
-        $offer = Offer::create([
-            'freelancer_id' => auth('sanctum')->user()->id,
-            'client_id' => $request->client_id,
-            'price' => $request->offer_price,
-            'description' => $request->offer_description ?? NULL,
-            'deadline' => $request->offer_deadline ?? NULL,
-            'revision' => $request->offer_revision ?? 0,
-            'revision_left' => $request->offer_revision ?? 0,
-            'status' => 0,
-        ]);
-
-        $last_offer_id = $offer->id;
-        $type = 'Offer';
-        $msg = __('You have a new offer');
-        client_notification($last_offer_id, $request->client_id, $type, $msg);
-
-        //check and create milestone
+        // Validate milestones BEFORE creating the offer so a failed validation
+        // neither leaves an orphan offer nor burns quota.
         $data=[];
         if(!empty($pay_by_milestone) && $pay_by_milestone === 'pay-by-milestone'){
             $requestData= [];
@@ -117,7 +93,36 @@ class OfferController extends Controller
                     "msg" => __('Total milestone price must be equal to offer price')
                 ])->setStatusCode(422);
             }
+        }
 
+        // Subscription gate: consume the monthly offer quota only after ALL
+        // validations pass — a rejected request must not burn quota.
+        $gate = PlanGate::for(auth('sanctum')->user()->id);
+        if (!$gate->consume('monthly_offer_limit')) {
+            return PlanGate::denied(
+                'monthly_offer_limit',
+                __('Aylık teklif hakkınız doldu. Daha fazla teklif göndermek için paketinizi yükseltin.')
+            );
+        }
+
+        $offer = Offer::create([
+            'freelancer_id' => auth('sanctum')->user()->id,
+            'client_id' => $request->client_id,
+            'price' => $request->offer_price,
+            'description' => $request->offer_description ?? NULL,
+            'deadline' => $request->offer_deadline ?? NULL,
+            'revision' => $request->offer_revision ?? 0,
+            'revision_left' => $request->offer_revision ?? 0,
+            'status' => 0,
+        ]);
+
+        $last_offer_id = $offer->id;
+        $type = 'Offer';
+        $msg = __('You have a new offer');
+        client_notification($last_offer_id, $request->client_id, $type, $msg);
+
+        //create milestones (already validated above)
+        if(!empty($pay_by_milestone) && $pay_by_milestone === 'pay-by-milestone'){
             self::createMilestone($last_offer_id,$request,$data);
         }
 

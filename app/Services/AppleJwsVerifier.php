@@ -34,6 +34,21 @@ class AppleJwsVerifier
     }
 
     /**
+     * Cryptographically verify any Apple-signed JWS (x5c chain anchored at the
+     * pinned Apple Root CA - G3) WITHOUT claim checks. Used for App Store
+     * Server Notifications payloads as well as transaction receipts.
+     *
+     * @return array|null The decoded payload on success, null on failure.
+     */
+    public function decode(string $jws): ?array
+    {
+        if ($this->verifySignatureAndChain($jws)) {
+            return $this->payload;
+        }
+        return null;
+    }
+
+    /**
      * @param string      $jws              The signed transaction JWS (header.payload.signature).
      * @param string      $expectedProductId Product id we expect this receipt to be for.
      * @param string|null $expectedBundleId  App bundle id (optional pin; null skips the check).
@@ -41,6 +56,30 @@ class AppleJwsVerifier
      * @return bool True when the JWS is authentic and claims are valid.
      */
     public function verify(string $jws, string $expectedProductId, ?string $expectedBundleId = null): bool
+    {
+        if (!$this->verifySignatureAndChain($jws)) {
+            return false;
+        }
+
+        $decoded = $this->payload;
+
+        $productId = $decoded['productId'] ?? $decoded['product_id'] ?? null;
+        if ($productId !== $expectedProductId) {
+            return $this->fail('productId mismatch');
+        }
+
+        if ($expectedBundleId !== null) {
+            $bundleId = $decoded['bundleId'] ?? $decoded['bundle_id'] ?? null;
+            if ($bundleId !== null && $bundleId !== $expectedBundleId) {
+                return $this->fail('bundleId mismatch');
+            }
+        }
+
+        return true;
+    }
+
+    /** Signature + certificate chain verification; fills $this->payload. */
+    protected function verifySignatureAndChain(string $jws): bool
     {
         try {
             $parts = explode('.', $jws);
@@ -101,19 +140,6 @@ class AppleJwsVerifier
 
             // 4) Verify the JWS signature using the leaf certificate (ES256).
             $decoded = (array) JWT::decode($jws, new Key($leafPem, 'ES256'));
-
-            // 5) Validate claims.
-            $productId = $decoded['productId'] ?? $decoded['product_id'] ?? null;
-            if ($productId !== $expectedProductId) {
-                return $this->fail('productId mismatch');
-            }
-
-            if ($expectedBundleId !== null) {
-                $bundleId = $decoded['bundleId'] ?? $decoded['bundle_id'] ?? null;
-                if ($bundleId !== null && $bundleId !== $expectedBundleId) {
-                    return $this->fail('bundleId mismatch');
-                }
-            }
 
             $this->payload = $decoded;
             return true;

@@ -6,6 +6,7 @@ use App\Helper\PaymentGatewayRequestHelper;
 use App\Http\Controllers\Controller;
 use App\Services\AppleJwsVerifier;
 use App\Services\GooglePlayVerifier;
+use Modules\Subscription\Services\PlanGate;
 use App\Mail\BasicMail;
 use App\Models\AdminNotification;
 use App\Models\User;
@@ -35,15 +36,25 @@ class SubscriptionController extends Controller
     public function switch_to_free(Request $request)
     {
         $user = auth('sanctum')->user();
-        $free_subscription = Subscription::with('subscription_type:id,validity')->find(10);
-        
+        $free_subscription = Subscription::with('subscription_type:id,validity')->find(Subscription::FREE_PLAN_ID);
+
         if (!$free_subscription) {
             return response()->json(['msg' => __('Free plan not found')], 422);
         }
 
-        self::cancel_old_subscriptions($user->id);
+        // If the active plan was bought through a store (Apple/Google), switching
+        // to free here does NOT stop the store's auto-renewal — the user must
+        // also cancel in the store, otherwise they keep getting charged. Tell
+        // the app so it can show the "manage subscriptions" guidance.
+        $store_cancellation_required = UserSubscription::where('user_id', $user->id)
+            ->where('status', 1)
+            ->whereIn('payment_gateway', ['apple_iap', 'google_iap'])
+            ->exists();
 
-        $user_sub = UserSubscription::create([
+        $user_sub = \DB::transaction(function () use ($user, $free_subscription) {
+            self::cancel_old_subscriptions($user->id);
+
+            return UserSubscription::create([
             'user_id' => $user->id,
             'subscription_id' => $free_subscription->id,
             'price' => 0,
@@ -58,12 +69,63 @@ class SubscriptionController extends Controller
             'payment_gateway' => 'free',
             'payment_status' => 'complete',
             'status' => 1,
-        ]);
+            ]);
+        });
+
+        PlanGate::forget($user->id);
 
         return response()->json([
             'status' => 'success',
             'msg' => __('Switched to free plan successfully'),
-            'subscription_details' => $user_sub
+            'subscription_details' => $user_sub,
+            'store_cancellation_required' => $store_cancellation_required,
+        ]);
+    }
+
+    /**
+     * The authenticated freelancer's current plan with structured features,
+     * usage counters and remaining quotas — the app's single source for
+     * "kalan haklar" UI and upsell decisions.
+     */
+    public function my_plan()
+    {
+        $user_id = auth('sanctum')->user()->id;
+        $gate = PlanGate::for($user_id);
+        $user_sub = $gate->userSubscription();
+
+        $counted = ['monthly_offer_limit', 'reels_monthly_limit', 'story_monthly_limit'];
+        $usage = [];
+        foreach ($counted as $key) {
+            $limit = $gate->limit($key);
+            $usage[$key] = [
+                'limit' => $limit,
+                'used' => $gate->used($key),
+                'remaining' => $limit === PlanGate::UNLIMITED ? -1 : $gate->remaining($key),
+                'unlimited' => $limit === PlanGate::UNLIMITED,
+            ];
+        }
+
+        $featureKeys = [
+            'main_category_limit', 'sub_category_limit', 'photo_limit',
+            'whatsapp_button', 'phone_call', 'urgent_jobs_access',
+            'search_rank', 'homepage_showcase', 'badge', 'chat_number_filter',
+        ];
+        $features = [];
+        foreach ($featureKeys as $key) {
+            $features[$key] = $gate->value($key);
+        }
+
+        return response()->json([
+            'plan' => [
+                'subscription_id' => $user_sub?->subscription_id,
+                'title' => $gate->planTitle() ?? 'Basic',
+                'is_trial' => (bool) ($user_sub?->is_trial ?? false),
+                'trial_ends_at' => $user_sub?->trial_ends_at,
+                'expire_date' => $user_sub?->expire_date,
+                'payment_gateway' => $user_sub?->payment_gateway,
+            ],
+            'usage' => $usage,
+            'features' => $features,
         ]);
     }
 
@@ -141,11 +203,15 @@ class SubscriptionController extends Controller
             ->where('user_id',$user_id)
             ->paginate(10)->withQueryString();
 
-        $total_limit = UserSubscription::where('user_id',$user_id)
+        // Single active plan model: report the ACTIVE subscription's limit, not a
+        // sum over rows (a race could briefly leave two active rows and a sum
+        // would double-count).
+        $total_limit = (int) UserSubscription::where('user_id',$user_id)
             ->where('payment_status','complete')
             ->where('status', 1)
             ->where('expire_date', '>', Carbon::now())
-            ->sum('limit');
+            ->orderByDesc('id')
+            ->value('limit');
 
         return response()->json([
             'all_subscriptions' => $all_subscriptions,
@@ -182,6 +248,21 @@ class SubscriptionController extends Controller
 
         if($subscription_details){
             $expire_date = \Carbon\Carbon::now()->addDays($subscription_details?->subscription_type?->validity);
+
+            // Upgrading during an active trial: carry the remaining trial days
+            // over so the user doesn't lose what they were promised. (Store IAP
+            // purchases are excluded — their expiry is dictated by the store.)
+            $active_trial = UserSubscription::where('user_id', $user_id)
+                ->where('status', 1)
+                ->where('is_trial', 1)
+                ->where('expire_date', '>', now())
+                ->first();
+            if ($active_trial) {
+                $remaining_trial_days = (int) now()->diffInDays($active_trial->expire_date, false);
+                if ($remaining_trial_days > 0) {
+                    $expire_date = $expire_date->addDays($remaining_trial_days);
+                }
+            }
             $title = __('Buy Subscription');
             $total = $subscription_details->price;
             $limit = $subscription_details->limit;
@@ -220,7 +301,7 @@ class SubscriptionController extends Controller
                             'limit' => $limit,
                             'expire_date' => $expire_date,
                             'payment_gateway' => $request->selected_payment_gateway,
-                            'manual_payment_payment' => $manual_payment_image,
+                            'manual_payment_image' => $manual_payment_image_name,
                             'payment_status' => $payment_status,
                             'status' => $status,
                         ]);
@@ -240,8 +321,15 @@ class SubscriptionController extends Controller
             }
             elseif($request->selected_payment_gateway === 'wallet')
             {
-                $wallet_balance = Wallet::select('balance')->where('user_id',$user->id)->first();
-                if(isset($wallet_balance) && $wallet_balance->balance >= $total){
+                // Atomic: balance check + deduct + subscription swap inside one
+                // transaction with a row lock, so concurrent requests can't
+                // double-spend the wallet or leave the user without a plan.
+                $buy_subscription = null;
+                \DB::transaction(function () use ($user, $subscription_details, $total, $limit, $expire_date, $request, $payment_status, $status, &$buy_subscription) {
+                    $wallet_balance = Wallet::where('user_id', $user->id)->lockForUpdate()->first();
+                    if (!$wallet_balance || $wallet_balance->balance < $total) {
+                        return; // handled below via $buy_subscription === null
+                    }
                     self::cancel_old_subscriptions($user->id);
                     $buy_subscription = UserSubscription::create([
                         'user_id' => $user->id,
@@ -253,10 +341,13 @@ class SubscriptionController extends Controller
                         'payment_status' => $payment_status,
                         'status' => $status,
                     ]);
+                    Wallet::where('user_id', $user->id)->update(['balance' => $wallet_balance->balance - $total]);
+                });
+
+                if ($buy_subscription) {
                     $last_subscription_id = $buy_subscription->id;
                     $this->adminNotification($last_subscription_id,$user->id);
-                    Wallet::where('user_id',$user->id)->update(['balance'=> $wallet_balance->balance - $total]);
-
+                    PlanGate::forget($user->id);
                 }else{
                     return response()->json([
                         'msg' => __('Please deposit to your wallet and try again.')
@@ -474,10 +565,11 @@ class SubscriptionController extends Controller
 
         $isValid = false;
         $subscriptionExpiresDate = null; // Will hold Apple-reported expiry for auto-renewable
+        $originalTransactionId = null;   // Apple originalTransactionId / Google purchaseToken
 
         if ($request->store == 'apple') {
             $rawReceipt = $request->receipt_data;
-            
+
             // Check if it's a JWS token (StoreKit 2)
             $parts = explode('.', $rawReceipt);
             if (count($parts) === 3) {
@@ -490,6 +582,20 @@ class SubscriptionController extends Controller
 
                 $verifier = new AppleJwsVerifier();
                 if ($verifier->verify($rawReceipt, $targetProductId, $expectedBundleId ?: null)) {
+                    // Ownership: the app sets appAccountToken = UUIDv5(user id).
+                    // If the receipt carries one and it doesn't match this user,
+                    // someone is replaying another account's receipt — reject.
+                    $payloadToken = $verifier->payload['appAccountToken'] ?? null;
+                    $expectedToken = iap_app_account_token($user->id);
+                    if (!empty($payloadToken) && !hash_equals($expectedToken, strtolower($payloadToken))) {
+                        \Log::warning('Apple JWS appAccountToken mismatch', [
+                            'user_id' => $user->id,
+                        ]);
+                        return response()->json(['msg' => __('Invalid receipt verification')], 422);
+                    }
+
+                    $originalTransactionId = $verifier->payload['originalTransactionId'] ?? null;
+
                     // Require an unexpired auto-renewable subscription window.
                     $subscriptionExpiresDate = $verifier->expiresAt();
                     if ($subscriptionExpiresDate === null || $subscriptionExpiresDate->isFuture()) {
@@ -522,6 +628,7 @@ class SubscriptionController extends Controller
                         foreach ($appleResponse['latest_receipt_info'] as $item) {
                             if ($item['product_id'] == $targetProductId) {
                                 $isValid = true;
+                                $originalTransactionId = $item['original_transaction_id'] ?? null;
                                 // Get the expiry date from the subscription info
                                 if (isset($item['expires_date_ms'])) {
                                     $subscriptionExpiresDate = Carbon::createFromTimestampMs($item['expires_date_ms'])->setTimezone(config('app.timezone'));
@@ -555,6 +662,8 @@ class SubscriptionController extends Controller
             if ($verifier->verify($googleProductId, $request->receipt_data)) {
                 $isValid = true;
                 $subscriptionExpiresDate = $verifier->expiresAt;
+                // Google lifecycle reference is the purchase token.
+                $originalTransactionId = $request->receipt_data;
             } else {
                 \Log::warning('Google Play verification failed', [
                     'user_id' => $user->id,
@@ -577,22 +686,27 @@ class SubscriptionController extends Controller
 
             // Use Apple-reported expiry date if available, otherwise calculate from validity
             $expire_date = $subscriptionExpiresDate ?? Carbon::now()->addDays($subscription->subscription_type->validity);
-            
-            // Cancel any old active subscriptions
-            self::cancel_old_subscriptions($user->id);
 
-            // Create user subscription record
-            $user_sub = UserSubscription::create([
-                'user_id' => $user->id,
-                'subscription_id' => $subscription->id,
-                'price' => $subscription->price,
-                'limit' => $subscription->limit,
-                'expire_date' => $expire_date,
-                'payment_gateway' => $request->store . '_iap',
-                'payment_status' => 'complete',
-                'transaction_id' => $request->transaction_id,
-                'status' => 1,
-            ]);
+            // Atomic swap: cancel old + create new in one transaction so a race
+            // can't leave the user with zero or two active subscriptions.
+            $user_sub = \DB::transaction(function () use ($user, $subscription, $expire_date, $request, $originalTransactionId) {
+                self::cancel_old_subscriptions($user->id);
+
+                return UserSubscription::create([
+                    'user_id' => $user->id,
+                    'subscription_id' => $subscription->id,
+                    'price' => $subscription->price,
+                    'limit' => $subscription->limit,
+                    'expire_date' => $expire_date,
+                    'payment_gateway' => $request->store . '_iap',
+                    'payment_status' => 'complete',
+                    'transaction_id' => $request->transaction_id,
+                    'original_transaction_id' => $originalTransactionId,
+                    'status' => 1,
+                ]);
+            });
+
+            PlanGate::forget($user->id);
 
             $this->adminNotification($user_sub->id, $user->id);
             $this->sendEmail($user->first_name . ' ' . $user->last_name, $user_sub->id, $user->email);

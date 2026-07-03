@@ -9,6 +9,15 @@ class Subscription extends Model
 {
     use HasFactory;
 
+    /**
+     * Canonical plan ids (single source of truth — do NOT hardcode 10/1/6
+     * elsewhere). Kept as existing DB row ids to preserve user_subscriptions
+     * FKs and store product mappings.
+     */
+    public const FREE_PLAN_ID = 10; // Basic (free)
+    public const ORTA_PLAN_ID = 1;  // Orta (mid tier)
+    public const PRO_PLAN_ID  = 6;  // Pro (top tier)
+
     protected $fillable = [
         'subscription_type_id',
         'title',

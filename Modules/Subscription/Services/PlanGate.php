@@ -47,6 +47,8 @@ class PlanGate
         'homepage_showcase'   => '0',
         'badge'               => null,
         'chat_number_filter'  => '1',
+        'commission_type'     => null,
+        'commission_rate'     => null,
     ];
 
     protected int $userId;
@@ -80,6 +82,12 @@ class PlanGate
      */
     public static function denied(string $featureKey, ?string $msg = null)
     {
+        // Telemetry: which features drive upsell moments (pricing signal).
+        \Log::info('plan_gate_denied', [
+            'feature' => $featureKey,
+            'user_id' => auth('sanctum')->id(),
+        ]);
+
         return response()->json([
             'msg' => $msg ?? __('Bu özellik için paketinizi yükseltmeniz gerekiyor.'),
             'upgrade_required' => true,
@@ -181,6 +189,9 @@ class PlanGate
     /**
      * Try to consume one unit of a counted feature.
      * Returns true if allowed (and increments the counter), false if over the limit.
+     *
+     * The increment is a single conditional UPDATE (atomic at the DB level), so
+     * concurrent requests cannot exceed the limit via read-modify-write races.
      */
     public function consume(string $key, int $amount = 1): bool
     {
@@ -200,14 +211,19 @@ class PlanGate
         $this->resetPeriodIfNeeded();
 
         $limit = $this->limit($key);
-        $used = (int) $this->userSub->{$column};
 
-        if ($used + $amount > $limit) {
+        // Atomic conditional increment: only succeeds when the new total stays
+        // within the limit. affected == 0 → limit reached (or row changed).
+        $affected = UserSubscription::where('id', $this->userSub->id)
+            ->where($column, '<=', $limit - $amount)
+            ->update([$column => \DB::raw("`{$column}` + {$amount}")]);
+
+        if ($affected === 0) {
             return false;
         }
 
-        $this->userSub->{$column} = $used + $amount;
-        $this->userSub->save();
+        // Keep the in-memory model in sync for subsequent used()/remaining() calls.
+        $this->userSub->{$column} = (int) $this->userSub->{$column} + $amount;
         return true;
     }
 

@@ -22,7 +22,8 @@ use Modules\Subscription\Entities\UserSubscription;
  */
 class TrialService
 {
-    public const FREE_PLAN_ID = 10;
+    /** @deprecated Use Subscription::FREE_PLAN_ID (single source of truth). */
+    public const FREE_PLAN_ID = Subscription::FREE_PLAN_ID;
 
     /**
      * Assign the signup trial to a freshly registered freelancer.
@@ -30,7 +31,13 @@ class TrialService
      */
     public static function assignSignupTrial(int $userId): ?UserSubscription
     {
-        $trialPlanId = (int) (get_static_option('signup_trial_plan_id') ?: 1);
+        // One trial per user — a user who already consumed a trial (e.g. via a
+        // re-activated account) gets the free plan instead of a fresh trial.
+        if (UserSubscription::where('user_id', $userId)->where('is_trial', 1)->exists()) {
+            return self::assignFreePlan($userId);
+        }
+
+        $trialPlanId = (int) (get_static_option('signup_trial_plan_id') ?: Subscription::ORTA_PLAN_ID);
         $plan = Subscription::find($trialPlanId);
 
         // Fall back to the free Basic plan if the configured trial plan is missing.
@@ -40,7 +47,7 @@ class TrialService
 
         $foundingLimit = (int) (get_static_option('founding_member_limit') ?: 0);
         $isFounding = $foundingLimit > 0
-            && UserSubscription::where('is_trial', 1)->count() < $foundingLimit;
+            && UserSubscription::where('is_trial', 1)->distinct('user_id')->count('user_id') < $foundingLimit;
 
         $days = $isFounding
             ? (int) (get_static_option('founding_member_days') ?: 90)

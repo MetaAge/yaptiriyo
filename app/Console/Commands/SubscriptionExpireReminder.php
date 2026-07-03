@@ -23,6 +23,11 @@ class SubscriptionExpireReminder extends Command
         $active_subscriptions = UserSubscription::where('payment_status', 'complete')
             ->where('status', 1)
             ->whereBetween('expire_date', [Carbon::now(), Carbon::now()->addDays($reminder_days)])
+            // Remind once per subscription — this command runs daily and would
+            // otherwise re-notify the same users every day within the window.
+            ->where(function ($q) {
+                $q->whereNull('email_send')->orWhere('email_send', '0');
+            })
             ->get(['id', 'user_id', 'limit', 'expire_date', 'created_at']);
 
 
@@ -38,6 +43,8 @@ class SubscriptionExpireReminder extends Command
                     freelancer_notification($subscription->id, $subscription->user_id, 'Subscription', __('Your subscription will expire at '). $subscription->expire_date);
                     event(new ProjectEvent(__('Your subscription will expire at '). $subscription->expire_date ,$subscription->user_id));
                 }
+
+                UserSubscription::where('id', $subscription->id)->update(['email_send' => '1']);
             }
         }
 

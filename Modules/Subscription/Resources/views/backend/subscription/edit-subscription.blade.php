@@ -52,9 +52,37 @@
                                 <x-form.text :title="__('Google Product ID')" :type="__('text')" :name="'google_product_id'" :id="'google_product_id'" :divClass="'mb-0'" :value="$subscription_details->google_product_id ?? ''" :placeholder="__('Enter Google Product ID')"/>
                                 <x-backend.image :title="__('')" :name="'logo'" value="{{$subscription_details->logo}}" :dimentions="'50x50'"/>
 
+                                {{-- Structured plan gating keys (PlanGate). These drive
+                                     limits/capabilities in the app — separate from the
+                                     free-text display features below. --}}
+                                <div class="single-input mt-4">
+                                    <label class="fw-bold">{{ __('Plan Özellik Anahtarları (feature_key)') }}</label>
+                                    <small class="d-block text-muted mb-2">
+                                        {{ __('-1 = sınırsız, 0/1 = kapalı/açık. Boş bırakılan değer null olur. Bu alanlar uygulamadaki limit ve yetkileri belirler.') }}
+                                    </small>
+                                    @php
+                                        $structured = $subscription_details->features->whereNotNull('feature_key');
+                                    @endphp
+                                    @foreach($structured as $sf)
+                                        <div class="d-flex align-items-center mb-2" style="gap:8px;">
+                                            <input class="form-control" style="max-width:260px;" type="text"
+                                                   value="{{ $sf->feature_key }}" readonly>
+                                            <input class="form-control" style="max-width:200px;" type="text"
+                                                   name="feature_keys[{{ $sf->feature_key }}]"
+                                                   value="{{ $sf->feature_value }}"
+                                                   placeholder="{{ __('değer') }}">
+                                        </div>
+                                    @endforeach
+                                    @if($structured->isEmpty())
+                                        <small class="text-warning d-block">
+                                            {{ __('Bu planda yapısal özellik anahtarı yok. PlanFeatureSeeder ile eklenebilir.') }}
+                                        </small>
+                                    @endif
+                                </div>
+
                                 <div class="single-input mt-3">
                                     <div id="features">
-                                        @foreach($subscription_details->features as $key => $feature)
+                                        @foreach($subscription_details->features->whereNull('feature_key')->values() as $key => $feature)
                                             <div class="attr single-input-feature-attr">
                                                 <input name="feature[{{ $key }}]"
                                                        class="feature form-control"

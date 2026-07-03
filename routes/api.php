@@ -22,6 +22,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::group(['prefix' => 'v1', 'middleware' => 'setlang'], function () {
     Route::get('app-status', [\App\Http\Controllers\Api\AppStatusController::class, 'getStatus']);
 
+    // Store subscription lifecycle webhooks (public; authenticated by JWS
+    // signature / Publisher API verification, not by session).
+    Route::post('webhooks/apple-iap', [\App\Http\Controllers\Api\StoreWebhookController::class, 'apple']);
+    Route::post('webhooks/google-iap', [\App\Http\Controllers\Api\StoreWebhookController::class, 'google']);
+
     //freelancer route start
     Route::group(['prefix' => 'freelancer'], function () {
 
@@ -180,6 +185,7 @@ Route::group(['prefix' => 'v1', 'middleware' => 'setlang'], function () {
             //subscription list
             Route::controller(\App\Http\Controllers\Api\Freelancer\SubscriptionController::class)->group(function () {
                 Route::get('subscription/history/list', 'all_subscription');
+                Route::get('subscription/my-plan', 'my_plan');
                 Route::post('subscription/buy', 'buy_subscription');
                 Route::post('subscription/switch-to-free', 'switch_to_free');
                 Route::post('subscription/validate-iap', 'validate_iap');
