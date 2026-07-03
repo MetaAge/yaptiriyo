@@ -18,6 +18,19 @@ class Subscription extends Model
     public const ORTA_PLAN_ID = 1;  // Orta (mid tier)
     public const PRO_PLAN_ID  = 6;  // Pro (top tier)
 
+    /**
+     * Resolve the free (Basic) plan. Prefers the canonical id, but falls back
+     * to any active zero-price plan so auto-assignment doesn't silently break
+     * when the row id differs in a given environment.
+     */
+    public static function freePlan(): ?self
+    {
+        return self::with('subscription_type:id,validity')->find(self::FREE_PLAN_ID)
+            ?? self::with('subscription_type:id,validity')
+                ->where('price', 0)->where('status', 1)
+                ->orderBy('id')->first();
+    }
+
     protected $fillable = [
         'subscription_type_id',
         'title',

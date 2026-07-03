@@ -2720,7 +2720,10 @@ function check_and_downgrade_expired_subscription($user_id)
     }
     $checked[$user_id] = true;
 
-    $free_plan_id = \Modules\Subscription\Entities\Subscription::FREE_PLAN_ID;
+    // Resolve the free plan by id with a price=0 fallback, so auto-assignment
+    // still works in environments where the free plan row id differs.
+    $free_subscription = \Modules\Subscription\Entities\Subscription::freePlan();
+    $free_plan_id = $free_subscription?->id ?? \Modules\Subscription\Entities\Subscription::FREE_PLAN_ID;
 
     // Check if the user has an active, valid paid subscription
     $active_paid_sub = \Modules\Subscription\Entities\UserSubscription::where('user_id', $user_id)
@@ -2751,7 +2754,6 @@ function check_and_downgrade_expired_subscription($user_id)
                 return;
             }
 
-            $free_subscription = \Modules\Subscription\Entities\Subscription::with('subscription_type:id,validity')->find($free_plan_id);
             if ($free_subscription) {
                 // Pasify all old subscriptions
                 \Modules\Subscription\Entities\UserSubscription::where('user_id', $user_id)

@@ -36,7 +36,7 @@ class SubscriptionController extends Controller
     public function switch_to_free(Request $request)
     {
         $user = auth('sanctum')->user();
-        $free_subscription = Subscription::with('subscription_type:id,validity')->find(Subscription::FREE_PLAN_ID);
+        $free_subscription = Subscription::freePlan();
 
         if (!$free_subscription) {
             return response()->json(['msg' => __('Free plan not found')], 422);

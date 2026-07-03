@@ -75,7 +75,7 @@ class TrialService
     /** Assign the free Basic plan (used as fallback). */
     public static function assignFreePlan(int $userId): ?UserSubscription
     {
-        $free = Subscription::with('subscription_type:id,validity')->find(self::FREE_PLAN_ID);
+        $free = Subscription::freePlan();
         if (!$free) {
             return null;
         }
