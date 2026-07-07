@@ -22,6 +22,35 @@ use Illuminate\Support\Str;
 
 class ProjectController extends Controller
 {
+    /**
+     * Generate a unique project slug. If the base slug (from the title) is
+     * already taken, append -2, -3, ... so freelancers can create multiple
+     * listings with the same title instead of being rejected.
+     *
+     * @param  string     $source     Raw slug/title input.
+     * @param  mixed|null $ignoreId   Project id to exclude (for updates).
+     */
+    private function unique_project_slug($source, $ignoreId = null): string
+    {
+        $base = Str::slug($source, '-', null);
+        if ($base === '') {
+            $base = 'ilan';
+        }
+
+        $slug = $base;
+        $i = 1;
+        while (
+            Project::where('slug', $slug)
+                ->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))
+                ->exists()
+        ) {
+            $i++;
+            $slug = $base . '-' . $i;
+        }
+
+        return $slug;
+    }
+
     // project list
     public function project_list()
     {
@@ -79,7 +108,7 @@ class ProjectController extends Controller
                 'category'=>'required',
                 'project_title'=>'required',
                 'project_description'=>'required',
-                'slug'=>'required|max:191|unique:projects,slug',
+                'slug'=>'nullable|max:191',
                 'image.*'=>'nullable|mimes:jpg,jpeg,png,bmp,tiff,svg|max:5120',
                 'basic_revision'=>'required|numeric|integer|max:1000',
                 'basic_regular_charge'=>'required|numeric|integer',
@@ -97,16 +126,9 @@ class ProjectController extends Controller
 
             $user_id  = auth('sanctum')->user()->id;
             $slug = !empty($request->slug) ? $request->slug : $request->project_title;
-            $generated_slug = Str::slug($slug);
-
-            $slugs = Project::select('slug')->get();
-            foreach($slugs as $s){
-                if($s->slug == $generated_slug){
-                    return response()->json([
-                        'msg'=>('Slug already exists')
-                    ])->setStatusCode(422);
-                }
-            }
+            // Aynı başlıkta ilan açılabilsin: slug çakışırsa reddetmek yerine
+            // otomatik olarak -2, -3 ... ekleyip benzersizleştir.
+            $generated_slug = $this->unique_project_slug($slug);
 
 
             if(get_static_option('project_auto_approval') == 'yes'){
@@ -194,7 +216,7 @@ class ProjectController extends Controller
                     'user_id'=>$user_id,
                     'category_id'=>$request->category,
                     'title'=>$request->project_title,
-                    'slug' => Str::slug($slug,'-',null),
+                    'slug' => $generated_slug,
                     'description'=>$request->project_description,
                     'image'=>$imageNames,
                     'basic_title'=>'Basic',
@@ -404,7 +426,7 @@ class ProjectController extends Controller
                 'category'=>'required',
                 'project_title'=>'required',
                 'project_description'=>'required',
-                'slug'=>'required|max:191|unique:projects,slug,'.$request->project_id,
+                'slug'=>'nullable|max:191',
                 'image.*'=>'nullable|mimes:jpg,jpeg,png,bmp,tiff,svg|max:5120',
                 'basic_revision'=>'required|numeric|integer|max:1000',
                 'basic_regular_charge'=>'required|numeric|integer',
@@ -420,8 +442,8 @@ class ProjectController extends Controller
 
             $user_id  = auth('sanctum')->user()->id;
             $slug = !empty($request->slug) ? $request->slug : $request->project_title;
-            $generated_slug = Str::slug($slug);
-            $slugs = Project::select('slug')->where('id','!=',$request->project_id)->get();
+            // Kendi ilanı hariç çakışmaları otomatik benzersizleştir.
+            $generated_slug = $this->unique_project_slug($slug, $request->project_id);
             $project_details = Project::with('project_attributes')
                 ->where('user_id',$user_id)
                 ->where('id',$request->project_id)
@@ -431,14 +453,6 @@ class ProjectController extends Controller
                 return response()->json([
                     'msg' => __('Project not found')
                 ])->setStatusCode(422);
-            }
-
-            foreach($slugs as $s){
-                if($s->slug == $generated_slug){
-                    return response()->json([
-                        'msg'=>('Slug already exists')
-                    ])->setStatusCode(422);
-                }
             }
 
             $standard_title = null;
@@ -541,7 +555,7 @@ class ProjectController extends Controller
                     'user_id'=>$user_id,
                     'category_id'=>$request->category,
                     'title'=>$request->project_title,
-                    'slug' => Str::slug($slug,'-',null),
+                    'slug' => $generated_slug,
                     'description'=>$request->project_description,
                     'image'=>$imageNames,
                     'basic_title'=>'Basic',
