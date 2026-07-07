@@ -336,12 +336,28 @@ class EmergencyController extends Controller
      */
     public function cancel($id)
     {
+        // Cancellable while still searching (pending) OR after a freelancer was
+        // accepted but BEFORE an order/payment started (order_id null). Once an
+        // order exists the job is underway and this endpoint must not cancel it.
         $emergency = EmergencyRequest::where('client_id', Auth::id())
-            ->whereIn('status', ['pending'])
+            ->whereIn('status', ['pending', 'accepted'])
+            ->whereNull('order_id')
             ->findOrFail($id);
+
+        $accepted_by = $emergency->accepted_by;
 
         $emergency->update(['status' => 'cancelled']);
         EmergencyOffer::where('emergency_request_id', $emergency->id)->delete();
+
+        // Inform the accepted freelancer that the client backed out.
+        if ($accepted_by) {
+            freelancer_notification(
+                $emergency->id,
+                $accepted_by,
+                'Emergency',
+                __('Müşteri acil talebi iptal etti.')
+            );
+        }
 
         return response()->json([
             'status' => 'success',
