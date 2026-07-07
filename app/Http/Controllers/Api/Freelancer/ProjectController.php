@@ -124,13 +124,19 @@ class ProjectController extends Controller
             $premium_regular_charge = null;
             $premium_discount_charge = null;
 
+            // Normalise charge inputs: the app sends a null discount as the
+            // string "null" (or ""), which MySQL truncates on a double column.
+            // Coerce any non-numeric value to null.
+            $toCharge = fn ($v) => is_numeric($v) ? (float) $v : null;
+            $basic_discount_charge = $toCharge($request->basic_discount_charge);
+
             if($request->offer_packages_available_or_not == 1){
                 $standard_title = 'Standard';
                 $premium_title = 'premium';
-                $standard_regular_charge = $request->standard_regular_charge;
-                $standard_discount_charge = $request->standard_discount_charge;
-                $premium_regular_charge = $request->premium_regular_charge;
-                $premium_discount_charge = $request->premium_discount_charge;
+                $standard_regular_charge = $toCharge($request->standard_regular_charge);
+                $standard_discount_charge = $toCharge($request->standard_discount_charge);
+                $premium_regular_charge = $toCharge($request->premium_regular_charge);
+                $premium_discount_charge = $toCharge($request->premium_discount_charge);
             }
 
             $country_id = $request->country_id;
@@ -201,7 +207,7 @@ class ProjectController extends Controller
                     'standard_delivery'=>$request->standard_delivery,
                     'premium_delivery'=>$request->premium_delivery,
                     'basic_regular_charge'=>$request->basic_regular_charge,
-                    'basic_discount_charge'=>$request->basic_discount_charge,
+                    'basic_discount_charge'=>$basic_discount_charge,
                     'standard_regular_charge'=>$standard_regular_charge,
                     'standard_discount_charge'=>$standard_discount_charge,
                     'premium_regular_charge'=>$premium_regular_charge,
@@ -442,13 +448,19 @@ class ProjectController extends Controller
             $premium_regular_charge = null;
             $premium_discount_charge = null;
 
+            // Normalise charge inputs: the app sends a null discount as the
+            // string "null" (or ""), which MySQL truncates on a double column.
+            // Coerce any non-numeric value to null.
+            $toCharge = fn ($v) => is_numeric($v) ? (float) $v : null;
+            $basic_discount_charge = $toCharge($request->basic_discount_charge);
+
             if($request->offer_packages_available_or_not == 1){
                 $standard_title = 'Standard';
                 $premium_title = 'premium';
-                $standard_regular_charge = $request->standard_regular_charge;
-                $standard_discount_charge = $request->standard_discount_charge;
-                $premium_regular_charge = $request->premium_regular_charge;
-                $premium_discount_charge = $request->premium_discount_charge;
+                $standard_regular_charge = $toCharge($request->standard_regular_charge);
+                $standard_discount_charge = $toCharge($request->standard_discount_charge);
+                $premium_regular_charge = $toCharge($request->premium_regular_charge);
+                $premium_discount_charge = $toCharge($request->premium_discount_charge);
             }
 
             $country_id = $request->country_id;
@@ -542,7 +554,7 @@ class ProjectController extends Controller
                     'standard_delivery'=>$request->standard_delivery,
                     'premium_delivery'=>$request->premium_delivery,
                     'basic_regular_charge'=>$request->basic_regular_charge,
-                    'basic_discount_charge'=>$request->basic_discount_charge,
+                    'basic_discount_charge'=>$basic_discount_charge,
                     'standard_regular_charge'=>$standard_regular_charge,
                     'standard_discount_charge'=>$standard_discount_charge,
                     'premium_regular_charge'=>$premium_regular_charge,
