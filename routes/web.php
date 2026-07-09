@@ -32,6 +32,13 @@ require_once __DIR__ . '/freelancer.php';
 require_once __DIR__ . '/admin.php';
 
 
+// Legal pages — standalone (no theme/maintenance dependency) so the App Store
+// review can always reach them.
+Route::view('/privacy-policy', 'legal.privacy-policy')->name('privacy.policy');
+Route::view('/gizlilik-politikasi', 'legal.privacy-policy'); // Türkçe alias
+Route::view('/terms', 'legal.terms')->name('terms.of.use');
+Route::view('/kullanim-kosullari', 'legal.terms'); // Türkçe alias
+
 // frontend starts
 Route::group(['middleware' => ['globalVariable', 'maintains_mode','setlang']], function () {
 

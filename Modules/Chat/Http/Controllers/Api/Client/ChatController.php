@@ -155,6 +155,11 @@ class ChatController extends Controller
                 return response()->json(['msg'=> __('User not found')])->setStatusCode('422');
             }
 
+            // Block check: no messaging between users who blocked each other.
+            if (\App\Models\UserBlock::existsBetween(auth('sanctum')->id(), $request->freelancer_id)) {
+                return response()->json(['msg' => __('Bu kullanıcıyla mesajlaşamazsınız.')])->setStatusCode(422);
+            }
+
             $message_send = UserChatService::send(
                 auth('sanctum')->id(),
                 $request->freelancer_id,

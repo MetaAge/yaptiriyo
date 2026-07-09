@@ -152,6 +152,11 @@ class ChatController extends Controller
             ]);
         }
 
+        // Block check: no messaging between users who blocked each other.
+        if (\App\Models\UserBlock::existsBetween(auth('sanctum')->id(), $request->client_id)) {
+            return response()->json(['msg' => __('Bu kullanıcıyla mesajlaşamazsınız.')])->setStatusCode(422);
+        }
+
         // Subscription gate: free-plan freelancers (chat_number_filter=1) cannot
         // share phone numbers in chat — mask them to prevent platform bypass.
         $number_masked = false;

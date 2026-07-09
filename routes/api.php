@@ -91,6 +91,13 @@ Route::group(['prefix' => 'v1', 'middleware' => 'setlang'], function () {
             Route::controller(\App\Http\Controllers\Api\Freelancer\LoginController::class)->group(function () {
                 Route::post('logout', 'logout');
             });
+            // moderation (report / block) — required for UGC (App Store 1.2)
+            Route::controller(\App\Http\Controllers\Api\ModerationController::class)->group(function () {
+                Route::post('moderation/report', 'report');
+                Route::post('moderation/block', 'block');
+                Route::post('moderation/unblock', 'unblock');
+                Route::get('moderation/blocked-list', 'blockedList');
+            });
             //country manage
             Route::controller(\App\Http\Controllers\Api\Freelancer\CountryManageController::class)->group(function () {
                 Route::get('country/all', 'country');
@@ -349,6 +356,13 @@ Route::group(['prefix' => 'v1', 'middleware' => 'setlang'], function () {
             //logout
             Route::controller(\App\Http\Controllers\Api\Client\LoginController::class)->group(function () {
                 Route::post('logout', 'logout');
+            });
+            // moderation (report / block) — required for UGC (App Store 1.2)
+            Route::controller(\App\Http\Controllers\Api\ModerationController::class)->group(function () {
+                Route::post('moderation/report', 'report');
+                Route::post('moderation/block', 'block');
+                Route::post('moderation/unblock', 'unblock');
+                Route::get('moderation/blocked-list', 'blockedList');
             });
             //personal info
             Route::controller(\App\Http\Controllers\Api\Client\PersonalInfoController::class)->group(function () {
