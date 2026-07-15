@@ -119,6 +119,52 @@
                 <p class="text-[11px] text-gray-400 text-center px-4">{{ __('Bu usta ile direkt iletişim, ücretli paket kullanan ustalarda açıktır. Mesajlaşarak iletişime geçebilirsiniz.') }}</p>
             </div>
         @endif
+
+        {{-- Şikâyet et / Engelle (UGC güvenliği) --}}
+        @auth
+            @if(auth()->id() !== $user->id)
+                <div class="flex items-center justify-center gap-4 mt-1 mb-2">
+                    <button type="button" onclick="yaptiriyoReport({{ $user->id }})"
+                            class="text-xs text-gray-400 hover:text-red-500 transition">
+                        <i class="fa-regular fa-flag mr-1"></i>{{ __('Şikâyet Et') }}
+                    </button>
+                    <button type="button" onclick="yaptiriyoBlock({{ $user->id }})"
+                            class="text-xs text-gray-400 hover:text-red-500 transition">
+                        <i class="fa-solid fa-ban mr-1"></i>{{ __('Engelle') }}
+                    </button>
+                </div>
+                <script>
+                    async function yaptiriyoModeration(url, body, confirmMsg) {
+                        if (confirmMsg && !confirm(confirmMsg)) return;
+                        const res = await fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                            },
+                            body: JSON.stringify(body),
+                        });
+                        const data = await res.json();
+                        alert(data.msg || (res.ok ? @json(__('İşlem tamamlandı.')) : @json(__('İşlem başarısız.'))));
+                    }
+                    function yaptiriyoReport(userId) {
+                        const reason = prompt(@json(__('Şikâyet nedeninizi kısaca yazın:')));
+                        if (!reason || !reason.trim()) return;
+                        yaptiriyoModeration(@json(route('web.moderation.report')), {
+                            reason: reason.trim().slice(0, 100),
+                            reported_user_id: userId,
+                            reportable_type: 'user',
+                            reportable_id: userId,
+                        });
+                    }
+                    function yaptiriyoBlock(userId) {
+                        yaptiriyoModeration(@json(route('web.moderation.block')), { user_id: userId },
+                            @json(__('Bu kullanıcıyı engellemek istediğinize emin misiniz? Engellenen kullanıcı sizinle mesajlaşamaz.')));
+                    }
+                </script>
+            @endif
+        @endauth
     </div>
 
 

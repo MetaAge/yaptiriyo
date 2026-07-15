@@ -40,6 +40,13 @@ Route::post('/fiyat-tahmini', [\App\Http\Controllers\Api\Client\PriceEstimatorCo
     ->middleware('throttle:15,1')
     ->name('web.price.estimate');
 
+// Moderasyon (şikâyet / engelle) — web (UGC güvenliği; App Store 1.2 paritesi)
+Route::middleware('auth')->prefix('moderasyon')->group(function () {
+    Route::post('/sikayet', [\App\Http\Controllers\Api\ModerationController::class, 'report'])->name('web.moderation.report');
+    Route::post('/engelle', [\App\Http\Controllers\Api\ModerationController::class, 'block'])->name('web.moderation.block');
+    Route::post('/engel-kaldir', [\App\Http\Controllers\Api\ModerationController::class, 'unblock'])->name('web.moderation.unblock');
+});
+
 // Acil talep (SOS) — müşteri web akışı. API controller'ı yeniden kullanılır
 // (Auth::id() default guard'la web oturumunda da çalışır, yanıtlar JSON).
 Route::middleware('auth')->prefix('acil-talep')->group(function () {

@@ -25,7 +25,7 @@ class ModerationController extends Controller
             'reportable_id' => 'nullable|integer',
         ]);
 
-        $userId = auth('sanctum')->id();
+        $userId = (auth('sanctum')->id() ?? auth()->id());
 
         $report = ContentReport::create([
             'reporter_id' => $userId,
@@ -58,7 +58,7 @@ class ModerationController extends Controller
     {
         $request->validate(['user_id' => 'required|integer']);
 
-        $me = auth('sanctum')->id();
+        $me = (auth('sanctum')->id() ?? auth()->id());
         if ((int) $request->user_id === (int) $me) {
             return response()->json(['msg' => __('Kendinizi engelleyemezsiniz.')], 422);
         }
@@ -79,7 +79,7 @@ class ModerationController extends Controller
     {
         $request->validate(['user_id' => 'required|integer']);
 
-        UserBlock::where('blocker_id', auth('sanctum')->id())
+        UserBlock::where('blocker_id', (auth('sanctum')->id() ?? auth()->id()))
             ->where('blocked_id', $request->user_id)
             ->delete();
 
@@ -92,7 +92,7 @@ class ModerationController extends Controller
     /** List the ids the current user has blocked. */
     public function blockedList()
     {
-        $ids = UserBlock::where('blocker_id', auth('sanctum')->id())
+        $ids = UserBlock::where('blocker_id', (auth('sanctum')->id() ?? auth()->id()))
             ->pluck('blocked_id');
 
         return response()->json(['blocked_user_ids' => $ids]);
