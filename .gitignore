@@ -16,3 +16,4 @@ yarn-error.log
 /storage/framework/views/*.php
 /storage/framework/cache/
 /storage/framework/sessions/
+/storage/logs/*.log
