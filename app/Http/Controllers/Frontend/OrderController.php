@@ -86,7 +86,19 @@ class OrderController extends Controller
             }
         }
 
-        $finalPrice = $totalPrice ?: ($basePrice + $extrasPrice);
+        // Pricing type bilgisi checkout görünümüne taşınır: m²/saat/adet
+        // ilanlarında miktar seçici gösterilir, toplam = birim fiyat × miktar.
+        $pricingType = $project->pricing_type ?? \App\Enums\PricingType::FIXED;
+        $requiresQuantity = \App\Enums\PricingType::requiresQuantity($pricingType);
+        $quantity = max(1, (float) ($request->quantity ?? 1));
+        $unitPrice = $basePrice;
+        if ($requiresQuantity) {
+            $basePrice = round($basePrice * $quantity, 2);
+        }
+
+        $finalPrice = $requiresQuantity
+            ? ($basePrice + $extrasPrice)
+            : ($totalPrice ?: ($basePrice + $extrasPrice));
 
         $countries = Country::where('status', 1)->get();
 
@@ -97,7 +109,11 @@ class OrderController extends Controller
             'basePrice',
             'extrasPrice',
             'finalPrice',
-            'countries'
+            'countries',
+            'pricingType',
+            'requiresQuantity',
+            'quantity',
+            'unitPrice'
         ));
     }
 
@@ -191,6 +207,15 @@ class OrderController extends Controller
                         }
                     }
                 }
+            }
+
+            // Yaptiriyo pricing types: m²/saat/adet ilanlarında fiyat sunucuda
+            // miktar × birim fiyat olarak hesaplanır (mobil API ile aynı kural).
+            $projectPricingType = $project->pricing_type ?? \App\Enums\PricingType::FIXED;
+            if (\App\Enums\PricingType::requiresQuantity($projectPricingType)) {
+                $quantity = max(0.01, (float) ($request->quantity ?? 1));
+                $request->merge(['unit_price' => (float) $base_price, 'quantity' => $quantity]);
+                $base_price = round($base_price * $quantity, 2);
             }
 
             $price = $base_price + $extra_services_price;

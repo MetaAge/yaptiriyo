@@ -22,6 +22,19 @@ use phpDocumentor\Reflection\Type;
 
 class OrderService
 {
+    /**
+     * Snapshot the project's pricing type onto the order (fixed/per_m2/hourly/
+     * per_unit) — read from the DB, never trusted from the form.
+     */
+    private function resolveProjectPricingType($request, $project_or_job): string
+    {
+        if ($project_or_job === 'project' && !empty($request->project_id)) {
+            return Project::where('id', $request->project_id)->value('pricing_type')
+                ?? \App\Enums\PricingType::FIXED;
+        }
+        return \App\Enums\PricingType::FIXED;
+    }
+
     private const CANCEL_ROUTE = 'order.payment.cancel.static';
 
   //user login
@@ -72,6 +85,9 @@ class OrderService
                   'freelancer_id' => $freelancer_id,
                   'identity' => $identity,
                   'is_project_job' => $project_or_job,
+                  'quantity' => max(0.01, (float) ($request->quantity ?? 1)),
+                  'unit_price' => (float) ($request->unit_price ?? 0),
+                  'pricing_type' => $this->resolveProjectPricingType($request, $project_or_job),
                   'is_basic_standard_premium_custom' => $type,
                   'revision' => $revision,
                   'revision_left' => $revision,
@@ -166,6 +182,9 @@ class OrderService
             'freelancer_id' => $freelancer_id,
             'identity' => $identity,
             'is_project_job' => $project_or_job,
+            'quantity' => max(0.01, (float) ($request->quantity ?? 1)),
+            'unit_price' => (float) ($request->unit_price ?? 0),
+            'pricing_type' => $this->resolveProjectPricingType($request, $project_or_job),
             'is_basic_standard_premium_custom' => $type,
             'revision' => $revision,
             'revision_left' => $revision,
@@ -300,6 +319,9 @@ class OrderService
             'freelancer_id' => $freelancer_id,
             'identity' => $identity,
             'is_project_job' => $project_or_job,
+            'quantity' => max(0.01, (float) ($request->quantity ?? 1)),
+            'unit_price' => (float) ($request->unit_price ?? 0),
+            'pricing_type' => $this->resolveProjectPricingType($request, $project_or_job),
             'is_basic_standard_premium_custom' => $type,
             'revision' => $revision,
             'revision_left' => $revision,
@@ -621,6 +643,9 @@ class OrderService
             'freelancer_id' => $freelancer_id,
             'identity' => $identity,
             'is_project_job' => $project_or_job,
+            'quantity' => max(0.01, (float) ($request->quantity ?? 1)),
+            'unit_price' => (float) ($request->unit_price ?? 0),
+            'pricing_type' => $this->resolveProjectPricingType($request, $project_or_job),
             'is_basic_standard_premium_custom' => $type,
             'revision' => $revision,
             'revision_left' => $revision,

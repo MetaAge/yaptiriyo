@@ -459,6 +459,13 @@ class OrderController extends Controller
 
         }else{
               $order = Order::where('id',$id)->first();
+
+              // Hakediş (milestone) siparişleri yalnızca hakediş bazında onaylanır;
+              // tüm-sipariş onayı freelancera tutarın tamamını tek seferde öderdi.
+              if (OrderMilestone::where('order_id', $id)->exists()) {
+                  return back()->with(toastr_warning(__('Bu sipariş hakediş usulüdür. Lütfen her hakedişi ayrı ayrı onaylayın.')));
+              }
+
               $total_earning = UserEarning::where('user_id',$order->freelancer_id)->first();
               $client_wallet = Wallet::where('user_id',Auth::guard('web')->user()->id)->first();
               $freelancer_wallet = Wallet::where('user_id',$order->freelancer_id)->first();
