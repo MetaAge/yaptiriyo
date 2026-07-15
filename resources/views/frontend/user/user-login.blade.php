@@ -142,7 +142,7 @@
                                     {{ get_static_option('login_page_sidebar_title') ?? __('Login and start discover') }}
                                 </h4>
                                 <p class="login-right-contents-para">
-                                    {{ get_static_option('login_page_sidebar_description') ?? __('Once login you will see the magic of xilancer marketplace.') }}
+                                    {{ get_static_option('login_page_sidebar_description') ?? __('Giriş yap, aradığın ustaya dakikalar içinde ulaş.') }}
                                 </p>
                             </div>
                         </div>

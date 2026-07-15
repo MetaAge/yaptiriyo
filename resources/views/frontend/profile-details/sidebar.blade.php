@@ -112,7 +112,7 @@
     <div class="border border-gray-200 rounded-2xl p-6 bg-white">
         <div class="flex items-center gap-3 mb-4 pb-4 border-b border-gray-100">
             <i class="fa-regular fa-user text-base-300"></i>
-            <span class="font-medium text-base-300">{{ __('On Xilancer since') }}</span>
+            <span class="font-medium text-base-300">{{ __("Yaptiriyo'da") }}</span>
             @if($user->created_at)
                 <span class="font-medium text-base-300">{{ $user->created_at->format('M Y') }}</span>
             @else

@@ -1,12 +1,13 @@
 <style>
     :root {
-        --main-color-one: {{ get_static_option('main_color_one') ?? '#FA8C00' }};
-        --main-color-two: {{ get_static_option('main_color_two') ?? '#FA8C00' }};
-        --main-color-one-rgb: {{ '250, 140, 0' }};
-        --secondary-color: {{get_static_option('secondary_color', '#E67E00')}};
-        --secondary-color-rgb: {{ '230, 126, 0'}};
-        --bg-gradient: {{ 'linear-gradient(90deg, #fff5e6 0%, #fefbf6 50%, #fff9f0 100%)' }};
-        --section-bg-base: {{ '#FA8C00' }};
+        {{-- Yaptiriyo marka turuncusu (#FF751F) — mobil uygulama ile aynı --}}
+        --main-color-one: {{ get_static_option('main_color_one') ?? '#FF751F' }};
+        --main-color-two: {{ get_static_option('main_color_two') ?? '#FF751F' }};
+        --main-color-one-rgb: {{ '255, 117, 31' }};
+        --secondary-color: {{get_static_option('secondary_color', '#E65F0A')}};
+        --secondary-color-rgb: {{ '230, 95, 10'}};
+        --bg-gradient: {{ 'linear-gradient(90deg, #fff3ea 0%, #fefbf6 50%, #fff7f0 100%)' }};
+        --section-bg-base: {{ '#FF751F' }};
         --section-bg-1: {{ '#F7F8FF' }};
         --section-bg-2: {{ '#F5F5F5' }};
         --footer-bg-1: {{ '#020418' }};
