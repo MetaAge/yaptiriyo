@@ -47,6 +47,15 @@
                         }
                     }
 
+                    // Miktarlı fiyatlandırma (m²/saat/adet): birim fiyat × miktar.
+                    $orderQuantity = max(1, (float) ($quantity ?? request('quantity', 1)));
+                    $orderPricingType = $pricingType ?? ($project->pricing_type ?? \App\Enums\PricingType::FIXED);
+                    $orderRequiresQty = \App\Enums\PricingType::requiresQuantity($orderPricingType);
+                    $orderUnitPrice = $basePriceValue;
+                    if ($orderRequiresQty) {
+                        $basePriceValue = round($basePriceValue * $orderQuantity, 2);
+                    }
+
                     $finalPriceValue = $basePriceValue + $extrasPriceValue;
 
                     if ($transactionFeeType == 'fixed') {
@@ -65,6 +74,9 @@
                 <input type="hidden" name="basic_standard_premium_type" id="basic_standard_premium_type" value="<?php echo e($packageType ?? ''); ?>">
                 <input type="hidden" name="selected_extras" id="selected_extras_input" value="<?php echo e(json_encode($selectedExtras ?? [])); ?>">
                 <input type="hidden" name="selected_payment_gateway" id="order_from_user_wallet" value="">
+                <?php if(!empty($orderRequiresQty)): ?>
+                    <input type="hidden" name="quantity" value="<?php echo e($orderQuantity); ?>">
+                <?php endif; ?>
 
                 <div class="flex flex-col lg:flex-row gap-8">
                     <!-- Left Column -->
@@ -327,6 +339,19 @@
 
                                     </span>
                                 </div>
+
+                                <?php if(!empty($orderRequiresQty)): ?>
+                                    <?php
+                                        $qtyUnit = \App\Enums\PricingType::QUANTITY_LABEL[$orderPricingType] ?? '';
+                                    ?>
+                                    <div class="flex justify-between items-center mb-4 text-sm bg-primary/5 border border-primary/15 rounded-lg px-3 py-2">
+                                        <span class="text-base-400"><?php echo e(__('Birim fiyat × Miktar')); ?></span>
+                                        <span class="font-semibold text-base-300">
+                                            <?php echo e(yaptiriyo_price_label($orderUnitPrice, $orderPricingType)); ?> × <?php echo e(rtrim(rtrim(number_format($orderQuantity, 2, ',', '.'), '0'), ',')); ?> <?php echo e($qtyUnit); ?>
+
+                                        </span>
+                                    </div>
+                                <?php endif; ?>
 
                                 <?php if($extrasPriceValue > 0 && !empty($extrasList)): ?>
                                     <div class="mb-4">

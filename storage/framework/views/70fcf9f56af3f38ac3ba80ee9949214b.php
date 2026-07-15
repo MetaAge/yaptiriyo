@@ -763,6 +763,29 @@
                             </div>
                         <?php endif; ?>
 
+                        <?php
+                            $requiresQty = \App\Enums\PricingType::requiresQuantity($project->pricing_type ?? \App\Enums\PricingType::FIXED);
+                            $qtyLabel = \App\Enums\PricingType::QUANTITY_LABEL[$project->pricing_type ?? 'fixed'] ?? '';
+                        ?>
+                        <?php if($requiresQty): ?>
+                            
+                            <div class="mb-6 border border-gray-200 rounded-xl p-4" id="quantityBox">
+                                <label class="block text-sm font-semibold text-base-300 mb-3"><?php echo e($qtyLabel); ?> <?php echo e(__('Miktarı')); ?></label>
+                                <div class="flex items-center gap-3">
+                                    <button type="button" id="qtyMinus"
+                                            class="w-10 h-10 rounded-lg bg-primary/10 text-primary font-bold text-lg hover:bg-primary/20 transition">−</button>
+                                    <input type="number" id="qtyInput" value="1" min="1" step="1"
+                                           class="flex-1 text-center text-xl font-bold border border-gray-200 rounded-lg py-2 outline-none focus:border-primary min-w-0">
+                                    <button type="button" id="qtyPlus"
+                                            class="w-10 h-10 rounded-lg bg-primary/10 text-primary font-bold text-lg hover:bg-primary/20 transition">+</button>
+                                </div>
+                                <div class="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
+                                    <span class="text-sm text-base-400"><?php echo e(__('Toplam')); ?></span>
+                                    <span class="text-xl font-bold text-primary" id="qtyTotal"></span>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+
                         <!-- Buttons -->
                         <?php if(Auth::guard('web')->check()): ?>
                             <?php if(Auth::guard('web')->user()->user_type == 1 && Auth::guard('web')->user()->id != $project->user_id && Session::get('user_role') != 'freelancer'): ?>
@@ -1108,8 +1131,48 @@
                     url.searchParams.append('extras', JSON.stringify(selectedExtras));
                 }
 
+                // Miktarlı fiyatlandırma (m²/saat/adet): checkout'a miktarı taşı.
+                const qtyInputEl = document.getElementById('qtyInput');
+                if (qtyInputEl) {
+                    const q = Math.max(1, parseFloat(qtyInputEl.value) || 1);
+                    url.searchParams.append('quantity', q);
+                }
+
                 window.location.href = url.toString();
             });
+
+            // ── Miktar seçici canlı toplam (m²/saat/adet ilanları) ──
+            const qtyBox = document.getElementById('quantityBox');
+            if (qtyBox) {
+                const qtyInput = document.getElementById('qtyInput');
+                const qtyTotal = document.getElementById('qtyTotal');
+                const unitSuffix = <?php echo json_encode(\App\Enums\PricingType::UNIT_SUFFIX[$project->pricing_type ?? 'fixed'] ?? '', 15, 512) ?>;
+
+                function activeUnitPrice() {
+                    const active = $('.package-tab.active').data('package') || 'basic';
+                    const panel = document.getElementById(active + 'Package');
+                    return panel ? parseFloat(panel.dataset.basePrice) || 0 : 0;
+                }
+
+                function renderQtyTotal() {
+                    const q = Math.max(1, parseFloat(qtyInput.value) || 1);
+                    const total = activeUnitPrice() * q;
+                    qtyTotal.textContent = total.toLocaleString('tr-TR', {maximumFractionDigits: 2}) + '₺'
+                        + ' (' + q + ' × ' + activeUnitPrice().toLocaleString('tr-TR') + unitSuffix + ')';
+                }
+
+                document.getElementById('qtyMinus').addEventListener('click', function () {
+                    qtyInput.value = Math.max(1, (parseFloat(qtyInput.value) || 1) - 1);
+                    renderQtyTotal();
+                });
+                document.getElementById('qtyPlus').addEventListener('click', function () {
+                    qtyInput.value = (parseFloat(qtyInput.value) || 1) + 1;
+                    renderQtyTotal();
+                });
+                qtyInput.addEventListener('input', renderQtyTotal);
+                $('.package-tab').on('click', function () { setTimeout(renderQtyTotal, 50); });
+                renderQtyTotal();
+            }
         });
 
         document.addEventListener('DOMContentLoaded', function() {
