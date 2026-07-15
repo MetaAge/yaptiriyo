@@ -1,2 +1,0 @@
-<link rel="stylesheet" href="<?php echo e(asset('assets/common/css/jquery.dataTables.min.css')); ?>">
-<?php /**PATH /Users/ahmetsahin/Desktop/xilancer/core/resources/views/components/data-table/data-table-css.blade.php ENDPATH**/ ?>

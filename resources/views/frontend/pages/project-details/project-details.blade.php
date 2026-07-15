@@ -396,18 +396,18 @@
                                 <tr class="text-base-300 text-sm">
                                     <th class="text-left p-4 font-medium border-r">Package</th>
                                     <th class="text-center p-4 font-medium border-r">
-                                        <div>{{ float_amount_with_currency_symbol($basicPrice) }}</div>
+                                        <div>{{ yaptiriyo_price_label($basicPrice, $project->pricing_type) }}</div>
                                         <div>{{ $project->basic_title }}</div>
                                     </th>
                                     @if(!empty($project->standard_title))
                                         <th class="text-center p-4 font-medium border-r">
-                                            <div>{{ float_amount_with_currency_symbol($standardPrice) }}</div>
+                                            <div>{{ yaptiriyo_price_label($standardPrice, $project->pricing_type) }}</div>
                                             <div>{{ $project->standard_title }}</div>
                                         </th>
                                     @endif
                                     @if(!empty($project->premium_title))
                                         <th class="text-center p-4 font-medium">
-                                            <div>{{ float_amount_with_currency_symbol($premiumPrice) }}</div>
+                                            <div>{{ yaptiriyo_price_label($premiumPrice, $project->pricing_type) }}</div>
                                             <div>{{ $project->premium_title }}</div>
                                         </th>
                                     @endif
@@ -492,16 +492,16 @@
                                 <tr class="bg-gray-50">
                                     <td class="border-r p-4 text-sm font-medium text-base-300">Total</td>
                                     <td class="border-r text-center p-4 text-sm font-medium text-base-300">
-                                        {{ float_amount_with_currency_symbol($basicPrice) }}
+                                        {{ yaptiriyo_price_label($basicPrice, $project->pricing_type) }}
                                     </td>
                                     @if(!empty($project->standard_title))
                                         <td class="border-r text-center p-4 text-sm font-medium text-base-300">
-                                            {{ float_amount_with_currency_symbol($standardPrice) }}
+                                            {{ yaptiriyo_price_label($standardPrice, $project->pricing_type) }}
                                         </td>
                                     @endif
                                     @if(!empty($project->premium_title))
                                         <td class="text-center p-4 text-sm font-medium text-base-300">
-                                            {{ float_amount_with_currency_symbol($premiumPrice) }}
+                                            {{ yaptiriyo_price_label($premiumPrice, $project->pricing_type) }}
                                         </td>
                                     @endif
                                 </tr>
@@ -557,7 +557,7 @@
                         <!-- Basic Package -->
                         <div id="basicPackage" class="package-content" data-base-price="{{ $basicPrice }}">
                             <div class="text-3xl font-semibold mb-2">
-                                {{ float_amount_with_currency_symbol($basicPrice) }}
+                                {{ yaptiriyo_price_label($basicPrice, $project->pricing_type) }}
                             </div>
                             <p class="text-base-400 mb-6">{{ $project->basic_title }}</p>
 
@@ -613,7 +613,7 @@
                         @if(!empty($project->standard_title))
                             <div id="standardPackage" class="package-content hidden" data-base-price="{{ $standardPrice }}">
                                 <div class="text-3xl font-semibold mb-2">
-                                    {{ float_amount_with_currency_symbol($standardPrice) }}
+                                    {{ yaptiriyo_price_label($standardPrice, $project->pricing_type) }}
                                 </div>
                                 <p class="text-base-300 mb-6">{{ $project->standard_title }}</p>
 
@@ -670,7 +670,7 @@
                         @if(!empty($project->premium_title))
                             <div id="premiumPackage" class="package-content hidden" data-base-price="{{ $premiumPrice }}">
                                 <div class="text-3xl font-semibold mb-2">
-                                    {{ float_amount_with_currency_symbol($premiumPrice) }}
+                                    {{ yaptiriyo_price_label($premiumPrice, $project->pricing_type) }}
                                 </div>
                                 <p class="text-base-300 mb-6">{{ $project->premium_title }}</p>
 

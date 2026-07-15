@@ -426,18 +426,18 @@
                                 <tr class="text-base-300 text-sm">
                                     <th class="text-left p-4 font-medium border-r">Package</th>
                                     <th class="text-center p-4 font-medium border-r">
-                                        <div><?php echo e(float_amount_with_currency_symbol($basicPrice)); ?></div>
+                                        <div><?php echo e(yaptiriyo_price_label($basicPrice, $project->pricing_type)); ?></div>
                                         <div><?php echo e($project->basic_title); ?></div>
                                     </th>
                                     <?php if(!empty($project->standard_title)): ?>
                                         <th class="text-center p-4 font-medium border-r">
-                                            <div><?php echo e(float_amount_with_currency_symbol($standardPrice)); ?></div>
+                                            <div><?php echo e(yaptiriyo_price_label($standardPrice, $project->pricing_type)); ?></div>
                                             <div><?php echo e($project->standard_title); ?></div>
                                         </th>
                                     <?php endif; ?>
                                     <?php if(!empty($project->premium_title)): ?>
                                         <th class="text-center p-4 font-medium">
-                                            <div><?php echo e(float_amount_with_currency_symbol($premiumPrice)); ?></div>
+                                            <div><?php echo e(yaptiriyo_price_label($premiumPrice, $project->pricing_type)); ?></div>
                                             <div><?php echo e($project->premium_title); ?></div>
                                         </th>
                                     <?php endif; ?>
@@ -525,18 +525,18 @@
                                 <tr class="bg-gray-50">
                                     <td class="border-r p-4 text-sm font-medium text-base-300">Total</td>
                                     <td class="border-r text-center p-4 text-sm font-medium text-base-300">
-                                        <?php echo e(float_amount_with_currency_symbol($basicPrice)); ?>
+                                        <?php echo e(yaptiriyo_price_label($basicPrice, $project->pricing_type)); ?>
 
                                     </td>
                                     <?php if(!empty($project->standard_title)): ?>
                                         <td class="border-r text-center p-4 text-sm font-medium text-base-300">
-                                            <?php echo e(float_amount_with_currency_symbol($standardPrice)); ?>
+                                            <?php echo e(yaptiriyo_price_label($standardPrice, $project->pricing_type)); ?>
 
                                         </td>
                                     <?php endif; ?>
                                     <?php if(!empty($project->premium_title)): ?>
                                         <td class="text-center p-4 text-sm font-medium text-base-300">
-                                            <?php echo e(float_amount_with_currency_symbol($premiumPrice)); ?>
+                                            <?php echo e(yaptiriyo_price_label($premiumPrice, $project->pricing_type)); ?>
 
                                         </td>
                                     <?php endif; ?>
@@ -594,7 +594,7 @@
                         <!-- Basic Package -->
                         <div id="basicPackage" class="package-content" data-base-price="<?php echo e($basicPrice); ?>">
                             <div class="text-3xl font-semibold mb-2">
-                                <?php echo e(float_amount_with_currency_symbol($basicPrice)); ?>
+                                <?php echo e(yaptiriyo_price_label($basicPrice, $project->pricing_type)); ?>
 
                             </div>
                             <p class="text-base-400 mb-6"><?php echo e($project->basic_title); ?></p>
@@ -651,7 +651,7 @@
                         <?php if(!empty($project->standard_title)): ?>
                             <div id="standardPackage" class="package-content hidden" data-base-price="<?php echo e($standardPrice); ?>">
                                 <div class="text-3xl font-semibold mb-2">
-                                    <?php echo e(float_amount_with_currency_symbol($standardPrice)); ?>
+                                    <?php echo e(yaptiriyo_price_label($standardPrice, $project->pricing_type)); ?>
 
                                 </div>
                                 <p class="text-base-300 mb-6"><?php echo e($project->standard_title); ?></p>
@@ -709,7 +709,7 @@
                         <?php if(!empty($project->premium_title)): ?>
                             <div id="premiumPackage" class="package-content hidden" data-base-price="<?php echo e($premiumPrice); ?>">
                                 <div class="text-3xl font-semibold mb-2">
-                                    <?php echo e(float_amount_with_currency_symbol($premiumPrice)); ?>
+                                    <?php echo e(yaptiriyo_price_label($premiumPrice, $project->pricing_type)); ?>
 
                                 </div>
                                 <p class="text-base-300 mb-6"><?php echo e($project->premium_title); ?></p>

@@ -1,12 +1,13 @@
 <style>
     :root {
-        --main-color-one: <?php echo e(get_static_option('main_color_one') ?? '#FA8C00'); ?>;
-        --main-color-two: <?php echo e(get_static_option('main_color_two') ?? '#FA8C00'); ?>;
-        --main-color-one-rgb: <?php echo e('250, 140, 0'); ?>;
-        --secondary-color: <?php echo e(get_static_option('secondary_color', '#E67E00')); ?>;
-        --secondary-color-rgb: <?php echo e('230, 126, 0'); ?>;
-        --bg-gradient: <?php echo e('linear-gradient(90deg, #fff5e6 0%, #fefbf6 50%, #fff9f0 100%)'); ?>;
-        --section-bg-base: <?php echo e('#FA8C00'); ?>;
+        
+        --main-color-one: <?php echo e(get_static_option('main_color_one') ?? '#FF751F'); ?>;
+        --main-color-two: <?php echo e(get_static_option('main_color_two') ?? '#FF751F'); ?>;
+        --main-color-one-rgb: <?php echo e('255, 117, 31'); ?>;
+        --secondary-color: <?php echo e(get_static_option('secondary_color', '#E65F0A')); ?>;
+        --secondary-color-rgb: <?php echo e('230, 95, 10'); ?>;
+        --bg-gradient: <?php echo e('linear-gradient(90deg, #fff3ea 0%, #fefbf6 50%, #fff7f0 100%)'); ?>;
+        --section-bg-base: <?php echo e('#FF751F'); ?>;
         --section-bg-1: <?php echo e('#F7F8FF'); ?>;
         --section-bg-2: <?php echo e('#F5F5F5'); ?>;
         --footer-bg-1: <?php echo e('#020418'); ?>;

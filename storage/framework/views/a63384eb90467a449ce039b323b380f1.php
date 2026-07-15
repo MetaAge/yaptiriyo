@@ -268,7 +268,7 @@
                     <div class="text-right flex items-center gap-1">
                         <p class="text-xs text-gray-600"><?php echo e(__('Starting at:')); ?></p>
                         <p class="text-lg font-semibold text-gray-800">
-                            <?php echo e(float_amount_with_currency_symbol($project->basic_discount_charge > 0 ? $project->basic_discount_charge : $project->basic_regular_charge)); ?>
+                            <?php echo e(yaptiriyo_price_label($project->basic_discount_charge > 0 ? $project->basic_discount_charge : $project->basic_regular_charge, $project->pricing_type, true)); ?>
 
                         </p>
                     </div>

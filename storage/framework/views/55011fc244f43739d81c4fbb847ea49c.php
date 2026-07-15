@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title><?php echo new \Illuminate\Support\EncodedHtmlString(get_static_option('site_title').' '. __('Mail')); ?></title>
+    <title><?php echo e(get_static_option('site_title').' '. __('Mail')); ?></title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
@@ -46,7 +46,7 @@
         }
 
         .btn-wrap .anchor-btn {
-            background-color: <?php echo new \Illuminate\Support\EncodedHtmlString(get_static_option('site_color')); ?>;
+            background-color: <?php echo e(get_static_option('site_color')); ?>;
             color: #fff;
             font-size: 14px;
             line-height: 26px;
@@ -105,7 +105,7 @@
 
 <div class="mail-container">
     <div class="logo-wrapper">
-        <a href="<?php echo new \Illuminate\Support\EncodedHtmlString(url('/')); ?>">
+        <a href="<?php echo e(url('/')); ?>">
             <?php echo render_image_markup_by_attachment_id(get_static_option('site_logo')); ?>
 
         </a>

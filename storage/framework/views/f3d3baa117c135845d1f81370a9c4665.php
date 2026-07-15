@@ -1,0 +1,1 @@
+<?php /**PATH /Users/ahmetsahin/Desktop/xilancer/core/resources/views/frontend/pages/project-details/checkout.blade.php ENDPATH**/ ?>

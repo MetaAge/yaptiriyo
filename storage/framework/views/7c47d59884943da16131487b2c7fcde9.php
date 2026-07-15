@@ -1,2 +1,0 @@
-<button class="btn dropdown-toggle status_dropdown__click" data-bs-toggle="dropdown" aria-expanded="false"> <?php echo e($title); ?> </button>
-<?php /**PATH /Users/ahmetsahin/Desktop/xilancer/core/resources/views/components/status/table/select-action.blade.php ENDPATH**/ ?>

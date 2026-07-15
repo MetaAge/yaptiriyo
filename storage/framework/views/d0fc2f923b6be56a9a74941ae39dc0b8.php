@@ -306,7 +306,7 @@
                                                 $relatedPrice = floatval($relatedProject->basic_discount_charge ?: $relatedProject->basic_regular_charge);
                                             ?>
                                             <p class="text-lg font-semibold text-gray-800">
-                                                <?php echo e(float_amount_with_currency_symbol($relatedPrice)); ?>
+                                                <?php echo e(yaptiriyo_price_label($relatedPrice, $relatedProject->pricing_type, true)); ?>
 
                                             </p>
                                         </div>

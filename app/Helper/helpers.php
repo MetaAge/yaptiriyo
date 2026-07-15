@@ -2022,6 +2022,29 @@ if (!function_exists('get_currency_symbol_for_symbol')) {
         return null; // Return null if no symbol found
     }
 }
+/**
+ * Yaptiriyo price label with pricing-type unit suffix.
+ * fixed  → "1.000₺"        per_m2 → "1.000₺/m²"
+ * hourly → "1.000₺/saat"   per_unit → "1.000₺/adet"
+ * When $fromPrefix is true, non-fixed types read "1.000₺/m²'den başlayan".
+ */
+function yaptiriyo_price_label($amount, ?string $pricing_type = null, bool $fromPrefix = false)
+{
+    $base = float_amount_with_currency_symbol($amount);
+    $suffixMap = \App\Enums\PricingType::UNIT_SUFFIX;
+    $type = $pricing_type ?: \App\Enums\PricingType::FIXED;
+    $suffix = $suffixMap[$type] ?? '';
+
+    if ($suffix === '') {
+        return $base;
+    }
+    // UNIT_SUFFIX values look like "₺/m²" — we only need the "/m²" part since
+    // the base already carries the currency symbol.
+    $unit = ltrim(str_replace('₺', '', $suffix), '/');
+    $label = $base . '/' . $unit;
+    return $fromPrefix ? $label . __("'den başlayan") : $label;
+}
+
 function float_amount_with_currency_symbol($amount, $text = false)
 {
     $symbol = site_currency_symbol($text);
@@ -2459,6 +2482,7 @@ function render_page_meta_data_for_service($service_details){
         ? $service_details->metaData->twitter_meta_image
         : get_attachment_image_by_id($service_details?->image)['img_url'] ?? '';
 
+    $service_schema = yaptiriyo_service_schema($service_details);
 
     return <<<HTML
        <title>{$meta_title}</title>
@@ -2481,8 +2505,56 @@ function render_page_meta_data_for_service($service_details){
        <meta name="twitter:title" content="{$twitter_meta_tags}" >
        <meta name="twitter:description" content="$twitter_meta_description">
        <meta name="twitter:image" content="{$twitter_meta_image}">
+       <link rel="canonical" href="{$site_url}">
+       {$service_schema}
 HTML;
 
+}
+
+/**
+ * schema.org Service JSON-LD for a service (project) page — Google rich
+ * results: provider, price (with pricing-type unit) and aggregate rating.
+ */
+function yaptiriyo_service_schema($service_details): string
+{
+    try {
+        $price = ($service_details->basic_discount_charge ?? 0) > 0
+            ? $service_details->basic_discount_charge
+            : $service_details->basic_regular_charge;
+
+        $schema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'Service',
+            'name' => cleanText($service_details->title ?? ''),
+            'description' => \Illuminate\Support\Str::limit(cleanText($service_details->description ?? ''), 300),
+            'provider' => [
+                '@type' => 'LocalBusiness',
+                'name' => trim(($service_details->project_creator?->first_name ?? '') . ' ' . ($service_details->project_creator?->last_name ?? '')) ?: 'Yaptiriyo Ustası',
+            ],
+            'areaServed' => 'TR',
+            'offers' => [
+                '@type' => 'Offer',
+                'price' => (string) round((float) $price, 2),
+                'priceCurrency' => 'TRY',
+            ],
+        ];
+
+        $ratingCount = (int) ($service_details->ratings_count ?? 0);
+        $avgRating = (float) ($service_details->ratings_avg_rating ?? 0);
+        if ($ratingCount > 0 && $avgRating > 0) {
+            $schema['aggregateRating'] = [
+                '@type' => 'AggregateRating',
+                'ratingValue' => round($avgRating, 1),
+                'reviewCount' => $ratingCount,
+            ];
+        }
+
+        return '<script type="application/ld+json">'
+            . json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+            . '</script>';
+    } catch (\Throwable $e) {
+        return '';
+    }
 }
 
 function render_page_meta_data_for_job($job_details){

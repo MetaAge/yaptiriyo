@@ -76,29 +76,46 @@
         </div>
 
         <?php
-            $is_pro = is_pro_user($user->id);
+            // Structured plan gating (mobil API ile aynı kurallar):
+            // whatsapp_button → WhatsApp, phone_call → arama, badge → rozet.
+            $freelancer_gate = \Modules\Subscription\Services\PlanGate::for($user->id);
+            $can_whatsapp = $freelancer_gate->can('whatsapp_button');
+            $can_call = $freelancer_gate->can('phone_call');
+            $usta_badge = $freelancer_gate->value('badge'); // trusted | pro | null
             $whatsapp_link = $user->phone ? "https://wa.me/" . preg_replace('/[^0-9]/', '', $user->phone) : null;
         ?>
 
-        <?php if($is_pro): ?>
+        <?php if($usta_badge === 'pro'): ?>
+            <div class="inline-flex items-center gap-1.5 bg-indigo-50 text-indigo-700 text-xs font-bold px-3 py-1.5 rounded-full mb-3">
+                <i class="fa-solid fa-bolt"></i> <?php echo e(__('Pro Usta')); ?>
+
+            </div>
+        <?php elseif($usta_badge === 'trusted'): ?>
+            <div class="inline-flex items-center gap-1.5 bg-blue-50 text-blue-700 text-xs font-bold px-3 py-1.5 rounded-full mb-3">
+                <i class="fa-solid fa-shield-halved"></i> <?php echo e(__('Güvenilir Usta')); ?>
+
+            </div>
+        <?php endif; ?>
+
+        <?php if($can_whatsapp && $whatsapp_link): ?>
             <!-- WhatsApp Button -->
-            <?php if($whatsapp_link): ?>
-                <a href="<?php echo e($whatsapp_link); ?>" target="_blank"
-                   class="w-full bg-[#25D366] text-white font-medium py-3 rounded-lg hover:bg-[#128C7E] transition mb-3 flex items-center justify-center gap-2">
-                    <i class="fa-brands fa-whatsapp text-xl font-bold"></i> <?php echo e(__('WhatsApp ile İletişime Geç')); ?>
+            <a href="<?php echo e($whatsapp_link); ?>" target="_blank"
+               class="w-full bg-[#25D366] text-white font-medium py-3 rounded-lg hover:bg-[#128C7E] transition mb-3 flex items-center justify-center gap-2">
+                <i class="fa-brands fa-whatsapp text-xl font-bold"></i> <?php echo e(__('WhatsApp ile İletişime Geç')); ?>
 
-                </a>
-            <?php endif; ?>
+            </a>
+        <?php endif; ?>
 
+        <?php if($can_call && $user->phone): ?>
             <!-- Call Button -->
-            <?php if($user->phone): ?>
-                <a href="tel:<?php echo e($user->phone); ?>"
-                   class="w-full bg-secondary text-white font-medium py-3 rounded-lg hover:bg-secondary/90 transition mb-3 flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-phone"></i> <?php echo e(__('Hemen Ara')); ?>
+            <a href="tel:<?php echo e($user->phone); ?>"
+               class="w-full bg-secondary text-white font-medium py-3 rounded-lg hover:bg-secondary/90 transition mb-3 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-phone"></i> <?php echo e(__('Hemen Ara')); ?>
 
-                </a>
-            <?php endif; ?>
-        <?php else: ?>
+            </a>
+        <?php endif; ?>
+
+        <?php if(!$can_whatsapp && !$can_call): ?>
             <!-- Locked State for Free Users -->
             <div class="w-full bg-gray-50 text-gray-500 font-medium py-4 rounded-xl mb-4 flex flex-col items-center justify-center gap-2 border border-dashed border-gray-300">
                 <div class="flex items-center gap-2">
@@ -107,8 +124,7 @@
                     </div>
                     <span class="text-sm font-semibold"><?php echo e(__('İletişim Bilgileri Gizli')); ?></span>
                 </div>
-                <p class="text-[11px] text-gray-400 text-center px-4"><?php echo e(__('Bu usta ile direkt iletişime geçmek için ustanın PRO paket kullanması gerekir.')); ?></p>
-                <a href="<?php echo e(route('subscriptions.all')); ?>" class="text-[11px] text-primary font-bold hover:underline"><?php echo e(__('PRO Paketleri İncele')); ?></a>
+                <p class="text-[11px] text-gray-400 text-center px-4"><?php echo e(__('Bu usta ile direkt iletişim, ücretli paket kullanan ustalarda açıktır. Mesajlaşarak iletişime geçebilirsiniz.')); ?></p>
             </div>
         <?php endif; ?>
     </div>
@@ -118,7 +134,7 @@
     <div class="border border-gray-200 rounded-2xl p-6 bg-white">
         <div class="flex items-center gap-3 mb-4 pb-4 border-b border-gray-100">
             <i class="fa-regular fa-user text-base-300"></i>
-            <span class="font-medium text-base-300"><?php echo e(__('On Xilancer since')); ?></span>
+            <span class="font-medium text-base-300"><?php echo e(__("Yaptiriyo'da")); ?></span>
             <?php if($user->created_at): ?>
                 <span class="font-medium text-base-300"><?php echo e($user->created_at->format('M Y')); ?></span>
             <?php else: ?>

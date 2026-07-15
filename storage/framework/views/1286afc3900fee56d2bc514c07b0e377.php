@@ -1,0 +1,1 @@
+<?php /**PATH /Users/ahmetsahin/Desktop/xilancer/core/resources/views/frontend/pages/job-details/job-details-js.blade.php ENDPATH**/ ?>

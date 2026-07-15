@@ -131,6 +131,16 @@
                                 <a href="<?php echo e(route('admin.city.import.csv.settings')); ?>"> <?php echo e(__('Import Cities')); ?> </a>
                             </li>
                         <?php endif; ?>
+                        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('city-list')): ?>
+                            <li class="dashboard__bottom__list__item <?php if(request()->routeIs(['admin.neighborhood.all'])): ?> selected <?php endif; ?>">
+                                <a href="<?php echo e(route('admin.neighborhood.all')); ?>"> <?php echo e(__('Neighborhood')); ?> </a>
+                            </li>
+                        <?php endif; ?>
+                        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('city-csv-file-import')): ?>
+                            <li class="dashboard__bottom__list__item <?php if(request()->routeIs(['admin.neighborhood.import.csv.settings'])): ?> selected <?php endif; ?>">
+                                <a href="<?php echo e(route('admin.neighborhood.import.csv.settings')); ?>"> <?php echo e(__('Import Neighborhoods')); ?> </a>
+                            </li>
+                        <?php endif; ?>
                     </ul>
                 </li>
 
@@ -392,6 +402,24 @@
                             </ul>
                         </li>
                     </ul>
+                </li>
+
+                <!-- Emergency SOS -->
+                <li class="dashboard__bottom__list__item <?php if(request()->is('admin/emergency*')): ?> active <?php endif; ?>">
+                    <a href="<?php echo e(route('admin.emergency.index')); ?>">
+                        <i class="fa-solid fa-truck-medical"></i>
+                        <?php echo e(__('Emergency SOS')); ?>
+
+                    </a>
+                </li>
+
+                <!-- Reels Management -->
+                <li class="dashboard__bottom__list__item <?php if(request()->is('admin/reels*')): ?> active <?php endif; ?>">
+                    <a href="<?php echo e(route('admin.reels.all')); ?>">
+                        <i class="fa-solid fa-video"></i>
+                        <?php echo e(__('Reels Management')); ?>
+
+                    </a>
                 </li>
 
                 <!-- Communication -->

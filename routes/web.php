@@ -32,6 +32,9 @@ require_once __DIR__ . '/freelancer.php';
 require_once __DIR__ . '/admin.php';
 
 
+// SEO: XML sitemap (cached hourly)
+Route::get('/sitemap.xml', [\App\Http\Controllers\Frontend\SitemapController::class, 'index'])->name('sitemap');
+
 // Legal pages — standalone (no theme/maintenance dependency) so the App Store
 // review can always reach them.
 Route::view('/privacy-policy', 'legal.privacy-policy')->name('privacy.policy');
