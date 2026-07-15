@@ -75,10 +75,10 @@ $value = context()->get($__contextArgs[0]); ?>' => 'https://schema.org',
                 <i class="fa-solid fa-lock text-primary text-xl"></i>
                 <span class="text-sm font-semibold"><?php echo e(__('Güvenli Ödeme')); ?></span>
             </div>
-            <div class="flex items-center justify-center gap-2 text-gray-700">
-                <i class="fa-solid fa-bolt text-primary text-xl"></i>
-                <span class="text-sm font-semibold"><?php echo e(__('Acil Hizmet')); ?></span>
-            </div>
+            <a href="<?php echo e(route('web.emergency.page')); ?>" class="flex items-center justify-center gap-2 text-gray-700 hover:text-red-500 transition">
+                <i class="fa-solid fa-bolt text-red-500 text-xl"></i>
+                <span class="text-sm font-semibold"><?php echo e(__('30 Dk\'da Acil Usta')); ?></span>
+            </a>
             <div class="flex items-center justify-center gap-2 text-gray-700">
                 <i class="fa-solid fa-star text-primary text-xl"></i>
                 <span class="text-sm font-semibold"><?php echo e(__('Gerçek Yorumlar')); ?></span>
@@ -189,6 +189,37 @@ $value = context()->get($__contextArgs[0]); ?>' => 'https://schema.org',
 
     
     <section class="max-w-7xl mx-auto px-4 md:px-6 py-12 md:py-16">
+        <div class="rounded-3xl p-8 md:p-12 relative overflow-hidden"
+             style="background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);">
+            <div class="absolute -right-10 -top-10 w-56 h-56 rounded-full bg-white/10"></div>
+            <div class="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                <div>
+                    <span class="inline-block bg-amber-400 text-black text-[11px] font-extrabold px-2.5 py-1 rounded-md mb-3">AI</span>
+                    <h2 class="text-2xl md:text-3xl font-bold text-white mb-2"><?php echo e(__('Usta Çağırmadan Fiyat Al')); ?></h2>
+                    <p class="text-white/85 text-sm md:text-base"><?php echo e(__('İşini birkaç kelimeyle anlat, yapay zekâ ortalama piyasa fiyatını saniyeler içinde hesaplasın.')); ?></p>
+                </div>
+                <div class="bg-white rounded-2xl p-5 shadow-lg">
+                    <textarea id="aiEstimateInput" rows="3"
+                              class="w-full border border-gray-200 rounded-xl p-3 text-sm text-gray-700 outline-none focus:border-primary resize-none"
+                              placeholder="<?php echo e(__('Örn: 2+1 daire boyama, malzeme dahil, acil.')); ?>"></textarea>
+                    <button type="button" id="aiEstimateBtn"
+                            class="w-full mt-3 bg-primary text-white font-bold py-3 rounded-xl hover:opacity-90 transition">
+                        <?php echo e(__('Analiz Et ve Fiyat Al')); ?>
+
+                    </button>
+                    <div id="aiEstimateResult" class="hidden mt-4 border-t border-gray-100 pt-4 text-center">
+                        <div class="text-[11px] font-bold tracking-widest text-gray-400 mb-1"><?php echo e(__('ÖNERİLEN BÜTÇE')); ?></div>
+                        <div id="aiEstimatePrice" class="text-3xl font-extrabold text-primary"></div>
+                        <div id="aiEstimateRange" class="text-sm text-gray-500 mt-1"></div>
+                    </div>
+                    <div id="aiEstimateError" class="hidden mt-3 text-sm text-red-600 text-center"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    
+    <section class="max-w-7xl mx-auto px-4 md:px-6 py-12 md:py-16">
         <h2 class="text-2xl md:text-3xl font-bold text-gray-900 text-center mb-10"><?php echo e(__('Nasıl Çalışır?')); ?></h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div class="text-center">
@@ -225,6 +256,63 @@ $value = context()->get($__contextArgs[0]); ?>' => 'https://schema.org',
     </section>
 
 </main>
+
+<script>
+    (function () {
+        const btn = document.getElementById('aiEstimateBtn');
+        if (!btn) return;
+        const input = document.getElementById('aiEstimateInput');
+        const result = document.getElementById('aiEstimateResult');
+        const priceEl = document.getElementById('aiEstimatePrice');
+        const rangeEl = document.getElementById('aiEstimateRange');
+        const errEl = document.getElementById('aiEstimateError');
+
+        btn.addEventListener('click', async function () {
+            const description = (input.value || '').trim();
+            errEl.classList.add('hidden');
+            result.classList.add('hidden');
+            if (description.length < 3) {
+                errEl.textContent = <?php echo json_encode(__('Lütfen işinizi birkaç kelimeyle anlatın.'), 15, 512) ?>;
+                errEl.classList.remove('hidden');
+                return;
+            }
+            btn.disabled = true;
+            btn.textContent = <?php echo json_encode(__('Analiz ediliyor...'), 15, 512) ?>;
+            try {
+                const res = await fetch(<?php echo json_encode(route('web.price.estimate'), 15, 512) ?>, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                    },
+                    body: JSON.stringify({ description }),
+                });
+                const data = await res.json();
+                if (!res.ok || data.status === 'error') {
+                    throw new Error(data.message || <?php echo json_encode(__('Tahmin alınamadı, lütfen tekrar deneyin.'), 512) ?>);
+                }
+                const est = data.estimate || {};
+                const rec = est.recommended ?? est.median ?? null;
+                const min = est.min ?? null;
+                const max = est.max ?? null;
+                const cur = est.currency ?? '₺';
+                if (!rec) throw new Error(<?php echo json_encode(__('Bu iş için yeterli veri bulunamadı. Daha fazla detay yazmayı deneyin.'), 15, 512) ?>);
+                priceEl.textContent = Number(rec).toLocaleString('tr-TR') + cur;
+                rangeEl.textContent = (min !== null && max !== null)
+                    ? <?php echo json_encode(__('Beklenen aralık:'), 15, 512) ?> + ' ' + Number(min).toLocaleString('tr-TR') + cur + ' – ' + Number(max).toLocaleString('tr-TR') + cur
+                    : '';
+                result.classList.remove('hidden');
+            } catch (e) {
+                errEl.textContent = e.message;
+                errEl.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = <?php echo json_encode(__('Analiz Et ve Fiyat Al'), 15, 512) ?>;
+            }
+        });
+    })();
+</script>
 <?php $__env->stopSection(); ?>
 
 <?php echo $__env->make('frontend.new_design.layout.new_master', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH /Users/ahmetsahin/Desktop/xilancer/core/resources/views/frontend/pages/yaptiriyo-home.blade.php ENDPATH**/ ?>

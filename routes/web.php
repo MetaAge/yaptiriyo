@@ -35,6 +35,22 @@ require_once __DIR__ . '/admin.php';
 // SEO: XML sitemap (cached hourly)
 Route::get('/sitemap.xml', [\App\Http\Controllers\Frontend\SitemapController::class, 'index'])->name('sitemap');
 
+// AI fiyat tahmini — web widget'ı (misafire açık, hız sınırlı)
+Route::post('/fiyat-tahmini', [\App\Http\Controllers\Api\Client\PriceEstimatorController::class, 'estimate'])
+    ->middleware('throttle:15,1')
+    ->name('web.price.estimate');
+
+// Acil talep (SOS) — müşteri web akışı. API controller'ı yeniden kullanılır
+// (Auth::id() default guard'la web oturumunda da çalışır, yanıtlar JSON).
+Route::middleware('auth')->prefix('acil-talep')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Frontend\EmergencyWebController::class, 'page'])->name('web.emergency.page');
+    Route::post('/olustur', [\App\Http\Controllers\Api\Client\EmergencyController::class, 'create'])->name('web.emergency.create');
+    Route::get('/aktif', [\App\Http\Controllers\Api\Client\EmergencyController::class, 'activeForClient'])->name('web.emergency.active');
+    Route::post('/teklif-sec/{id}', [\App\Http\Controllers\Api\Client\EmergencyController::class, 'selectOffer'])->name('web.emergency.select');
+    Route::post('/iptal/{id}', [\App\Http\Controllers\Api\Client\EmergencyController::class, 'cancel'])->name('web.emergency.cancel');
+    Route::post('/tamamla/{id}', [\App\Http\Controllers\Api\Client\EmergencyController::class, 'complete'])->name('web.emergency.complete');
+});
+
 // Legal pages — standalone (no theme/maintenance dependency) so the App Store
 // review can always reach them.
 Route::view('/privacy-policy', 'legal.privacy-policy')->name('privacy.policy');
