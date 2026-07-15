@@ -2557,6 +2557,65 @@ function yaptiriyo_service_schema($service_details): string
     }
 }
 
+/**
+ * Human-readable Turkish rows for a subscription's structured feature keys —
+ * mirrors the mobile app's plan cards. Returns [['text' => ..., 'on' => bool]].
+ */
+function yaptiriyo_plan_feature_rows($subscription): array
+{
+    $get = function ($key) use ($subscription) {
+        $f = $subscription->features->firstWhere('feature_key', $key);
+        return $f?->feature_value;
+    };
+
+    $fmtLimit = function ($v, $suffix) {
+        if ($v === null || $v === '') return null;
+        return ((int) $v === -1) ? __('Sınırsız') . ' ' . $suffix : $v . ' ' . $suffix;
+    };
+
+    $rows = [];
+
+    if (($v = $get('monthly_offer_limit')) !== null) {
+        $rows[] = ['text' => ((int) $v === -1 ? __('Sınırsız teklif hakkı') : __('Ayda :count teklif gönderme', ['count' => $v])), 'on' => (int) $v !== 0];
+    }
+    $main = $get('main_category_limit');
+    $sub = $get('sub_category_limit');
+    if ($main !== null || $sub !== null) {
+        $mainTxt = (int) $main === -1 ? __('Sınırsız') : $main;
+        $subTxt = (int) $sub === -1 ? __('Sınırsız') : $sub;
+        $rows[] = ['text' => $mainTxt . ' ' . __('ana kategori') . ' • ' . $subTxt . ' ' . __('alt kategori'), 'on' => true];
+    }
+    if (($v = $fmtLimit($get('photo_limit'), __('fotoğraf yükleme'))) !== null) {
+        $rows[] = ['text' => $v, 'on' => true];
+    }
+    if (($v = $get('whatsapp_button')) !== null) {
+        $rows[] = ['text' => __('WhatsApp ile iletişim'), 'on' => $v == '1'];
+    }
+    if (($v = $get('phone_call')) !== null) {
+        $rows[] = ['text' => __('Telefonla arama'), 'on' => $v == '1'];
+    }
+    if (($v = $get('urgent_jobs_access')) !== null) {
+        $rows[] = ['text' => $v === 'priority' ? __('Acil işlerde öncelik') : __('Acil işlere teklif verme'), 'on' => $v !== 'view_delayed'];
+    }
+    if (($v = $get('reels_monthly_limit')) !== null) {
+        $rows[] = ['text' => (int) $v === -1 ? __('Sınırsız reels paylaşımı') : ((int) $v === 0 ? __('Reels paylaşımı') : __('Ayda :count reels', ['count' => $v])), 'on' => (int) $v !== 0];
+    }
+    if (($v = $get('story_monthly_limit')) !== null) {
+        $rows[] = ['text' => (int) $v === -1 ? __('Sınırsız hikaye paylaşımı') : ((int) $v === 0 ? __('Hikaye paylaşımı') : __('Ayda :count hikaye', ['count' => $v])), 'on' => (int) $v !== 0];
+    }
+    if (($v = $get('search_rank')) !== null) {
+        $rows[] = ['text' => (int) $v >= 2 ? __('Aramalarda en üst sıralama') : ((int) $v === 1 ? __('Aramalarda öne çıkma') : __('Standart sıralamada görünme')), 'on' => true];
+    }
+    if (($v = $get('homepage_showcase')) !== null && $v == '1') {
+        $rows[] = ['text' => __('Ana sayfa vitrini'), 'on' => true];
+    }
+    if (($v = $get('badge')) !== null && $v !== '') {
+        $rows[] = ['text' => $v === 'pro' ? __('"Pro Usta" rozeti') : __('"Güvenilir Usta" rozeti'), 'on' => true];
+    }
+
+    return $rows;
+}
+
 function render_page_meta_data_for_job($job_details){
 
     $user_lang = LanguageHelper::user_lang_slug();

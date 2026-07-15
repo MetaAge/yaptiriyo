@@ -100,26 +100,31 @@
                                                                                 <?php echo e($subscription->title); ?> </h5>
                                                                         </div>
                                                                     </div>
+                                                                    <?php
+                                                                        // Yapısal feature_key satırları (mobil uygulama ile aynı):
+                                                                        // varsa onları göster; yoksa eski serbest-metin satırlarına düş.
+                                                                        $structuredRows = yaptiriyo_plan_feature_rows($subscription);
+                                                                    ?>
                                                                     <ul class="single-pricing-list list-style-none">
-                                                                        <?php $__currentLoopData = $subscription->features; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $feature): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                                            <?php if($feature->status == 'on'): ?>
+                                                                        <?php if(count($structuredRows) > 0): ?>
+                                                                            <?php $__currentLoopData = $structuredRows; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $row): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                                                 <li class="single-pricing-list-item">
-                                                                                    <span
-                                                                                        class="single-pricing-list-item-icon">
-                                                                                        <i class="fa-solid fa-check"></i>
+                                                                                    <span class="single-pricing-list-item-icon <?php echo e($row['on'] ? '' : 'cross-icon'); ?>">
+                                                                                        <i class="fa-solid <?php echo e($row['on'] ? 'fa-check' : 'fa-xmark'); ?>"></i>
+                                                                                    </span> <?php echo e($row['text']); ?>
+
+                                                                                </li>
+                                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                                        <?php else: ?>
+                                                                            <?php $__currentLoopData = $subscription->features->whereNull('feature_key'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $feature): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                                <li class="single-pricing-list-item">
+                                                                                    <span class="single-pricing-list-item-icon <?php echo e($feature->status == 'on' ? '' : 'cross-icon'); ?>">
+                                                                                        <i class="fa-solid <?php echo e($feature->status == 'on' ? 'fa-check' : 'fa-xmark'); ?>"></i>
                                                                                     </span> <?php echo e($feature->feature); ?>
 
                                                                                 </li>
-                                                                            <?php else: ?>
-                                                                                <li class="single-pricing-list-item">
-                                                                                    <span
-                                                                                        class="single-pricing-list-item-icon cross-icon">
-                                                                                        <i class="fa-solid fa-xmark"></i>
-                                                                                    </span><?php echo e($feature->feature); ?>
-
-                                                                                </li>
-                                                                            <?php endif; ?>
-                                                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                                        <?php endif; ?>
                                                                     </ul>
                                                                     <h3 class="single-pricing-price">
                                                                         <?php echo e(float_amount_with_currency_symbol($subscription->price)); ?>

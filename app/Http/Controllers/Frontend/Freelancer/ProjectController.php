@@ -187,6 +187,9 @@ class ProjectController extends Controller
                     'state_id' => $request->state_id,
                     'city_id' => $request->city_id,
                     'neighborhood_id' => $request->neighborhood_id,
+                    // Fiyatlandırma tipi ilk alt kategoriden miras alınır (mobil API paritesi).
+                    'pricing_type' => \Modules\Service\Entities\SubCategory::whereIn('id', (array) $request->subcategory)
+                        ->value('pricing_type') ?? \App\Enums\PricingType::FIXED,
                     'load_from' => in_array($storage_driver, ['CustomUploader']) ? 0 : 1, //added for cloud storage 0=local 1=cloud
                 ]);
                 $project->project_sub_categories()->attach($request->subcategory);
@@ -544,6 +547,9 @@ class ProjectController extends Controller
                     'state_id' => $request->state_id,
                     'city_id' => $request->city_id,
                     'neighborhood_id' => $request->neighborhood_id,
+                    // Fiyatlandırma tipi ilk alt kategoriden miras alınır (mobil API paritesi).
+                    'pricing_type' => \Modules\Service\Entities\SubCategory::whereIn('id', (array) $request->subcategory)
+                        ->value('pricing_type') ?? \App\Enums\PricingType::FIXED,
                 ]);
 
                 //update product pivot table data

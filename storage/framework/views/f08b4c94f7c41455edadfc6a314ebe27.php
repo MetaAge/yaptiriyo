@@ -283,6 +283,7 @@
         <div class="popup-contents-form custom-form">
             <div class="single-input single-input-icon">
                 <label class="label-title"> <?php echo e(__('Regular Charge')); ?> </label>
+                <p class="text-muted" style="font-size:12px;margin:2px 0 6px;"><?php echo e(__('Alt kategoriniz m²/saat/adet bazlı ise buraya BİRİM fiyatı girin (örn. m² başına ücret). Toplam, sipariş sırasında miktara göre hesaplanır.')); ?></p>
                 <input type="text" name="basic_regular_charge" id="basic_regular_charge" class="form--control" value="<?php echo float_amount_without_currency_symbol(50); ?>">
                 <?php if(moduleExists('CurrencySwitcher')): ?>
                     <span class="input-icon"><?php echo e(site_currency_symbol()); ?></span>
