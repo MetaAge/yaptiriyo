@@ -300,7 +300,7 @@
                                                 $relatedPrice = floatval($relatedProject->basic_discount_charge ?: $relatedProject->basic_regular_charge);
                                             @endphp
                                             <p class="text-lg font-semibold text-gray-800">
-                                                {{ float_amount_with_currency_symbol($relatedPrice) }}
+                                                {{ yaptiriyo_price_label($relatedPrice, $relatedProject->pricing_type, true) }}
                                             </p>
                                         </div>
                                     </footer>

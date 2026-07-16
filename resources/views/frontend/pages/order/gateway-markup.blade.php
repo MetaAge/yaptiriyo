@@ -47,6 +47,15 @@
                         }
                     }
 
+                    // Miktarlı fiyatlandırma (m²/saat/adet): birim fiyat × miktar.
+                    $orderQuantity = max(1, (float) ($quantity ?? request('quantity', 1)));
+                    $orderPricingType = $pricingType ?? ($project->pricing_type ?? \App\Enums\PricingType::FIXED);
+                    $orderRequiresQty = \App\Enums\PricingType::requiresQuantity($orderPricingType);
+                    $orderUnitPrice = $basePriceValue;
+                    if ($orderRequiresQty) {
+                        $basePriceValue = round($basePriceValue * $orderQuantity, 2);
+                    }
+
                     $finalPriceValue = $basePriceValue + $extrasPriceValue;
 
                     if ($transactionFeeType == 'fixed') {
@@ -65,6 +74,9 @@
                 <input type="hidden" name="basic_standard_premium_type" id="basic_standard_premium_type" value="{{ $packageType ?? '' }}">
                 <input type="hidden" name="selected_extras" id="selected_extras_input" value="{{ json_encode($selectedExtras ?? []) }}">
                 <input type="hidden" name="selected_payment_gateway" id="order_from_user_wallet" value="">
+                @if(!empty($orderRequiresQty))
+                    <input type="hidden" name="quantity" value="{{ $orderQuantity }}">
+                @endif
 
                 <div class="flex flex-col lg:flex-row gap-8">
                     <!-- Left Column -->
@@ -319,6 +331,18 @@
                                         {{ float_amount_with_currency_symbol($basePriceValue) }}
                                     </span>
                                 </div>
+
+                                @if(!empty($orderRequiresQty))
+                                    @php
+                                        $qtyUnit = \App\Enums\PricingType::QUANTITY_LABEL[$orderPricingType] ?? '';
+                                    @endphp
+                                    <div class="flex justify-between items-center mb-4 text-sm bg-primary/5 border border-primary/15 rounded-lg px-3 py-2">
+                                        <span class="text-base-400">{{ __('Birim fiyat × Miktar') }}</span>
+                                        <span class="font-semibold text-base-300">
+                                            {{ yaptiriyo_price_label($orderUnitPrice, $orderPricingType) }} × {{ rtrim(rtrim(number_format($orderQuantity, 2, ',', '.'), '0'), ',') }} {{ $qtyUnit }}
+                                        </span>
+                                    </div>
+                                @endif
 
                                 @if($extrasPriceValue > 0 && !empty($extrasList))
                                     <div class="mb-4">

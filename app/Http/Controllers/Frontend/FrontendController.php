@@ -14,13 +14,28 @@ class FrontendController extends Controller
 {
     public function home_page()
     {
-        $home_page_id = get_static_option('home_page');
-        $page_details = Page::find($home_page_id);
-        if (empty($page_details)){
-            // show any notice or
-        }
-        return view('frontend.pages.frontend-home',compact('page_details'));
+        // Yaptiriyo statik ana sayfa (SEO-dostu). Eski page-builder ana
+        // sayfasına dönmek için aşağıdaki iki satırı açman yeterli:
+        // $page_details = Page::find(get_static_option('home_page'));
+        // return view('frontend.pages.frontend-home', compact('page_details'));
 
+        $top_categories = \Modules\Service\Entities\Category::select(['id', 'category', 'slug'])
+            ->where('status', 1)
+            ->orderBy('id')
+            ->limit(12)
+            ->get();
+
+        $featured_projects = \App\Models\Project::with('project_creator:id,first_name,last_name,username')
+            ->withCount('ratings')
+            ->withAvg('ratings', 'rating')
+            ->where('status', 1)
+            ->where('project_on_off', '1')
+            ->orderByRaw("CASE WHEN is_pro = 'yes' AND pro_expire_date > NOW() THEN 0 ELSE 1 END")
+            ->orderByDesc('id')
+            ->limit(8)
+            ->get();
+
+        return view('frontend.pages.yaptiriyo-home', compact('top_categories', 'featured_projects'));
     }
 
     public function dynamic_single_page($slug)

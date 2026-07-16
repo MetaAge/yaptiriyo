@@ -212,9 +212,9 @@
                         <p class="text-xs text-gray-600">{{ __('Starting at:') }}</p>
                         <p class="text-lg font-semibold text-gray-800">
                             @if($project->basic_discount_charge)
-                                {{ float_amount_with_currency_symbol($project->basic_discount_charge) }}
+                                {{ yaptiriyo_price_label($project->basic_discount_charge, $project->pricing_type) }}
                             @else
-                                {{ float_amount_with_currency_symbol($project->basic_regular_charge) }}
+                                {{ yaptiriyo_price_label($project->basic_regular_charge, $project->pricing_type) }}
                             @endif
                         </p>
                     </div>

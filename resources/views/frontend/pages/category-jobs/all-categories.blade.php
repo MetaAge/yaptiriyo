@@ -65,7 +65,7 @@
 
                 <!-- Keep content at normal stacking level -->
                 <div class="text-center relative flex items-center justify-center flex-col gap-6">
-                    <h3 class="text-[36px] text-white font-medium animate-on-scroll">{{ __('Get Started with Xilancer') }}</h3>
+                    <h3 class="text-[36px] text-white font-medium animate-on-scroll">{{ __("Yaptiriyo ile Hemen Başla") }}</h3>
                     <p class="text-white max-w-[600px] text-center">
                         {{ __('Connect with top freelancers or showcase your skills to clients worldwide. Start your journey today and turn ideas into successful projects.') }}
                     </p>

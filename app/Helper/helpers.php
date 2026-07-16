@@ -2022,6 +2022,29 @@ if (!function_exists('get_currency_symbol_for_symbol')) {
         return null; // Return null if no symbol found
     }
 }
+/**
+ * Yaptiriyo price label with pricing-type unit suffix.
+ * fixed  → "1.000₺"        per_m2 → "1.000₺/m²"
+ * hourly → "1.000₺/saat"   per_unit → "1.000₺/adet"
+ * When $fromPrefix is true, non-fixed types read "1.000₺/m²'den başlayan".
+ */
+function yaptiriyo_price_label($amount, ?string $pricing_type = null, bool $fromPrefix = false)
+{
+    $base = float_amount_with_currency_symbol($amount);
+    $suffixMap = \App\Enums\PricingType::UNIT_SUFFIX;
+    $type = $pricing_type ?: \App\Enums\PricingType::FIXED;
+    $suffix = $suffixMap[$type] ?? '';
+
+    if ($suffix === '') {
+        return $base;
+    }
+    // UNIT_SUFFIX values look like "₺/m²" — we only need the "/m²" part since
+    // the base already carries the currency symbol.
+    $unit = ltrim(str_replace('₺', '', $suffix), '/');
+    $label = $base . '/' . $unit;
+    return $fromPrefix ? $label . __("'den başlayan") : $label;
+}
+
 function float_amount_with_currency_symbol($amount, $text = false)
 {
     $symbol = site_currency_symbol($text);
@@ -2459,6 +2482,7 @@ function render_page_meta_data_for_service($service_details){
         ? $service_details->metaData->twitter_meta_image
         : get_attachment_image_by_id($service_details?->image)['img_url'] ?? '';
 
+    $service_schema = yaptiriyo_service_schema($service_details);
 
     return <<<HTML
        <title>{$meta_title}</title>
@@ -2481,8 +2505,115 @@ function render_page_meta_data_for_service($service_details){
        <meta name="twitter:title" content="{$twitter_meta_tags}" >
        <meta name="twitter:description" content="$twitter_meta_description">
        <meta name="twitter:image" content="{$twitter_meta_image}">
+       <link rel="canonical" href="{$site_url}">
+       {$service_schema}
 HTML;
 
+}
+
+/**
+ * schema.org Service JSON-LD for a service (project) page — Google rich
+ * results: provider, price (with pricing-type unit) and aggregate rating.
+ */
+function yaptiriyo_service_schema($service_details): string
+{
+    try {
+        $price = ($service_details->basic_discount_charge ?? 0) > 0
+            ? $service_details->basic_discount_charge
+            : $service_details->basic_regular_charge;
+
+        $schema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'Service',
+            'name' => cleanText($service_details->title ?? ''),
+            'description' => \Illuminate\Support\Str::limit(cleanText($service_details->description ?? ''), 300),
+            'provider' => [
+                '@type' => 'LocalBusiness',
+                'name' => trim(($service_details->project_creator?->first_name ?? '') . ' ' . ($service_details->project_creator?->last_name ?? '')) ?: 'Yaptiriyo Ustası',
+            ],
+            'areaServed' => 'TR',
+            'offers' => [
+                '@type' => 'Offer',
+                'price' => (string) round((float) $price, 2),
+                'priceCurrency' => 'TRY',
+            ],
+        ];
+
+        $ratingCount = (int) ($service_details->ratings_count ?? 0);
+        $avgRating = (float) ($service_details->ratings_avg_rating ?? 0);
+        if ($ratingCount > 0 && $avgRating > 0) {
+            $schema['aggregateRating'] = [
+                '@type' => 'AggregateRating',
+                'ratingValue' => round($avgRating, 1),
+                'reviewCount' => $ratingCount,
+            ];
+        }
+
+        return '<script type="application/ld+json">'
+            . json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+            . '</script>';
+    } catch (\Throwable $e) {
+        return '';
+    }
+}
+
+/**
+ * Human-readable Turkish rows for a subscription's structured feature keys —
+ * mirrors the mobile app's plan cards. Returns [['text' => ..., 'on' => bool]].
+ */
+function yaptiriyo_plan_feature_rows($subscription): array
+{
+    $get = function ($key) use ($subscription) {
+        $f = $subscription->features->firstWhere('feature_key', $key);
+        return $f?->feature_value;
+    };
+
+    $fmtLimit = function ($v, $suffix) {
+        if ($v === null || $v === '') return null;
+        return ((int) $v === -1) ? __('Sınırsız') . ' ' . $suffix : $v . ' ' . $suffix;
+    };
+
+    $rows = [];
+
+    if (($v = $get('monthly_offer_limit')) !== null) {
+        $rows[] = ['text' => ((int) $v === -1 ? __('Sınırsız teklif hakkı') : __('Ayda :count teklif gönderme', ['count' => $v])), 'on' => (int) $v !== 0];
+    }
+    $main = $get('main_category_limit');
+    $sub = $get('sub_category_limit');
+    if ($main !== null || $sub !== null) {
+        $mainTxt = (int) $main === -1 ? __('Sınırsız') : $main;
+        $subTxt = (int) $sub === -1 ? __('Sınırsız') : $sub;
+        $rows[] = ['text' => $mainTxt . ' ' . __('ana kategori') . ' • ' . $subTxt . ' ' . __('alt kategori'), 'on' => true];
+    }
+    if (($v = $fmtLimit($get('photo_limit'), __('fotoğraf yükleme'))) !== null) {
+        $rows[] = ['text' => $v, 'on' => true];
+    }
+    if (($v = $get('whatsapp_button')) !== null) {
+        $rows[] = ['text' => __('WhatsApp ile iletişim'), 'on' => $v == '1'];
+    }
+    if (($v = $get('phone_call')) !== null) {
+        $rows[] = ['text' => __('Telefonla arama'), 'on' => $v == '1'];
+    }
+    if (($v = $get('urgent_jobs_access')) !== null) {
+        $rows[] = ['text' => $v === 'priority' ? __('Acil işlerde öncelik') : __('Acil işlere teklif verme'), 'on' => $v !== 'view_delayed'];
+    }
+    if (($v = $get('reels_monthly_limit')) !== null) {
+        $rows[] = ['text' => (int) $v === -1 ? __('Sınırsız reels paylaşımı') : ((int) $v === 0 ? __('Reels paylaşımı') : __('Ayda :count reels', ['count' => $v])), 'on' => (int) $v !== 0];
+    }
+    if (($v = $get('story_monthly_limit')) !== null) {
+        $rows[] = ['text' => (int) $v === -1 ? __('Sınırsız hikaye paylaşımı') : ((int) $v === 0 ? __('Hikaye paylaşımı') : __('Ayda :count hikaye', ['count' => $v])), 'on' => (int) $v !== 0];
+    }
+    if (($v = $get('search_rank')) !== null) {
+        $rows[] = ['text' => (int) $v >= 2 ? __('Aramalarda en üst sıralama') : ((int) $v === 1 ? __('Aramalarda öne çıkma') : __('Standart sıralamada görünme')), 'on' => true];
+    }
+    if (($v = $get('homepage_showcase')) !== null && $v == '1') {
+        $rows[] = ['text' => __('Ana sayfa vitrini'), 'on' => true];
+    }
+    if (($v = $get('badge')) !== null && $v !== '') {
+        $rows[] = ['text' => $v === 'pro' ? __('"Pro Usta" rozeti') : __('"Güvenilir Usta" rozeti'), 'on' => true];
+    }
+
+    return $rows;
 }
 
 function render_page_meta_data_for_job($job_details){

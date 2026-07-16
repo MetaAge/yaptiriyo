@@ -226,6 +226,13 @@ class OrderController extends Controller
     // order submit
     public function order_submit(Request $request)
     {
+        // Hakediş (milestone) siparişleri hakediş bazında teslim edilir; tüm-sipariş
+        // teslimi akışı tam-ödeme yoluna düşürür (API tarafındaki guard ile aynı).
+        if (empty($request->order_milestone_id)
+            && OrderMilestone::where('order_id', $request->order_id)->exists()) {
+            return back()->with(toastr_warning(__('Bu sipariş hakediş usulüdür. Lütfen her hakedişi ayrı ayrı teslim edin.')));
+        }
+
         $allowedSize = get_static_option('max_upload_size') ?? '1048576';
         $allowedExtensions = json_decode(get_static_option('file_extensions'), true);
         

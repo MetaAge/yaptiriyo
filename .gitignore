@@ -13,3 +13,7 @@ yarn-error.log
 
 *.zip
 /storage/app/firebase/firebase_credentials.json
+/storage/framework/views/*.php
+/storage/framework/cache/
+/storage/framework/sessions/
+/storage/logs/*.log

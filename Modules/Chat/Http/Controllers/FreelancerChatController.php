@@ -115,6 +115,19 @@ class FreelancerChatController extends Controller
             }
         }
 
+        // Engel kontrolü: engellenen taraflar mesajlaşamaz (mobil API paritesi).
+        if (\App\Models\UserBlock::existsBetween(auth('web')->id(), $request->client_id)) {
+            return back()->with(toastr_error(__('Bu kullanıcıyla mesajlaşamazsınız.')));
+        }
+
+        // Ücretsiz plandaki ustalarda telefon/iletişim bilgisi maskelenir
+        // (chat_number_filter feature'ı — mobil API paritesi).
+        $outgoing_message = $request->message;
+        if (\Modules\Subscription\Services\PlanGate::for(auth('web')->id())->can('chat_number_filter')) {
+            [$outgoing_message] = mask_contact_info($outgoing_message);
+            $request->merge(['message' => $outgoing_message]);
+        }
+
         if($order_details?->is_project_job != 'offer') {
             try {
                 //: send message

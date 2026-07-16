@@ -502,6 +502,44 @@
                 <!-- Portfolio -->
                 @include('frontend.profile-details.all-portfolio')
 
+                {{-- Reels vitrini: ustanın gerçek işlerinden videolar --}}
+                @php
+                    $usta_reels = \App\Models\Reel::where('user_id', $user->id)
+                        ->latest()->limit(6)->get();
+                @endphp
+                @if($usta_reels->isNotEmpty())
+                    <section class="pt-6">
+                        <h2 class="text-xl lg:text-2xl text-base-300 font-medium mb-4">
+                            <i class="fa-solid fa-clapperboard text-primary mr-1"></i> {{ __('İşlerinden Videolar') }}
+                        </h2>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                            @foreach($usta_reels as $reel)
+                                <a href="{{ route('reels.view', $reel->id) }}" target="_blank"
+                                   class="group relative rounded-2xl overflow-hidden bg-gray-900 aspect-[9/16] block">
+                                    @if($reel->thumbnail)
+                                        <img src="{{ asset('assets/uploads/reels/thumbnails/'.$reel->thumbnail) }}"
+                                             alt="{{ __('İş videosu') }}" loading="lazy"
+                                             class="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition duration-300">
+                                    @else
+                                        <video src="{{ asset('assets/uploads/reels/'.$reel->video) }}#t=0.5"
+                                               class="w-full h-full object-cover" preload="metadata" muted playsinline></video>
+                                    @endif
+                                    <div class="absolute inset-0 flex items-center justify-center">
+                                        <span class="w-12 h-12 rounded-full bg-white/25 backdrop-blur flex items-center justify-center text-white group-hover:bg-primary transition">
+                                            <i class="fa-solid fa-play ml-0.5"></i>
+                                        </span>
+                                    </div>
+                                    @if($reel->views)
+                                        <span class="absolute bottom-2 left-2 text-white/90 text-xs font-semibold">
+                                            <i class="fa-solid fa-eye mr-1"></i>{{ $reel->views }}
+                                        </span>
+                                    @endif
+                                </a>
+                            @endforeach
+                        </div>
+                    </section>
+                @endif
+
                 <!-- Review Section -->
                 @if ($complete_orders_in_total >= 1)
                     <section class="pt-6" id="reviews">

@@ -72,27 +72,42 @@
         </div>
 
         @php
-            $is_pro = is_pro_user($user->id);
+            // Structured plan gating (mobil API ile aynı kurallar):
+            // whatsapp_button → WhatsApp, phone_call → arama, badge → rozet.
+            $freelancer_gate = \Modules\Subscription\Services\PlanGate::for($user->id);
+            $can_whatsapp = $freelancer_gate->can('whatsapp_button');
+            $can_call = $freelancer_gate->can('phone_call');
+            $usta_badge = $freelancer_gate->value('badge'); // trusted | pro | null
             $whatsapp_link = $user->phone ? "https://wa.me/" . preg_replace('/[^0-9]/', '', $user->phone) : null;
         @endphp
 
-        @if($is_pro)
-            <!-- WhatsApp Button -->
-            @if($whatsapp_link)
-                <a href="{{ $whatsapp_link }}" target="_blank"
-                   class="w-full bg-[#25D366] text-white font-medium py-3 rounded-lg hover:bg-[#128C7E] transition mb-3 flex items-center justify-center gap-2">
-                    <i class="fa-brands fa-whatsapp text-xl font-bold"></i> {{ __('WhatsApp ile İletişime Geç') }}
-                </a>
-            @endif
+        @if($usta_badge === 'pro')
+            <div class="inline-flex items-center gap-1.5 bg-indigo-50 text-indigo-700 text-xs font-bold px-3 py-1.5 rounded-full mb-3">
+                <i class="fa-solid fa-bolt"></i> {{ __('Pro Usta') }}
+            </div>
+        @elseif($usta_badge === 'trusted')
+            <div class="inline-flex items-center gap-1.5 bg-blue-50 text-blue-700 text-xs font-bold px-3 py-1.5 rounded-full mb-3">
+                <i class="fa-solid fa-shield-halved"></i> {{ __('Güvenilir Usta') }}
+            </div>
+        @endif
 
+        @if($can_whatsapp && $whatsapp_link)
+            <!-- WhatsApp Button -->
+            <a href="{{ $whatsapp_link }}" target="_blank"
+               class="w-full bg-[#25D366] text-white font-medium py-3 rounded-lg hover:bg-[#128C7E] transition mb-3 flex items-center justify-center gap-2">
+                <i class="fa-brands fa-whatsapp text-xl font-bold"></i> {{ __('WhatsApp ile İletişime Geç') }}
+            </a>
+        @endif
+
+        @if($can_call && $user->phone)
             <!-- Call Button -->
-            @if($user->phone)
-                <a href="tel:{{ $user->phone }}"
-                   class="w-full bg-secondary text-white font-medium py-3 rounded-lg hover:bg-secondary/90 transition mb-3 flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-phone"></i> {{ __('Hemen Ara') }}
-                </a>
-            @endif
-        @else
+            <a href="tel:{{ $user->phone }}"
+               class="w-full bg-secondary text-white font-medium py-3 rounded-lg hover:bg-secondary/90 transition mb-3 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-phone"></i> {{ __('Hemen Ara') }}
+            </a>
+        @endif
+
+        @if(!$can_whatsapp && !$can_call)
             <!-- Locked State for Free Users -->
             <div class="w-full bg-gray-50 text-gray-500 font-medium py-4 rounded-xl mb-4 flex flex-col items-center justify-center gap-2 border border-dashed border-gray-300">
                 <div class="flex items-center gap-2">
@@ -101,10 +116,55 @@
                     </div>
                     <span class="text-sm font-semibold">{{ __('İletişim Bilgileri Gizli') }}</span>
                 </div>
-                <p class="text-[11px] text-gray-400 text-center px-4">{{ __('Bu usta ile direkt iletişime geçmek için ustanın PRO paket kullanması gerekir.') }}</p>
-                <a href="{{ route('subscriptions.all') }}" class="text-[11px] text-primary font-bold hover:underline">{{ __('PRO Paketleri İncele') }}</a>
+                <p class="text-[11px] text-gray-400 text-center px-4">{{ __('Bu usta ile direkt iletişim, ücretli paket kullanan ustalarda açıktır. Mesajlaşarak iletişime geçebilirsiniz.') }}</p>
             </div>
         @endif
+
+        {{-- Şikâyet et / Engelle (UGC güvenliği) --}}
+        @auth
+            @if(auth()->id() !== $user->id)
+                <div class="flex items-center justify-center gap-4 mt-1 mb-2">
+                    <button type="button" onclick="yaptiriyoReport({{ $user->id }})"
+                            class="text-xs text-gray-400 hover:text-red-500 transition">
+                        <i class="fa-regular fa-flag mr-1"></i>{{ __('Şikâyet Et') }}
+                    </button>
+                    <button type="button" onclick="yaptiriyoBlock({{ $user->id }})"
+                            class="text-xs text-gray-400 hover:text-red-500 transition">
+                        <i class="fa-solid fa-ban mr-1"></i>{{ __('Engelle') }}
+                    </button>
+                </div>
+                <script>
+                    async function yaptiriyoModeration(url, body, confirmMsg) {
+                        if (confirmMsg && !confirm(confirmMsg)) return;
+                        const res = await fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                            },
+                            body: JSON.stringify(body),
+                        });
+                        const data = await res.json();
+                        alert(data.msg || (res.ok ? @json(__('İşlem tamamlandı.')) : @json(__('İşlem başarısız.'))));
+                    }
+                    function yaptiriyoReport(userId) {
+                        const reason = prompt(@json(__('Şikâyet nedeninizi kısaca yazın:')));
+                        if (!reason || !reason.trim()) return;
+                        yaptiriyoModeration(@json(route('web.moderation.report')), {
+                            reason: reason.trim().slice(0, 100),
+                            reported_user_id: userId,
+                            reportable_type: 'user',
+                            reportable_id: userId,
+                        });
+                    }
+                    function yaptiriyoBlock(userId) {
+                        yaptiriyoModeration(@json(route('web.moderation.block')), { user_id: userId },
+                            @json(__('Bu kullanıcıyı engellemek istediğinize emin misiniz? Engellenen kullanıcı sizinle mesajlaşamaz.')));
+                    }
+                </script>
+            @endif
+        @endauth
     </div>
 
 
@@ -112,7 +172,7 @@
     <div class="border border-gray-200 rounded-2xl p-6 bg-white">
         <div class="flex items-center gap-3 mb-4 pb-4 border-b border-gray-100">
             <i class="fa-regular fa-user text-base-300"></i>
-            <span class="font-medium text-base-300">{{ __('On Xilancer since') }}</span>
+            <span class="font-medium text-base-300">{{ __("Yaptiriyo'da") }}</span>
             @if($user->created_at)
                 <span class="font-medium text-base-300">{{ $user->created_at->format('M Y') }}</span>
             @else

@@ -1,2 +1,0 @@
-<script src="<?php echo e(asset('assets/common/js/jquery.dataTables.min.js')); ?>"></script>
-<?php /**PATH /Users/ahmetsahin/Desktop/xilancer/core/resources/views/components/data-table/data-table-js.blade.php ENDPATH**/ ?>

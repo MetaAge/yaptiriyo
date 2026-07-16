@@ -43,24 +43,29 @@
                                                                                 {{ $subscription->title }} </h5>
                                                                         </div>
                                                                     </div>
+                                                                    @php
+                                                                        // Yapısal feature_key satırları (mobil uygulama ile aynı):
+                                                                        // varsa onları göster; yoksa eski serbest-metin satırlarına düş.
+                                                                        $structuredRows = yaptiriyo_plan_feature_rows($subscription);
+                                                                    @endphp
                                                                     <ul class="single-pricing-list list-style-none">
-                                                                        @foreach ($subscription->features as $feature)
-                                                                            @if ($feature->status == 'on')
+                                                                        @if(count($structuredRows) > 0)
+                                                                            @foreach ($structuredRows as $row)
                                                                                 <li class="single-pricing-list-item">
-                                                                                    <span
-                                                                                        class="single-pricing-list-item-icon">
-                                                                                        <i class="fa-solid fa-check"></i>
+                                                                                    <span class="single-pricing-list-item-icon {{ $row['on'] ? '' : 'cross-icon' }}">
+                                                                                        <i class="fa-solid {{ $row['on'] ? 'fa-check' : 'fa-xmark' }}"></i>
+                                                                                    </span> {{ $row['text'] }}
+                                                                                </li>
+                                                                            @endforeach
+                                                                        @else
+                                                                            @foreach ($subscription->features->whereNull('feature_key') as $feature)
+                                                                                <li class="single-pricing-list-item">
+                                                                                    <span class="single-pricing-list-item-icon {{ $feature->status == 'on' ? '' : 'cross-icon' }}">
+                                                                                        <i class="fa-solid {{ $feature->status == 'on' ? 'fa-check' : 'fa-xmark' }}"></i>
                                                                                     </span> {{ $feature->feature }}
                                                                                 </li>
-                                                                            @else
-                                                                                <li class="single-pricing-list-item">
-                                                                                    <span
-                                                                                        class="single-pricing-list-item-icon cross-icon">
-                                                                                        <i class="fa-solid fa-xmark"></i>
-                                                                                    </span>{{ $feature->feature }}
-                                                                                </li>
-                                                                            @endif
-                                                                        @endforeach
+                                                                            @endforeach
+                                                                        @endif
                                                                     </ul>
                                                                     <h3 class="single-pricing-price">
                                                                         {{ float_amount_with_currency_symbol($subscription->price) }}

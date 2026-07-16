@@ -16,9 +16,9 @@ class PreventJobUrlAccess
      */
     public function handle(Request $request, Closure $next)
     {
-        if(get_static_option('job_enable_disable') != 'disable'){
-            return $next($request);
-        }
-        return abort('404');
+        // Yaptiriyo: the freelancer "job board" concept is retired. All job
+        // pages permanently redirect to the homepage (301 keeps any SEO value
+        // instead of dropping visitors on a 404).
+        return redirect()->route('homepage', [], 301);
     }
 }

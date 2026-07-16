@@ -114,6 +114,11 @@ class ChatController extends Controller
             }
         }
 
+        // Engel kontrolü: engellenen taraflar mesajlaşamaz (mobil API paritesi).
+        if (\App\Models\UserBlock::existsBetween(auth('web')->id(), $request->freelancer_id)) {
+            return back()->with(toastr_error(__('Bu kullanıcıyla mesajlaşamazsınız.')));
+        }
+
         if($order_details?->is_project_job != 'offer') {
 
             try {
